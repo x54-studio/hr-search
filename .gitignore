@@ -1,3 +1,6 @@
 .env
 .cursorignore
 .cursorrules
+.venv
+__pychache__/
+*.pyc
