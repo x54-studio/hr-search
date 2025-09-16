@@ -1,4 +1,3 @@
--- backend/scripts/init.sql
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS pgcrypto; -- for gen_random_uuid()
 CREATE EXTENSION IF NOT EXISTS vector;
@@ -85,13 +84,4 @@ CREATE TABLE IF NOT EXISTS webinar_embeddings (
 
 CREATE INDEX IF NOT EXISTS idx_embeddings_vector ON webinar_embeddings USING hnsw (vector vector_cosine_ops);
 
--- Optional seed for categories
--- INSERT INTO categories (name, slug) VALUES
---     ('Rekrutacja', 'rekrutacja'),
---     ('Onboarding', 'onboarding'),
---     ('Rozwój pracowników', 'rozwoj'),
---     ('Prawo pracy', 'prawo-pracy'),
---     ('Wynagrodzenia', 'wynagrodzenia'),
---     ('Well-being', 'wellbeing'),
---     ('Zarządzanie', 'zarzadzanie')
--- ON CONFLICT (slug) DO NOTHING;
+
