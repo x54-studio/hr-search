@@ -4,3 +4,4 @@
 .venv
 __pychache__/
 *.pyc
+.models_cache/
