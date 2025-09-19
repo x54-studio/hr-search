@@ -1,0 +1,902 @@
+[
+  {
+    "title": "Skuteczna rekrutacja w IT - praktyczny przewodnik 2024",
+    "description": "Kompleksowy przewodnik po rekrutacji specjalistów IT w 2024 roku. Webinar obejmuje pełny proces rekrutacyjny - od tworzenia atrakcyjnych job description i strategii sourcingu, przez przeprowadzanie skutecznych rozmów kwalifikacyjnych, po wdrożenie nowego pracownika. Uczestnicy poznają najnowsze trendy w rekrutacji IT, narzędzia do automatyzacji procesów, metody oceny kompetencji technicznych i miękkich, oraz sposoby budowania pozytywnego candidate experience. Prezentowane będą case studies z firm technologicznych, praktyczne wskazówki dotyczące employer branding w branży IT, oraz strategie pozyskiwania pasywnych kandydatów. Webinar skierowany do rekruterów, HR business partnerów i menedżerów rekrutujących do zespołów technicznych.",
+    "category_slug": "rekrutacja-selekcja",
+    "duration_ms": 2700000,
+    "recorded_date": "2024-01-15",
+    "speakers": ["Jan Kowalski", "Anna Nowak"],
+    "tags": ["rekrutacja", "IT", "rozmowa kwalifikacyjna", "sourcing", "candidate experience"]
+  },
+  {
+    "title": "Onboarding nowych pracowników - checklist i best practices",
+    "description": "Szczegółowy przewodnik po procesie onboarding nowych pracowników, który znacząco wpływa na retencję i zaangażowanie. Webinar obejmuje planowanie pierwszych dni pracy, przygotowanie niezbędnych dokumentów i systemów, projektowanie programów szkoleniowych dostosowanych do roli i poziomu doświadczenia, oraz strategie integracji z zespołem i kulturą organizacyjną. Uczestnicy dowiedzą się, jak stworzyć pozytywne pierwsze wrażenie, zbudować relacje z nowym pracownikiem, monitorować postępy adaptacji, oraz jak wykorzystać technologie do automatyzacji procesu onboarding. Prezentowane będą różne modele onboarding - od tradycyjnego po cyfrowy, oraz metody pomiaru skuteczności procesu. Webinar zawiera praktyczne szablony, checklisty i narzędzia do implementacji.",
+    "category_slug": "onboarding",
+    "duration_ms": 1800000,
+    "recorded_date": "2024-01-20",
+    "speakers": ["Magdalena Wiśniewska"],
+    "tags": ["onboarding", "dokumenty", "szkolenia", "integracja", "nowy pracownik"]
+  },
+  {
+    "title": "RODO w HR - co musisz wiedzieć w 2024",
+    "description": "Kompleksowe omówienie aktualnych wymagań RODO w kontekście procesów HR i zarządzania danymi pracowników. Webinar obejmuje szczegółową analizę podstaw prawnych przetwarzania danych osobowych w HR, wymagania dotyczące pozyskiwania i dokumentowania zgód, prawa pracowników do informacji, dostępu, sprostowania i usunięcia danych, oraz obowiązki administratora danych. Uczestnicy poznają praktyczne aspekty wdrażania RODO w rekrutacji, zarządzaniu kadrami, systemach HRIS, oraz w procesach monitoringu i kontroli pracowników. Prezentowane będą case studies z audytów RODO w firmach, wzory dokumentów i procedur, oraz najczęstsze błędy i jak ich unikać. Webinar skierowany do specjalistów HR, prawników pracy i osób odpowiedzialnych za compliance.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-01-25",
+    "speakers": ["Piotr Zieliński"],
+    "tags": ["RODO", "prawo pracy", "dane osobowe", "compliance", "zgody"]
+  },
+  {
+    "title": "Well-being w miejscu pracy - jak przeciwdziałać wypaleniu",
+    "description": "Praktyczny przewodnik po budowaniu kultury well-being w organizacji i przeciwdziałaniu wypaleniu zawodowemu. Webinar obejmuje identyfikację wczesnych sygnałów wypalenia, projektowanie programów prewencyjnych i interwencyjnych, oraz strategie wspierania work-life balance w różnych modelach pracy. Uczestnicy poznają narzędzia do monitorowania dobrostanu pracowników, metody budowania odporności psychicznej, techniki zarządzania stresem, oraz sposoby tworzenia wspierającego środowiska pracy. Prezentowane będą programy wellness, inicjatywy prozdrowotne, oraz metody integracji well-being z kulturą organizacyjną. Webinar zawiera case studies z firm, które skutecznie wdrożyły programy well-being, oraz praktyczne narzędzia do pomiaru i oceny skuteczności działań.",
+    "category_slug": "wellbeing-bhp",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-02-01",
+    "speakers": ["Katarzyna Dąbrowska"],
+    "tags": ["well-being", "wypalenie zawodowe", "stres", "work-life balance", "zdrowie psychiczne"]
+  },
+  {
+    "title": "Struktury wynagrodzeń 2024 - trendy i praktyki",
+    "description": "Kompleksowa analiza aktualnych trendów w wynagrodzeniach i projektowaniu atrakcyjnych pakietów wynagrodzeniowych. Webinar obejmuje metodologie projektowania struktur płacowych, ustalania widełek wynagrodzeń, oraz tworzenia programów benefitów dostosowanych do potrzeb różnych grup pracowników. Uczestnicy poznają techniki benchmarkingu wynagrodzeń, analizy rynku pracy, oraz strategie budowania total rewards packages. Prezentowane będą trendy w wynagrodzeniach w różnych branżach, wpływ inflacji na polityki płacowe, oraz nowoczesne podejścia do equity programs i long-term incentives. Webinar zawiera praktyczne narzędzia do analizy wynagrodzeń, szablony do projektowania struktur płacowych, oraz case studies z firm implementujących nowoczesne systemy wynagrodzeń.",
+    "category_slug": "wynagrodzenia-benefity",
+    "duration_ms": 1950000,
+    "recorded_date": "2024-02-05",
+    "speakers": ["Michał Wójcik"],
+    "tags": ["wynagrodzenia", "benefity", "widełki płacowe", "benchmarking", "struktury płacowe"]
+  },
+  {
+    "title": "Diversity & Inclusion - budowanie inkluzywnej kultury",
+    "description": "Szczegółowy przewodnik po budowaniu kultury Diversity & Inclusion w organizacji i tworzeniu inkluzywnego środowiska pracy. Webinar obejmuje projektowanie i implementację programów D&I, strategie rekrutacji inkluzywnej, przeciwdziałanie unconscious bias, oraz budowanie kultury szacunku i równości. Uczestnicy poznają metody identyfikacji i eliminacji barier w dostępie do pracy, techniki tworzenia inkluzywnych procesów rekrutacyjnych, oraz strategie wspierania różnorodności w zespołach. Prezentowane będą programy mentoringu i sponsoringu, inicjatywy wspierające różne grupy pracowników, oraz metody pomiaru postępów w zakresie D&I. Webinar zawiera praktyczne narzędzia do audytu D&I, szablony polityk równości, oraz case studies z firm, które skutecznie wdrożyły programy różnorodności.",
+    "category_slug": "diversity-inclusion",
+    "duration_ms": 2250000,
+    "recorded_date": "2024-02-10",
+    "speakers": ["Agnieszka Kamińska"],
+    "tags": ["diversity & inclusion", "równość", "antydyskryminacja", "kultura organizacyjna", "rekrutacja inkluzywna"]
+  },
+  {
+    "title": "HR Analytics - jak mierzyć efektywność procesów HR",
+    "description": "Kompleksowe wprowadzenie do HR Analytics i wykorzystania danych w zarządzaniu zasobami ludzkimi. Webinar obejmuje identyfikację kluczowych metryk HR, projektowanie dashboardów i systemów raportowania, oraz analizę danych w celu optymalizacji procesów rekrutacji, retencji i rozwoju pracowników. Uczestnicy poznają narzędzia do zbierania i analizy danych HR, techniki wizualizacji danych, oraz metody budowania data-driven culture w HR. Prezentowane będą case studies wykorzystania people analytics w różnych obszarach HR, techniki predictive analytics w rekrutacji i retencji, oraz strategie komunikowania insights z danych do zarządu. Webinar zawiera praktyczne narzędzia do analizy danych, szablony dashboardów, oraz wskazówki dotyczące etyki w HR analytics.",
+    "category_slug": "hr-analytics",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-02-15",
+    "speakers": ["Tomasz Lewandowski"],
+    "tags": ["HR analytics", "KPI", "dashboardy", "metryki", "raportowanie"]
+  },
+  {
+    "title": "Exit interview - jak przeprowadzić efektywną rozmowę wyjściową",
+    "description": "Szczegółowy przewodnik po przeprowadzaniu efektywnych exit interview i wykorzystaniu informacji zwrotnej do poprawy procesów HR. Webinar obejmuje projektowanie pytań exit interview, techniki prowadzenia rozmów wyjściowych, oraz strategie wykorzystania feedbacku do identyfikacji problemów i możliwości poprawy. Uczestnicy poznają różne modele exit interview, techniki budowania zaufania z odchodzącymi pracownikami, oraz metody analizy i raportowania wyników. Prezentowane będą case studies wykorzystania exit interview do poprawy retencji, identyfikacji problemów w kulturze organizacyjnej, oraz budowania alumni networks. Webinar zawiera szablony pytań, narzędzia do analizy feedbacku, oraz wskazówki dotyczące follow-up actions po exit interview.",
+    "category_slug": "offboarding",
+    "duration_ms": 1650000,
+    "recorded_date": "2024-02-20",
+    "speakers": ["Jan Kowalski"],
+    "tags": ["exit interview", "offboarding", "feedback", "rozmowa wyjściowa", "retencja"]
+  },
+  {
+    "title": "Szkolenia i rozwój pracowników - strategie L&D",
+    "description": "Kompleksowy przewodnik po projektowaniu i implementacji skutecznych programów Learning & Development w organizacji. Webinar obejmuje identyfikację potrzeb szkoleniowych na poziomie indywidualnym i organizacyjnym, projektowanie ścieżek rozwoju kompetencji, wybór odpowiednich metod nauki, oraz mierzenie ROI programów rozwojowych. Uczestnicy poznają różne modele L&D - od tradycyjnych szkoleń po microlearning i peer-to-peer learning, techniki personalizacji programów rozwojowych, oraz strategie budowania learning culture w organizacji. Prezentowane będą case studies skutecznych programów L&D z różnych branż, techniki wykorzystania technologii w nauce, oraz metody angażowania menedżerów w rozwój zespołów. Webinar zawiera narzędzia do analizy potrzeb szkoleniowych, szablony programów rozwojowych, oraz wskazówki dotyczące mierzenia skuteczności L&D.",
+    "category_slug": "szkolenia-rozwoj",
+    "duration_ms": 2550000,
+    "recorded_date": "2024-02-25",
+    "speakers": ["Magdalena Wiśniewska", "Tomasz Lewandowski"],
+    "tags": ["szkolenia", "rozwój", "kompetencje", "L&D", "reskilling", "upskilling"]
+  },
+  {
+    "title": "Feedback i ocena pracownicza - nowoczesne podejścia",
+    "description": "Szczegółowa analiza ewolucji systemów ocen pracowniczych i budowania kultury continuous feedback w nowoczesnych organizacjach. Webinar obejmuje porównanie tradycyjnych systemów ocen z nowoczesnymi podejściami, implementację continuous feedback, systemów 360 stopni, oraz metodologii OKR w zarządzaniu wydajnością. Uczestnicy poznają techniki budowania kultury feedbacku, szkolenia menedżerów w udzielaniu konstruktywnego feedbacku, oraz strategie angażowania pracowników w proces ocen. Prezentowane będą case studies transformacji systemów ocen w różnych organizacjach, techniki wykorzystania technologii w zarządzaniu wydajnością, oraz metody integracji feedbacku z procesami rozwojowymi. Webinar zawiera narzędzia do projektowania systemów ocen, szablony rozmów feedback, oraz wskazówki dotyczące komunikowania zmian w systemach ocen.",
+    "category_slug": "ocena-wynikow-feedback",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-03-01",
+    "speakers": ["Agnieszka Kamińska", "Katarzyna Dąbrowska"],
+    "tags": ["feedback", "ocena pracownicza", "OKR", "360 stopni", "continuous feedback"]
+  },
+  {
+    "title": "Employer branding w social media - budowanie wizerunku pracodawcy",
+    "description": "Kompleksowy przewodnik po budowaniu silnego employer brand w social mediach i wykorzystaniu platform społecznościowych do pozyskiwania talentów. Webinar obejmuje strategie content marketingu HR, tworzenie angażujących treści o kulturze firmy, wykorzystanie LinkedIn, Instagram i TikTok w rekrutacji, oraz budowanie społeczności wokół marki pracodawcy. Uczestnicy poznają techniki storytelling w HR, współpracę z influencerami branżowymi, oraz metody mierzenia skuteczności employer branding w social mediach. Prezentowane będą case studies udanych kampanii employer branding, narzędzia do zarządzania treściami HR, oraz strategie budowania employer advocacy wśród pracowników.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-03-05",
+    "speakers": ["Robert Nowak", "Magdalena Zielińska"],
+    "tags": ["employer branding", "social media", "content marketing", "LinkedIn", "storytelling"]
+  },
+  {
+    "title": "Rekrutacja międzynarodowa - pozyskiwanie talentów z zagranicy",
+    "description": "Praktyczny przewodnik po rekrutacji międzynarodowej i budowaniu globalnych zespołów. Webinar obejmuje strategie sourcingu talentów z różnych krajów, procesy wizowe i relokacji pracowników, zarządzanie zespołami rozproszonymi geograficznie, oraz budowanie kultury międzynarodowej w organizacji. Uczestnicy poznają specyfikę rekrutacji w różnych regionach, techniki cross-cultural communication, oraz metody integracji pracowników z różnych kultur. Prezentowane będą case studies udanych rekrutacji międzynarodowych, narzędzia do zarządzania globalnymi talentami, oraz strategie budowania employer brand na rynkach zagranicznych.",
+    "category_slug": "rekrutacja-selekcja",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-03-08",
+    "speakers": ["Ewa Kowalczyk", "Jan Kowalski"],
+    "tags": ["rekrutacja międzynarodowa", "globalne zespoły", "cross-cultural", "relokacja", "sourcing"]
+  },
+  {
+    "title": "Talent acquisition w fintech - specyfika branży finansowej",
+    "description": "Szczegółowy przewodnik po rekrutacji w branży fintech i highly regulated industries. Webinar obejmuje specyfikę pozyskiwania talentów w sektorze finansowym, wymagania compliance w procesach rekrutacyjnych, rekrutację specjalistów od risk management i product management, oraz budowanie employer brand w branży finansowej. Uczestnicy poznają trendy w fintech recruitment, metody oceny kompetencji w highly regulated industries, oraz strategie pozyskiwania pasywnych kandydatów z sektora finansowego. Prezentowane będą case studies rekrutacji w bankach i fintechach, narzędzia do compliance w rekrutacji, oraz metody budowania zaufania w procesach rekrutacyjnych.",
+    "category_slug": "rekrutacja-selekcja",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-03-12",
+    "speakers": ["Monika Zielińska", "Piotr Zieliński"],
+    "tags": ["fintech", "compliance", "risk management", "highly regulated", "banking"]
+  },
+  {
+    "title": "Performance management i OKR - nowoczesne zarządzanie wydajnością",
+    "description": "Kompleksowy przewodnik po implementacji systemów OKR i continuous performance management w organizacji. Webinar obejmuje projektowanie systemów OKR, techniki 360-degree feedback, budowanie kultury continuous feedback, oraz integrację performance management z procesami rozwojowymi. Uczestnicy poznają metodologie zarządzania celami, techniki coachingu menedżerów, oraz narzędzia do monitorowania postępów. Prezentowane będą case studies transformacji performance management, platformy do zarządzania OKR, oraz metody angażowania pracowników w procesy ocen.",
+    "category_slug": "ocena-wynikow-feedback",
+    "duration_ms": 2500000,
+    "recorded_date": "2024-03-15",
+    "speakers": ["Paweł Wiśniewski", "Piotr Dąbrowski"],
+    "tags": ["OKR", "performance management", "360 stopni", "continuous feedback", "cele"]
+  },
+  {
+    "title": "Learning & Development - projektowanie programów rozwojowych",
+    "description": "Szczegółowy przewodnik po projektowaniu skutecznych programów L&D i budowaniu learning culture w organizacji. Webinar obejmuje identyfikację potrzeb szkoleniowych, projektowanie ścieżek rozwoju kompetencji, wybór metod nauki, oraz mierzenie ROI programów rozwojowych. Uczestnicy poznają różne modele L&D, techniki personalizacji programów, oraz strategie angażowania menedżerów w rozwój zespołów. Prezentowane będą case studies programów L&D, platformy e-learningowe, oraz metody budowania learning culture.",
+    "category_slug": "szkolenia-rozwoj",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-03-18",
+    "speakers": ["Joanna Dąbrowska", "Beata Dąbrowska"],
+    "tags": ["L&D", "szkolenia", "kompetencje", "e-learning", "rozwój"]
+  },
+  {
+    "title": "HR transformation - cyfrowa transformacja działów HR",
+    "description": "Kompleksowy przewodnik po transformacji działów HR i wdrażaniu nowoczesnych technologii HR. Webinar obejmuje strategie digitalizacji HR, implementację systemów HRIS, automatyzację procesów HR, oraz budowanie data-driven culture w HR. Uczestnicy poznają trendy w HR tech, metodologie change management w HR, oraz techniki angażowania pracowników w transformację. Prezentowane będą case studies transformacji HR, narzędzia do automatyzacji, oraz strategie budowania kompetencji cyfrowych w zespołach HR.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2600000,
+    "recorded_date": "2024-03-22",
+    "speakers": ["Marcin Kamiński", "Tomasz Lewandowski", "Tomasz Kowalczyk"],
+    "tags": ["HR transformation", "digitalizacja", "HRIS", "automatyzacja", "change management"]
+  },
+  {
+    "title": "Employee relations - zarządzanie konfliktami w zespole",
+    "description": "Praktyczny przewodnik po zarządzaniu relacjami z pracownikami i rozwiązywaniu konfliktów w miejscu pracy. Webinar obejmuje techniki mediacji, budowanie pozytywnych relacji między pracownikami a zarządem, oraz strategie zapobiegania konfliktom. Uczestnicy poznają metody komunikacji w sytuacjach kryzysowych, techniki negocjacji, oraz narzędzia do monitorowania klimatu w organizacji. Prezentowane będą case studies rozwiązywania konfliktów, programy wsparcia pracowników, oraz strategie budowania kultury szacunku.",
+    "category_slug": "employee-relations",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-03-25",
+    "speakers": ["Agnieszka Lewandowska", "Natalia Wiśniewska"],
+    "tags": ["employee relations", "konflikty", "mediacja", "komunikacja", "klimat"]
+  },
+  {
+    "title": "AI w rekrutacji - przyszłość talent acquisition",
+    "description": "Szczegółowa analiza wykorzystania sztucznej inteligencji w procesach rekrutacyjnych i automatyzacji HR. Webinar obejmuje implementację chatbotów rekrutacyjnych, systemów ATS z AI, narzędzi do automatycznej oceny CV, oraz etyczne aspekty AI w HR. Uczestnicy poznają techniki machine learning w rekrutacji, predictive analytics, oraz metody automatyzacji procesów rekrutacyjnych. Prezentowane będą case studies implementacji AI w HR, narzędzia do AI recruitment, oraz strategie przygotowania organizacji do przyszłości AI.",
+    "category_slug": "rekrutacja-selekcja",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-03-28",
+    "speakers": ["Tomasz Kowalczyk", "Michał Dąbrowski"],
+    "tags": ["AI", "automatyzacja", "machine learning", "chatboty", "ATS"]
+  },
+  {
+    "title": "Work-life balance - elastyczne modele pracy",
+    "description": "Kompleksowy przewodnik po projektowaniu elastycznych modeli pracy i wspieraniu work-life balance w organizacji. Webinar obejmuje implementację programów pracy zdalnej, job sharing, flexible hours, oraz zarządzanie zespołami rozproszonymi. Uczestnicy poznają techniki remote team management, virtual collaboration, oraz metody budowania kultury zaufania w rozproszonych zespołach. Prezentowane będą case studies elastycznych modeli pracy, narzędzia do zarządzania czasem, oraz strategie work-life integration.",
+    "category_slug": "wellbeing-bhp",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-04-01",
+    "speakers": ["Katarzyna Nowak", "Katarzyna Dąbrowska"],
+    "tags": ["work-life balance", "praca zdalna", "elastyczność", "remote work", "well-being"]
+  },
+  {
+    "title": "Compensation & benefits w IT - konkurencyjne pakiety wynagrodzeniowe",
+    "description": "Szczegółowy przewodnik po projektowaniu atrakcyjnych pakietów wynagrodzeniowych dla firm technologicznych. Webinar obejmuje programy equity, stock options, niestandardowe benefity, oraz strategie total rewards w branży IT. Uczestnicy poznają techniki benchmarkingu wynagrodzeń w IT, projektowania employee value proposition, oraz budowania konkurencyjnych pakietów. Prezentowane będą case studies programów wynagrodzeń w startupach i korporacjach, narzędzia do analizy wynagrodzeń, oraz trendy w IT compensation.",
+    "category_slug": "wynagrodzenia-benefity",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-04-05",
+    "speakers": ["Piotr Wiśniewski", "Michał Wójcik"],
+    "tags": ["compensation", "benefity", "equity", "stock options", "IT"]
+  },
+  {
+    "title": "Pay equity - sprawiedliwość wynagrodzeń i transparentność",
+    "description": "Kompleksowy przewodnik po analizie sprawiedliwości wynagrodzeń i budowaniu transparentnych systemów płacowych. Webinar obejmuje audyty wynagrodzeń, analizy gender pay gap, job evaluation, oraz strategie budowania transparentnych systemów wynagrodzeń. Uczestnicy poznają techniki analizy równości płac, narzędzia do job evaluation, oraz metody komunikowania wynagrodzeń. Prezentowane będą case studies audytów wynagrodzeń, raporty o równości płac, oraz strategie przeciwdziałania dyskryminacji płacowej.",
+    "category_slug": "wynagrodzenia-benefity",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-04-08",
+    "speakers": ["Marcin Kowalczyk", "Agnieszka Nowak"],
+    "tags": ["pay equity", "transparentność", "gender pay gap", "job evaluation", "równość"]
+  },
+  {
+    "title": "Antydyskryminacja - budowanie równości w miejscu pracy",
+    "description": "Praktyczny przewodnik po przeciwdziałaniu dyskryminacji i budowaniu inkluzywnych środowisk pracy. Webinar obejmuje polityki równości, programy przeciwdziałania dyskryminacji, unconscious bias training, oraz budowanie kultury szacunku. Uczestnicy poznają techniki identyfikacji i eliminacji barier, metody inclusive hiring, oraz strategie wspierania różnorodności. Prezentowane będą case studies programów antydyskryminacyjnych, narzędzia do monitorowania równości, oraz metody budowania kultury inkluzji.",
+    "category_slug": "diversity-inclusion",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-04-12",
+    "speakers": ["Agnieszka Nowak", "Agnieszka Kamińska"],
+    "tags": ["antydyskryminacja", "równość", "unconscious bias", "inclusive hiring", "kultura"]
+  },
+  {
+    "title": "Ergonomia - projektowanie zdrowych stanowisk pracy",
+    "description": "Szczegółowy przewodnik po projektowaniu ergonomicznych stanowisk pracy i wspieraniu zdrowia pracowników. Webinar obejmuje audyty ergonomiczne, projektowanie stanowisk pracy, szkolenia z prawidłowej postawy, oraz programy workplace wellness. Uczestnicy poznają techniki oceny ryzyka ergonomicznego, narzędzia do projektowania stanowisk, oraz metody wspierania zdrowia pracowników. Prezentowane będą case studies programów ergonomicznych, wytyczne dla różnych branż, oraz narzędzia do oceny stanowisk pracy.",
+    "category_slug": "wellbeing-bhp",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-04-15",
+    "speakers": ["Tomasz Wiśniewski", "Łukasz Nowak"],
+    "tags": ["ergonomia", "zdrowie", "stanowiska pracy", "wellness", "BHP"]
+  },
+  {
+    "title": "Wartości organizacyjne - budowanie tożsamości firmy",
+    "description": "Kompleksowy przewodnik po projektowaniu systemów wartości i budowaniu kultury organizacyjnej opartej na wartościach. Webinar obejmuje identyfikację wartości organizacyjnych, projektowanie programów kulturowych, values alignment, oraz budowanie employer brand opartego na wartościach. Uczestnicy poznają techniki living values, projektowania doświadczeń pracowniczych, oraz metody pomiaru kultury organizacyjnej. Prezentowane będą case studies programów wartości, narzędzia do culture change, oraz strategie budowania tożsamości organizacyjnej.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-04-18",
+    "speakers": ["Katarzyna Kowalczyk", "Marcin Kamiński"],
+    "tags": ["wartości", "kultura organizacyjna", "tożsamość", "culture change", "employer brand"]
+  },
+  {
+    "title": "HR KPI i OKR - mierzenie efektywności HR",
+    "description": "Szczegółowy przewodnik po projektowaniu systemów pomiaru efektywności HR i budowaniu data-driven culture. Webinar obejmuje identyfikację kluczowych metryk HR, projektowanie dashboardów, systemy raportowania, oraz interpretację danych HR. Uczestnicy poznają techniki workforce analytics, narzędzia do wizualizacji danych, oraz metody komunikowania insights z danych. Prezentowane będą case studies HR analytics, frameworki pomiaru, oraz strategie budowania kompetencji analitycznych w HR.",
+    "category_slug": "ocena-wynikow-feedback",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-04-22",
+    "speakers": ["Piotr Dąbrowski", "Michał Dąbrowski"],
+    "tags": ["KPI", "OKR", "HR analytics", "dashboardy", "metryki"]
+  },
+  {
+    "title": "Offboarding - zarządzanie odejściami pracowników",
+    "description": "Praktyczny przewodnik po projektowaniu procesów offboarding i budowaniu pozytywnych relacji z byłymi pracownikami. Webinar obejmuje strategie knowledge transfer, exit interviews, alumni networks, oraz retention strategies. Uczestnicy poznają techniki graceful exits, budowania alumni programs, oraz wykorzystania feedbacku z exit interview. Prezentowane będą case studies programów offboarding, narzędzia do zarządzania odejściami, oraz strategie budowania employer brand wśród byłych pracowników.",
+    "category_slug": "offboarding",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-04-25",
+    "speakers": ["Aleksandra Kowalczyk", "Jan Kowalski"],
+    "tags": ["offboarding", "exit interview", "alumni", "knowledge transfer", "retencja"]
+  },
+  {
+    "title": "BHP i bezpieczeństwo - zarządzanie ryzykiem zawodowym",
+    "description": "Kompleksowy przewodnik po zarządzaniu bezpieczeństwem w miejscu pracy i budowaniu kultury bezpieczeństwa. Webinar obejmuje ocenę ryzyka zawodowego, szkolenia BHP, compliance z przepisami, oraz zapobieganie wypadkom przy pracy. Uczestnicy poznają techniki audytu bezpieczeństwa, narzędzia do zarządzania ryzykiem, oraz metody budowania kultury bezpieczeństwa. Prezentowane będą case studies programów BHP, systemy zarządzania bezpieczeństwem, oraz strategie angażowania pracowników w bezpieczeństwo.",
+    "category_slug": "wellbeing-bhp",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-04-28",
+    "speakers": ["Łukasz Nowak", "Tomasz Wiśniewski"],
+    "tags": ["BHP", "bezpieczeństwo", "ryzyko zawodowe", "compliance", "kultura bezpieczeństwa"]
+  },
+  {
+    "title": "Komunikacja wewnętrzna - budowanie zaangażowania",
+    "description": "Szczegółowy przewodnik po projektowaniu strategii komunikacji wewnętrznej i budowaniu employee engagement. Webinar obejmuje internal branding, employer advocacy, storytelling w HR, oraz komunikację w sytuacjach kryzysowych. Uczestnicy poznają techniki budowania kultury feedbacku, narzędzia do komunikacji wewnętrznej, oraz metody angażowania pracowników. Prezentowane będą case studies programów komunikacji, platformy do engagement, oraz strategie budowania employer brand wewnętrznie.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-05-02",
+    "speakers": ["Natalia Wiśniewska", "Robert Nowak"],
+    "tags": ["komunikacja wewnętrzna", "engagement", "storytelling", "internal branding", "feedback"]
+  },
+  {
+    "title": "Sukcesja i leadership development - rozwój liderów",
+    "description": "Kompleksowy przewodnik po planach sukcesji i rozwoju liderów w organizacji. Webinar obejmuje identyfikację potencjału liderów, succession planning, high potential programs, oraz budowanie pipeline'u talentów. Uczestnicy poznają techniki assessmentu potencjału, programy mentoringu, oraz metody rozwoju kompetencji przywódczych. Prezentowane będą case studies programów sukcesji, narzędzia do oceny potencjału, oraz strategie budowania bench strength.",
+    "category_slug": "talent-sukcesja",
+    "duration_ms": 2500000,
+    "recorded_date": "2024-05-05",
+    "speakers": ["Grzegorz Zieliński", "Paweł Wiśniewski"],
+    "tags": ["sukcesja", "leadership", "high potential", "mentoring", "assessment"]
+  },
+  {
+    "title": "Reskilling i upskilling - transformacja kompetencji",
+    "description": "Szczegółowy przewodnik po projektowaniu programów reskilling i upskilling w organizacji. Webinar obejmuje identyfikację luk kompetencyjnych, projektowanie ścieżek rozwoju, wybór metod nauki, oraz mierzenie skuteczności programów. Uczestnicy poznają techniki skills mapping, competency frameworks, oraz strategie angażowania pracowników w rozwój. Prezentowane będą case studies transformacji kompetencji, platformy do zarządzania umiejętnościami, oraz metody budowania learning culture.",
+    "category_slug": "szkolenia-rozwoj",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-05-08",
+    "speakers": ["Beata Dąbrowska", "Joanna Dąbrowska"],
+    "tags": ["reskilling", "upskilling", "kompetencje", "transformacja", "rozwój"]
+  },
+  {
+    "title": "Candidate experience - budowanie pozytywnego doświadczenia",
+    "description": "Kompleksowy przewodnik po projektowaniu pozytywnego candidate experience w procesach rekrutacyjnych. Webinar obejmuje mapowanie journey kandydata, optymalizację procesów rekrutacyjnych, komunikację z kandydatami, oraz budowanie employer brand. Uczestnicy poznają techniki personalizacji procesów, narzędzia do automatyzacji komunikacji, oraz metody mierzenia satisfaction kandydatów. Prezentowane będą case studies udanych programów candidate experience, narzędzia do feedbacku, oraz strategie budowania długoterminowych relacji z talentami.",
+    "category_slug": "rekrutacja-selekcja",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-05-12",
+    "speakers": ["Anna Nowak", "Jan Kowalski"],
+    "tags": ["candidate experience", "rekrutacja", "employer brand", "feedback", "journey"]
+  },
+  {
+    "title": "Prawo pracy - aktualne regulacje i compliance",
+    "description": "Szczegółowy przewodnik po aktualnych regulacjach prawa pracy i wymaganiach compliance w HR. Webinar obejmuje analizę zmian w Kodeksie Pracy, regulacje dotyczące pracy zdalnej, umowy o pracę, oraz obowiązki pracodawcy. Uczestnicy poznają techniki zarządzania ryzykiem prawnym, procedury compliance, oraz metody aktualizacji polityk HR. Prezentowane będą case studies sporów pracowniczych, wzory dokumentów, oraz strategie budowania kultury compliance.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-05-15",
+    "speakers": ["Piotr Zieliński", "Agnieszka Lewandowska"],
+    "tags": ["prawo pracy", "compliance", "umowy", "regulacje", "ryzyko"]
+  },
+  {
+    "title": "Mental health w miejscu pracy - wsparcie psychologiczne",
+    "description": "Praktyczny przewodnik po wspieraniu zdrowia psychicznego pracowników i budowaniu kultury well-being. Webinar obejmuje identyfikację problemów psychicznych, programy wsparcia, szkolenia z zakresu mental health, oraz strategie prewencyjne. Uczestnicy poznają techniki rozmów o zdrowiu psychicznym, narzędzia do monitorowania well-being, oraz metody budowania wspierającego środowiska. Prezentowane będą case studies programów mental health, platformy wsparcia, oraz strategie destygmatyzacji problemów psychicznych.",
+    "category_slug": "wellbeing-bhp",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-05-18",
+    "speakers": ["Katarzyna Dąbrowska", "Tomasz Wiśniewski"],
+    "tags": ["mental health", "well-being", "wsparcie psychologiczne", "stres", "zdrowie"]
+  },
+  {
+    "title": "Remote team management - zarządzanie zespołami zdalnymi",
+    "description": "Kompleksowy przewodnik po zarządzaniu zespołami rozproszonymi i budowaniu kultury pracy zdalnej. Webinar obejmuje techniki virtual leadership, narzędzia do współpracy, budowanie zaufania na odległość, oraz strategie engagement. Uczestnicy poznają metodologie zarządzania zdalnego, platformy do komunikacji, oraz techniki budowania relacji wirtualnych. Prezentowane będą case studies udanych zespołów zdalnych, narzędzia do productivity, oraz strategie work-life balance w pracy zdalnej.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-05-22",
+    "speakers": ["Katarzyna Nowak", "Ewa Kowalczyk"],
+    "tags": ["remote work", "zespoły zdalne", "virtual leadership", "współpraca", "engagement"]
+  },
+  {
+    "title": "Employer advocacy - budowanie ambasadorów marki",
+    "description": "Szczegółowy przewodnik po budowaniu employer advocacy i angażowaniu pracowników w promocję marki pracodawcy. Webinar obejmuje strategie budowania ambasadorskich programów, szkolenia pracowników, content marketing wewnętrzny, oraz mierzenie skuteczności advocacy. Uczestnicy poznają techniki angażowania pracowników, narzędzia do content creation, oraz metody budowania kultury dzielenia się. Prezentowane będą case studies programów advocacy, platformy do employee-generated content, oraz strategie budowania społeczności wokół marki.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-05-25",
+    "speakers": ["Robert Nowak", "Natalia Wiśniewska"],
+    "tags": ["employer advocacy", "ambasadorzy", "content marketing", "social media", "engagement"]
+  },
+  {
+    "title": "Talent pipeline - budowanie rezerw talentów",
+    "description": "Praktyczny przewodnik po budowaniu i zarządzaniu pipeline'em talentów w organizacji. Webinar obejmuje strategie identyfikacji potencjału, programy development, succession planning, oraz retention strategies. Uczestnicy poznają techniki assessmentu potencjału, narzędzia do talent mapping, oraz metody budowania bench strength. Prezentowane będą case studies programów talent pipeline, platformy do zarządzania talentami, oraz strategie angażowania high potentials.",
+    "category_slug": "talent-sukcesja",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-05-28",
+    "speakers": ["Grzegorz Zieliński", "Marcin Kamiński"],
+    "tags": ["talent pipeline", "high potential", "sukcesja", "rozwój", "retencja"]
+  },
+  {
+    "title": "HR automation - automatyzacja procesów HR",
+    "description": "Kompleksowy przewodnik po automatyzacji procesów HR i wdrażaniu nowoczesnych technologii. Webinar obejmuje identyfikację procesów do automatyzacji, wybór narzędzi, implementację rozwiązań, oraz mierzenie ROI. Uczestnicy poznają techniki process mapping, narzędzia do automatyzacji, oraz strategie change management. Prezentowane będą case studies automatyzacji HR, platformy RPA, oraz metody budowania kompetencji cyfrowych w zespołach HR.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2500000,
+    "recorded_date": "2024-06-01",
+    "speakers": ["Tomasz Kowalczyk", "Tomasz Lewandowski", "Marcin Kamiński"],
+    "tags": ["automatyzacja", "HR tech", "RPA", "procesy", "digitalizacja"]
+  },
+  {
+    "title": "Inclusive hiring - rekrutacja inkluzywna",
+    "description": "Szczegółowy przewodnik po projektowaniu inkluzywnych procesów rekrutacyjnych i przeciwdziałaniu bias. Webinar obejmuje techniki eliminacji unconscious bias, projektowanie inkluzywnych job description, oraz strategie sourcingu różnorodnych talentów. Uczestnicy poznają metodologie inclusive hiring, narzędzia do oceny bias, oraz techniki budowania inkluzywnych zespołów. Prezentowane będą case studies programów inclusive hiring, narzędzia do diversity sourcing, oraz strategie budowania kultury inkluzji.",
+    "category_slug": "diversity-inclusion",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-06-05",
+    "speakers": ["Agnieszka Kamińska", "Agnieszka Nowak"],
+    "tags": ["inclusive hiring", "diversity", "bias", "rekrutacja", "inkluzja"]
+  },
+  {
+    "title": "Employee retention - strategie zatrzymywania talentów",
+    "description": "Praktyczny przewodnik po budowaniu strategii retention i zmniejszaniu turnover w organizacji. Webinar obejmuje analizę przyczyn odejść, programy retention, strategie engagement, oraz budowanie kultury retencji. Uczestnicy poznają techniki exit interview, narzędzia do retention analytics, oraz metody budowania lojalności. Prezentowane będą case studies programów retention, platformy do employee engagement, oraz strategie budowania długoterminowych relacji z pracownikami.",
+    "category_slug": "employee-relations",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-06-08",
+    "speakers": ["Aleksandra Kowalczyk", "Natalia Wiśniewska"],
+    "tags": ["retention", "turnover", "engagement", "lojalność", "exit interview"]
+  },
+  {
+    "title": "Workplace wellness - programy zdrowotne",
+    "description": "Kompleksowy przewodnik po projektowaniu programów workplace wellness i wspieraniu zdrowia pracowników. Webinar obejmuje identyfikację potrzeb zdrowotnych, projektowanie programów wellness, współpracę z dostawcami usług medycznych, oraz mierzenie skuteczności programów. Uczestnicy poznają techniki budowania kultury zdrowia, narzędzia do wellness, oraz strategie angażowania pracowników. Prezentowane będą case studies programów wellness, platformy do zarządzania zdrowiem, oraz metody budowania healthy workplace.",
+    "category_slug": "wellbeing-bhp",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-06-12",
+    "speakers": ["Tomasz Wiśniewski", "Katarzyna Dąbrowska"],
+    "tags": ["wellness", "zdrowie", "programy zdrowotne", "workplace", "well-being"]
+  },
+  {
+    "title": "HR business partnering - strategiczne partnerstwo",
+    "description": "Szczegółowy przewodnik po roli HR business partnera i budowaniu strategicznego partnerstwa z biznesem. Webinar obejmuje techniki business partnering, analizę potrzeb biznesowych, projektowanie rozwiązań HR, oraz komunikację z zarządem. Uczestnicy poznają metodologie strategicznego HR, narzędzia do business analysis, oraz techniki budowania relacji z menedżerami. Prezentowane będą case studies strategicznych projektów HR, narzędzia do business partnering, oraz strategie demonstrowania wartości HR.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-06-15",
+    "speakers": ["Marcin Kamiński", "Piotr Dąbrowski"],
+    "tags": ["HR business partner", "strategia", "biznes", "partnerstwo", "wartość"]
+  },
+  {
+    "title": "Skills-based organization - organizacja oparta na kompetencjach",
+    "description": "Kompleksowy przewodnik po transformacji organizacji w kierunku modelu opartego na kompetencjach. Webinar obejmuje projektowanie competency frameworks, skills mapping, programy reskilling, oraz budowanie kultury uczenia się. Uczestnicy poznają techniki identyfikacji kompetencji, narzędzia do skills assessment, oraz strategie budowania learning organization. Prezentowane będą case studies transformacji kompetencyjnych, platformy do zarządzania umiejętnościami, oraz metody budowania agile workforce.",
+    "category_slug": "szkolenia-rozwoj",
+    "duration_ms": 2500000,
+    "recorded_date": "2024-06-18",
+    "speakers": ["Beata Dąbrowska", "Joanna Dąbrowska", "Marcin Kamiński"],
+    "tags": ["skills-based", "kompetencje", "reskilling", "learning organization", "agile"]
+  },
+  {
+    "title": "Employee engagement - budowanie zaangażowania",
+    "description": "Praktyczny przewodnik po budowaniu employee engagement i mierzeniu zaangażowania pracowników. Webinar obejmuje strategie engagement, narzędzia do pomiaru, programy motywacyjne, oraz budowanie kultury zaangażowania. Uczestnicy poznają techniki angażowania pracowników, platformy do engagement, oraz metody budowania meaningful work. Prezentowane będą case studies programów engagement, narzędzia do feedbacku, oraz strategie budowania employee experience.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-06-22",
+    "speakers": ["Natalia Wiśniewska", "Katarzyna Kowalczyk"],
+    "tags": ["engagement", "zaangażowanie", "motywacja", "employee experience", "kultura"]
+  },
+  {
+    "title": "HR compliance - zarządzanie zgodnością",
+    "description": "Szczegółowy przewodnik po zarządzaniu compliance w HR i budowaniu kultury zgodności. Webinar obejmuje identyfikację wymagań prawnych, projektowanie procedur compliance, audyty wewnętrzne, oraz szkolenia pracowników. Uczestnicy poznają techniki risk assessment, narzędzia do compliance management, oraz metody budowania kultury etycznej. Prezentowane będą case studies audytów compliance, platformy do zarządzania ryzykiem, oraz strategie komunikowania wymagań prawnych.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-06-25",
+    "speakers": ["Piotr Zieliński", "Łukasz Nowak"],
+    "tags": ["compliance", "zgodność", "audyty", "ryzyko", "etyka"]
+  },
+  {
+    "title": "Future of work - przyszłość pracy",
+    "description": "Kompleksowa analiza trendów w przyszłości pracy i przygotowania organizacji do zmian. Webinar obejmuje analizę megatrendów, wpływ technologii na pracę, nowe modele zatrudnienia, oraz strategie adaptacji. Uczestnicy poznają techniki foresight, narzędzia do scenario planning, oraz metody budowania agile organization. Prezentowane będą case studies transformacji organizacji, platformy do future skills, oraz strategie przygotowania pracowników do przyszłości.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2600000,
+    "recorded_date": "2024-06-28",
+    "speakers": ["Marcin Kamiński", "Tomasz Kowalczyk", "Katarzyna Nowak"],
+    "tags": ["future of work", "przyszłość", "trendy", "technologia", "transformacja"]
+  },
+  {
+    "title": "Employee onboarding - pierwsze dni w pracy",
+    "description": "Szczegółowy przewodnik po projektowaniu procesu onboarding i tworzeniu pozytywnego pierwszego wrażenia. Webinar obejmuje planowanie pierwszych dni, przygotowanie dokumentów, integrację z zespołem, oraz budowanie relacji z nowym pracownikiem. Uczestnicy poznają techniki welcome experience, narzędzia do onboarding, oraz metody monitorowania postępów. Prezentowane będą case studies udanych programów onboarding, platformy do zarządzania procesem, oraz strategie budowania retention od pierwszego dnia.",
+    "category_slug": "onboarding",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-07-02",
+    "speakers": ["Magdalena Wiśniewska", "Aleksandra Kowalczyk"],
+    "tags": ["onboarding", "pierwsze dni", "integracja", "welcome experience", "retencja"]
+  },
+  {
+    "title": "HR metrics - kluczowe wskaźniki HR",
+    "description": "Praktyczny przewodnik po identyfikacji i mierzeniu kluczowych wskaźników HR w organizacji. Webinar obejmuje wybór odpowiednich metryk, projektowanie dashboardów, analizę danych, oraz komunikowanie insights. Uczestnicy poznają techniki data analysis, narzędzia do wizualizacji, oraz metody budowania data-driven HR. Prezentowane będą case studies HR analytics, platformy do raportowania, oraz strategie demonstrowania wartości HR poprzez dane.",
+    "category_slug": "ocena-wynikow-feedback",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-07-05",
+    "speakers": ["Michał Dąbrowski", "Piotr Dąbrowski"],
+    "tags": ["HR metrics", "wskaźniki", "analytics", "dashboardy", "dane"]
+  },
+  {
+    "title": "Workplace culture - budowanie kultury organizacyjnej",
+    "description": "Kompleksowy przewodnik po budowaniu silnej kultury organizacyjnej i zarządzaniu kulturą w organizacji. Webinar obejmuje identyfikację wartości, projektowanie rytuałów, budowanie tradycji, oraz mierzenie kultury. Uczestnicy poznają techniki culture change, narzędzia do pomiaru kultury, oraz strategie angażowania pracowników w budowanie kultury. Prezentowane będą case studies transformacji kultury, platformy do culture management, oraz metody budowania unique culture.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-07-08",
+    "speakers": ["Katarzyna Kowalczyk", "Natalia Wiśniewska", "Marcin Kamiński"],
+    "tags": ["kultura organizacyjna", "wartości", "tradycje", "culture change", "tożsamość"]
+  },
+  {
+    "title": "Talent acquisition strategy - strategia pozyskiwania talentów",
+    "description": "Szczegółowy przewodnik po budowaniu strategicznego podejścia do talent acquisition i pozyskiwania najlepszych talentów. Webinar obejmuje analizę rynku talentów, projektowanie employer value proposition, strategie sourcingu, oraz budowanie talent pipeline. Uczestnicy poznają techniki talent mapping, narzędzia do sourcingu, oraz metody budowania competitive advantage w rekrutacji. Prezentowane będą case studies strategicznych programów TA, platformy do talent acquisition, oraz strategie budowania employer brand wśród talentów.",
+    "category_slug": "rekrutacja-selekcja",
+    "duration_ms": 2500000,
+    "recorded_date": "2024-07-12",
+    "speakers": ["Jan Kowalski", "Anna Nowak", "Ewa Kowalczyk"],
+    "tags": ["talent acquisition", "strategia", "sourcing", "employer brand", "pipeline"]
+  },
+  {
+    "title": "Umowy o pracę - rodzaje i specyfika",
+    "description": "Kompleksowy przewodnik po rodzajach umów o pracę, ich specyfice i praktycznym zastosowaniu. Webinar obejmuje analizę umowy o pracę na czas nieokreślony, umowy na czas określony, umowy na okres próbny, oraz umowy na zastępstwo. Uczestnicy poznają wymagania formalne każdego typu umowy, procedury zawierania i rozwiązywania, oraz konsekwencje prawne. Prezentowane będą wzory umów, case studies sporów pracowniczych, oraz praktyczne wskazówki dotyczące negocjacji warunków zatrudnienia.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-07-15",
+    "speakers": ["Piotr Zieliński"],
+    "tags": ["umowa o pracę", "czas nieokreślony", "czas określony", "okres próbny", "zastępstwo"]
+  },
+  {
+    "title": "Umowy cywilnoprawne w HR - zlecenie i dzieło",
+    "description": "Szczegółowa analiza umów cywilnoprawnych w kontekście HR - umowy zlecenia, umowy o dzieło, oraz kontrakty B2B. Webinar obejmuje różnice między umowami o pracę a umowami cywilnoprawnymi, wymagania formalne, obowiązki podatkowe, oraz ryzyko prawne. Uczestnicy poznają kryteria kwalifikacji umów, procedury zawierania, oraz metody weryfikacji legalności. Prezentowane będą case studies kontroli PIP, wzory umów, oraz strategie minimalizacji ryzyka prawnego.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-07-18",
+    "speakers": ["Piotr Zieliński", "Agnieszka Lewandowska"],
+    "tags": ["zlecenie", "dzieło", "B2B", "umowy cywilnoprawne", "PIP"]
+  },
+  {
+    "title": "Czas pracy - regulacje i praktyka",
+    "description": "Praktyczny przewodnik po regulacjach czasu pracy i ich zastosowaniu w różnych branżach. Webinar obejmuje normy czasu pracy, systemy czasu pracy, nadgodziny, oraz pracę w niedziele i święta. Uczestnicy poznają procedury rozliczania czasu pracy, dokumentowanie, oraz metody kontroli. Prezentowane będą case studies sporów o nadgodziny, wzory dokumentów, oraz praktyczne wskazówki dotyczące elastycznych form zatrudnienia.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-07-22",
+    "speakers": ["Piotr Zieliński"],
+    "tags": ["czas pracy", "nadgodziny", "niedziele", "święta", "systemy czasu"]
+  },
+  {
+    "title": "Urlopy pracownicze - kompletny przewodnik",
+    "description": "Kompleksowy przewodnik po urlopach pracowniczych - urlop wypoczynkowy, urlop na żądanie, urlop bezpłatny, oraz urlopy okolicznościowe. Webinar obejmuje procedury udzielania urlopów, rozliczanie, oraz prawa i obowiązki pracodawcy. Uczestnicy poznają wymagania formalne, dokumentowanie, oraz metody rozwiązywania sporów. Prezentowane będą case studies sporów urlopowych, wzory dokumentów, oraz praktyczne wskazówki dotyczące planowania urlopów.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-07-25",
+    "speakers": ["Piotr Zieliński", "Agnieszka Lewandowska"],
+    "tags": ["urlopy", "wypoczynkowy", "na żądanie", "bezpłatny", "okolicznościowy"]
+  },
+  {
+    "title": "Dyscyplinarka - procedury i praktyka",
+    "description": "Szczegółowy przewodnik po procedurach dyscyplinarnych i karach porządkowych w miejscu pracy. Webinar obejmuje rodzaje kar, procedury nakładania, prawa pracownika, oraz środki odwoławcze. Uczestnicy poznają wymagania formalne, dokumentowanie, oraz metody prowadzenia postępowań. Prezentowane będą case studies sporów dyscyplinarnych, wzory dokumentów, oraz praktyczne wskazówki dotyczące zapobiegania konfliktom.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-07-28",
+    "speakers": ["Piotr Zieliński"],
+    "tags": ["dyscyplinarka", "kary porządkowe", "procedury", "odwołania", "konflikty"]
+  },
+  {
+    "title": "Rozwiązanie umowy o pracę - procedury i prawa",
+    "description": "Kompleksowy przewodnik po procedurach rozwiązania umowy o pracę - wypowiedzenie, rozwiązanie za porozumieniem stron, oraz rozwiązanie bez wypowiedzenia. Webinar obejmuje wymagania formalne, okresy wypowiedzenia, prawa pracownika, oraz obowiązki pracodawcy. Uczestnicy poznają procedury dokumentowania, rozliczanie, oraz metody unikania sporów. Prezentowane będą case studies sporów o rozwiązanie umowy, wzory dokumentów, oraz praktyczne wskazówki dotyczące negocjacji.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-08-01",
+    "speakers": ["Piotr Zieliński", "Aleksandra Kowalczyk"],
+    "tags": ["rozwiązanie umowy", "wypowiedzenie", "porozumienie stron", "bez wypowiedzenia", "okresy"]
+  },
+  {
+    "title": "RODO w HR - przetwarzanie danych osobowych",
+    "description": "Szczegółowy przewodnik po wymaganiach RODO w procesach HR i zarządzaniu danymi pracowników. Webinar obejmuje podstawy prawne przetwarzania, zgody, prawa pracowników, oraz obowiązki administratora. Uczestnicy poznają procedury wdrażania RODO, dokumentowanie, oraz metody audytu. Prezentowane będą case studies kontroli UODO, wzory dokumentów, oraz praktyczne wskazówki dotyczące compliance.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2500000,
+    "recorded_date": "2024-08-05",
+    "speakers": ["Piotr Zieliński", "Tomasz Lewandowski"],
+    "tags": ["RODO", "dane osobowe", "zgody", "prawa pracowników", "UODO"]
+  },
+  {
+    "title": "Monitoring pracowników - regulacje i praktyka",
+    "description": "Praktyczny przewodnik po legalnym monitorowaniu pracowników i kontroli w miejscu pracy. Webinar obejmuje monitoring wizyjny, monitoring komputerowy, kontrola korespondencji, oraz monitoring GPS. Uczestnicy poznają wymagania prawne, procedury wdrażania, oraz prawa pracowników. Prezentowane będą case studies sporów o monitoring, wzory regulaminów, oraz praktyczne wskazówki dotyczące równowagi między kontrolą a prywatnością.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-08-08",
+    "speakers": ["Piotr Zieliński", "Łukasz Nowak"],
+    "tags": ["monitoring", "kontrola", "prywatność", "wizyjny", "komputerowy"]
+  },
+  {
+    "title": "BHP - obowiązki pracodawcy i pracownika",
+    "description": "Kompleksowy przewodnik po obowiązkach BHP pracodawcy i pracownika w różnych branżach. Webinar obejmuje ocenę ryzyka zawodowego, szkolenia BHP, środki ochrony indywidualnej, oraz procedury w razie wypadku. Uczestnicy poznają wymagania prawne, dokumentowanie, oraz metody kontroli. Prezentowane będą case studies wypadków przy pracy, wzory dokumentów, oraz praktyczne wskazówki dotyczące budowania kultury bezpieczeństwa.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-08-12",
+    "speakers": ["Łukasz Nowak", "Tomasz Wiśniewski"],
+    "tags": ["BHP", "obowiązki", "ryzyko zawodowe", "wypadki", "kultura bezpieczeństwa"]
+  },
+  {
+    "title": "Równość w zatrudnieniu - przeciwdziałanie dyskryminacji",
+    "description": "Szczegółowy przewodnik po zasadach równości w zatrudnieniu i przeciwdziałaniu dyskryminacji. Webinar obejmuje rodzaje dyskryminacji, procedury rekrutacyjne, awanse, oraz wynagrodzenia. Uczestnicy poznają wymagania prawne, procedury skargowe, oraz metody audytu. Prezentowane będą case studies sporów o dyskryminację, wzory polityk, oraz praktyczne wskazówki dotyczące budowania kultury równości.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-08-15",
+    "speakers": ["Agnieszka Nowak", "Piotr Zieliński"],
+    "tags": ["równość", "dyskryminacja", "rekrutacja", "awanse", "wynagrodzenia"]
+  },
+  {
+    "title": "Mobbing i molestowanie - zapobieganie i procedury",
+    "description": "Praktyczny przewodnik po zapobieganiu mobbingowi i molestowaniu w miejscu pracy. Webinar obejmuje definicje prawne, procedury zgłaszania, postępowania wyjaśniające, oraz środki ochrony. Uczestnicy poznają wymagania formalne, dokumentowanie, oraz metody szkolenia pracowników. Prezentowane będą case studies sporów o mobbing, wzory procedur, oraz praktyczne wskazówki dotyczące budowania kultury szacunku.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-08-18",
+    "speakers": ["Agnieszka Lewandowska", "Piotr Zieliński"],
+    "tags": ["mobbing", "molestowanie", "procedury", "ochrona", "kultura szacunku"]
+  },
+  {
+    "title": "Wynagrodzenia - regulacje i praktyka",
+    "description": "Kompleksowy przewodnik po regulacjach wynagrodzeń i ich praktycznym zastosowaniu. Webinar obejmuje minimalne wynagrodzenie, składniki wynagrodzenia, premie, oraz dodatki. Uczestnicy poznają wymagania formalne, procedury rozliczania, oraz metody kontroli. Prezentowane będą case studies sporów o wynagrodzenia, wzory umów, oraz praktyczne wskazówki dotyczące negocjacji płacowych.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-08-22",
+    "speakers": ["Michał Wójcik", "Piotr Zieliński"],
+    "tags": ["wynagrodzenia", "minimalne", "składniki", "premie", "dodatki"]
+  },
+  {
+    "title": "Praca zdalna - regulacje i praktyka",
+    "description": "Szczegółowy przewodnik po regulacjach pracy zdalnej i ich praktycznym zastosowaniu. Webinar obejmuje umowy o pracę zdalną, obowiązki pracodawcy, prawa pracownika, oraz kontrolę wykonywania pracy. Uczestnicy poznają wymagania formalne, procedury wdrażania, oraz metody zarządzania. Prezentowane będą case studies sporów o pracę zdalną, wzory umów, oraz praktyczne wskazówki dotyczące organizacji pracy.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-08-25",
+    "speakers": ["Katarzyna Nowak", "Piotr Zieliński"],
+    "tags": ["praca zdalna", "umowy", "obowiązki", "kontrola", "organizacja"]
+  },
+  {
+    "title": "Kontrola PIP - przygotowanie i procedury",
+    "description": "Praktyczny przewodnik po kontrolach Państwowej Inspekcji Pracy i przygotowaniu do nich. Webinar obejmuje uprawnienia inspektorów, procedury kontroli, dokumenty wymagane, oraz prawa pracodawcy. Uczestnicy poznają metody przygotowania, procedury podczas kontroli, oraz środki odwoławcze. Prezentowane będą case studies kontroli PIP, wzory dokumentów, oraz praktyczne wskazówki dotyczące compliance.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-08-28",
+    "speakers": ["Piotr Zieliński", "Łukasz Nowak"],
+    "tags": ["PIP", "kontrola", "inspektorzy", "uprawnienia", "odwołania"]
+  },
+  {
+    "title": "Sądy pracy - procedury i praktyka",
+    "description": "Kompleksowy przewodnik po postępowaniach przed sądami pracy i rozwiązywaniu sporów pracowniczych. Webinar obejmuje właściwość sądów, procedury sądowe, dowody, oraz wyroki. Uczestnicy poznają wymagania formalne, strategie procesowe, oraz metody negocjacji. Prezentowane będą case studies spraw sądowych, wzory pism, oraz praktyczne wskazówki dotyczące unikania sporów.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-09-01",
+    "speakers": ["Piotr Zieliński", "Agnieszka Lewandowska"],
+    "tags": ["sądy pracy", "spory", "procedury", "dowody", "wyroki"]
+  },
+  {
+    "title": "Związki zawodowe - prawa i obowiązki",
+    "description": "Szczegółowy przewodnik po prawach i obowiązkach związków zawodowych w miejscu pracy. Webinar obejmuje uprawnienia związków, procedury konsultacyjne, negocjacje zbiorowe, oraz strajki. Uczestnicy poznają wymagania formalne, procedury współpracy, oraz metody rozwiązywania konfliktów. Prezentowane będą case studies sporów związkowych, wzory umów, oraz praktyczne wskazówki dotyczące budowania relacji.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-09-05",
+    "speakers": ["Piotr Zieliński", "Agnieszka Lewandowska"],
+    "tags": ["związki zawodowe", "uprawnienia", "konsultacje", "negocjacje", "strajki"]
+  },
+  {
+    "title": "Praca w niedziele i święta - regulacje",
+    "description": "Praktyczny przewodnik po regulacjach pracy w niedziele i święta w różnych branżach. Webinar obejmuje zakazy i wyjątki, dodatki, rekompensaty, oraz procedury. Uczestnicy poznają wymagania formalne, procedury rozliczania, oraz metody planowania. Prezentowane będą case studies sporów o pracę w niedziele, wzory dokumentów, oraz praktyczne wskazówki dotyczące organizacji pracy.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-09-08",
+    "speakers": ["Piotr Zieliński"],
+    "tags": ["niedziele", "święta", "zakazy", "dodatki", "rekompensaty"]
+  },
+  {
+    "title": "Praca młodocianych - specjalne regulacje",
+    "description": "Kompleksowy przewodnik po specjalnych regulacjach dotyczących zatrudniania młodocianych. Webinar obejmuje wiek zatrudnienia, czas pracy, urlopy, oraz szkolenia. Uczestnicy poznają wymagania formalne, procedury zatrudniania, oraz metody kontroli. Prezentowane będą case studies sporów o pracę młodocianych, wzory umów, oraz praktyczne wskazówki dotyczące compliance.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-09-12",
+    "speakers": ["Piotr Zieliński", "Łukasz Nowak"],
+    "tags": ["młodociani", "wiek", "czas pracy", "urlopy", "szkolenia"]
+  },
+  {
+    "title": "Praca kobiet w ciąży - ochrona prawna",
+    "description": "Szczegółowy przewodnik po ochronie prawnej kobiet w ciąży i matek karmiących. Webinar obejmuje zakazy zatrudniania, czas pracy, urlopy, oraz zwolnienia. Uczestnicy poznają wymagania formalne, procedury ochrony, oraz metody kontroli. Prezentowane będą case studies sporów o ochronę kobiet w ciąży, wzory dokumentów, oraz praktyczne wskazówki dotyczące compliance.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-09-15",
+    "speakers": ["Agnieszka Nowak", "Piotr Zieliński"],
+    "tags": ["kobiety w ciąży", "ochrona", "zakazy", "urlopy", "zwolnienia"]
+  },
+  {
+    "title": "Praca w nocy - regulacje i praktyka",
+    "description": "Praktyczny przewodnik po regulacjach pracy w nocy i ich praktycznym zastosowaniu. Webinar obejmuje definicje, czas pracy, dodatki, oraz procedury. Uczestnicy poznają wymagania formalne, procedury rozliczania, oraz metody kontroli. Prezentowane będą case studies sporów o pracę w nocy, wzory dokumentów, oraz praktyczne wskazówki dotyczące organizacji pracy.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 1900000,
+    "recorded_date": "2024-09-18",
+    "speakers": ["Piotr Zieliński"],
+    "tags": ["praca w nocy", "definicje", "dodatki", "procedury", "organizacja"]
+  },
+  {
+    "title": "Praca w ruchu ciągłym - specjalne regulacje",
+    "description": "Kompleksowy przewodnik po specjalnych regulacjach dotyczących pracy w ruchu ciągłym. Webinar obejmuje definicje, czas pracy, urlopy, oraz procedury. Uczestnicy poznają wymagania formalne, procedury wdrażania, oraz metody kontroli. Prezentowane będą case studies sporów o pracę w ruchu ciągłym, wzory dokumentów, oraz praktyczne wskazówki dotyczące compliance.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-09-22",
+    "speakers": ["Piotr Zieliński", "Łukasz Nowak"],
+    "tags": ["ruch ciągły", "definicje", "czas pracy", "urlopy", "procedury"]
+  },
+  {
+    "title": "Praca w rolnictwie - specjalne regulacje",
+    "description": "Szczegółowy przewodnik po specjalnych regulacjach dotyczących pracy w rolnictwie. Webinar obejmuje definicje, czas pracy, urlopy, oraz procedury. Uczestnicy poznają wymagania formalne, procedury wdrażania, oraz metody kontroli. Prezentowane będą case studies sporów o pracę w rolnictwie, wzory dokumentów, oraz praktyczne wskazówki dotyczące compliance.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-09-25",
+    "speakers": ["Piotr Zieliński", "Tomasz Wiśniewski"],
+    "tags": ["rolnictwo", "definicje", "czas pracy", "urlopy", "procedury"]
+  },
+  {
+    "title": "Praca w transporcie - specjalne regulacje",
+    "description": "Praktyczny przewodnik po specjalnych regulacjach dotyczących pracy w transporcie. Webinar obejmuje definicje, czas pracy, urlopy, oraz procedury. Uczestnicy poznają wymagania formalne, procedury wdrażania, oraz metody kontroli. Prezentowane będą case studies sporów o pracę w transporcie, wzory dokumentów, oraz praktyczne wskazówki dotyczące compliance.",
+    "category_slug": "prawo-pracy-compliance",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-09-28",
+    "speakers": ["Piotr Zieliński", "Łukasz Nowak"],
+    "tags": ["transport", "definicje", "czas pracy", "urlopy", "procedury"]
+  },
+  {
+    "title": "Sourcing talentów - zaawansowane techniki pozyskiwania",
+    "description": "Kompleksowy przewodnik po zaawansowanych technikach sourcingu talentów i budowaniu efektywnych strategii pozyskiwania kandydatów. Webinar obejmuje wykorzystanie LinkedIn, GitHub, Stack Overflow, oraz innych platform branżowych, techniki boolean search, social media sourcing, oraz budowanie talent pools. Uczestnicy poznają narzędzia do sourcingu, metody weryfikacji kandydatów, oraz strategie budowania długoterminowych relacji z talentami. Prezentowane będą case studies udanych kampanii sourcingowych, narzędzia do automatyzacji, oraz metody mierzenia skuteczności sourcingu.",
+    "category_slug": "rekrutacja-selekcja",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-10-02",
+    "speakers": ["Jan Kowalski", "Anna Nowak"],
+    "tags": ["sourcing", "LinkedIn", "GitHub", "boolean search", "talent pools"]
+  },
+  {
+    "title": "Job description - tworzenie skutecznych opisów stanowisk",
+    "description": "Szczegółowy przewodnik po tworzeniu atrakcyjnych i skutecznych opisów stanowisk pracy. Webinar obejmuje strukturę job description, pisanie wymagań, opisywanie benefitów, oraz optymalizację pod wyszukiwarki. Uczestnicy poznają techniki copywritingu HR, metody A/B testing opisów, oraz strategie personalizacji pod różne grupy kandydatów. Prezentowane będą case studies udanych job description, narzędzia do analizy, oraz metody mierzenia konwersji. Webinar zawiera szablony, checklisty, oraz praktyczne wskazówki dotyczące tworzenia opisów dla różnych branż.",
+    "category_slug": "rekrutacja-selekcja",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-10-05",
+    "speakers": ["Anna Nowak", "Robert Nowak"],
+    "tags": ["job description", "copywriting", "optymalizacja", "A/B testing", "personalizacja"]
+  },
+  {
+    "title": "Rozmowa kwalifikacyjna - techniki i metody oceny",
+    "description": "Praktyczny przewodnik po prowadzeniu skutecznych rozmów kwalifikacyjnych i ocenie kandydatów. Webinar obejmuje różne typy rozmów - behawioralne, kompetencyjne, case study, oraz techniki STAR. Uczestnicy poznają metody zadawania pytań, techniki aktywnego słuchania, oraz strategie oceny odpowiedzi. Prezentowane będą case studies trudnych rozmów, narzędzia do oceny, oraz metody eliminacji bias. Webinar zawiera szablony pytań, checklisty oceny, oraz praktyczne wskazówki dotyczące różnych poziomów stanowisk.",
+    "category_slug": "rekrutacja-selekcja",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-10-08",
+    "speakers": ["Jan Kowalski", "Ewa Kowalczyk"],
+    "tags": ["rozmowa kwalifikacyjna", "behawioralne", "STAR", "ocena", "bias"]
+  },
+  {
+    "title": "Onboarding checklist - kompletna lista kontrolna",
+    "description": "Szczegółowy przewodnik po tworzeniu i wdrażaniu kompletnych checklist onboardingowych. Webinar obejmuje planowanie pierwszych dni, przygotowanie dokumentów, szkolenia obowiązkowe, oraz integrację z zespołem. Uczestnicy poznają różne modele onboarding - od tradycyjnego po cyfrowy, techniki personalizacji procesu, oraz metody monitorowania postępów. Prezentowane będą case studies udanych programów onboarding, narzędzia do zarządzania procesem, oraz metody mierzenia skuteczności. Webinar zawiera gotowe szablony, checklisty, oraz praktyczne wskazówki dla różnych ról.",
+    "category_slug": "onboarding",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-10-12",
+    "speakers": ["Magdalena Wiśniewska", "Aleksandra Kowalczyk"],
+    "tags": ["onboarding", "checklist", "dokumenty", "szkolenia", "integracja"]
+  },
+  {
+    "title": "Exit interview - zaawansowane techniki przeprowadzania",
+    "description": "Kompleksowy przewodnik po zaawansowanych technikach przeprowadzania exit interview i wykorzystaniu informacji zwrotnej. Webinar obejmuje projektowanie pytań, techniki budowania zaufania, metody analizy feedbacku, oraz strategie follow-up. Uczestnicy poznają różne modele exit interview, techniki rozmów z trudnymi pracownikami, oraz metody identyfikacji trendów. Prezentowane będą case studies wykorzystania exit interview do poprawy procesów, narzędzia do analizy danych, oraz strategie budowania alumni networks. Webinar zawiera szablony pytań, narzędzia analityczne, oraz praktyczne wskazówki dotyczące różnych sytuacji.",
+    "category_slug": "offboarding",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-10-15",
+    "speakers": ["Aleksandra Kowalczyk", "Natalia Wiśniewska"],
+    "tags": ["exit interview", "feedback", "analiza", "alumni", "trendy"]
+  },
+  {
+    "title": "E-learning w HR - projektowanie cyfrowych szkoleń",
+    "description": "Szczegółowy przewodnik po projektowaniu i wdrażaniu programów e-learningowych w organizacji. Webinar obejmuje identyfikację potrzeb szkoleniowych, wybór platform LMS, projektowanie treści interaktywnych, oraz mierzenie skuteczności. Uczestnicy poznają różne formaty e-learningu - od wideo po VR, techniki gamifikacji, oraz strategie angażowania pracowników. Prezentowane będą case studies udanych programów e-learning, narzędzia do tworzenia treści, oraz metody budowania learning culture. Webinar zawiera szablony projektów, narzędzia do analizy, oraz praktyczne wskazówki dotyczące różnych grup pracowników.",
+    "category_slug": "szkolenia-rozwoj",
+    "duration_ms": 2500000,
+    "recorded_date": "2024-10-18",
+    "speakers": ["Joanna Dąbrowska", "Tomasz Lewandowski"],
+    "tags": ["e-learning", "LMS", "interaktywne", "gamifikacja", "VR"]
+  },
+  {
+    "title": "Microlearning - małe kroki, duże efekty",
+    "description": "Praktyczny przewodnik po implementacji strategii microlearning w organizacji. Webinar obejmuje projektowanie krótkich modułów szkoleniowych, wybór odpowiednich formatów, techniki delivery, oraz mierzenie engagement. Uczestnicy poznają różne platformy microlearning, techniki personalizacji treści, oraz strategie integracji z codzienną pracą. Prezentowane będą case studies udanych programów microlearning, narzędzia do tworzenia treści, oraz metody budowania nawyków uczenia się. Webinar zawiera szablony modułów, narzędzia do analizy, oraz praktyczne wskazówki dotyczące różnych kompetencji.",
+    "category_slug": "szkolenia-rozwoj",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-10-22",
+    "speakers": ["Joanna Dąbrowska", "Beata Dąbrowska"],
+    "tags": ["microlearning", "krótkie moduły", "engagement", "nawyki", "personalizacja"]
+  },
+  {
+    "title": "360 stopni feedback - implementacja i praktyka",
+    "description": "Kompleksowy przewodnik po implementacji systemów 360 stopni feedback w organizacji. Webinar obejmuje projektowanie procesu, wybór narzędzi, szkolenie uczestników, oraz analizę wyników. Uczestnicy poznają różne modele 360 feedback, techniki eliminacji bias, oraz strategie komunikowania wyników. Prezentowane będą case studies udanych implementacji, narzędzia do zarządzania procesem, oraz metody integracji z rozwojem. Webinar zawiera szablony pytań, narzędzia analityczne, oraz praktyczne wskazówki dotyczące różnych poziomów organizacji.",
+    "category_slug": "ocena-wynikow-feedback",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-10-25",
+    "speakers": ["Paweł Wiśniewski", "Agnieszka Kamińska"],
+    "tags": ["360 stopni", "feedback", "bias", "analiza", "rozwój"]
+  },
+  {
+    "title": "Continuous feedback - budowanie kultury feedbacku",
+    "description": "Szczegółowy przewodnik po budowaniu kultury continuous feedback w organizacji. Webinar obejmuje szkolenie menedżerów, techniki udzielania feedbacku, narzędzia do komunikacji, oraz strategie angażowania pracowników. Uczestnicy poznają różne modele continuous feedback, techniki rozmów, oraz metody mierzenia kultury feedbacku. Prezentowane będą case studies transformacji kultury, narzędzia do feedbacku, oraz strategie budowania zaufania. Webinar zawiera szablony rozmów, narzędzia do pomiaru, oraz praktyczne wskazówki dotyczące różnych sytuacji.",
+    "category_slug": "ocena-wynikow-feedback",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-10-28",
+    "speakers": ["Paweł Wiśniewski", "Natalia Wiśniewska"],
+    "tags": ["continuous feedback", "kultura", "menedżerowie", "zaufanie", "komunikacja"]
+  },
+  {
+    "title": "Talent mapping - mapowanie potencjału w organizacji",
+    "description": "Praktyczny przewodnik po mapowaniu talentów i identyfikacji potencjału w organizacji. Webinar obejmuje techniki assessmentu, narzędzia do talent mapping, identyfikację high potentials, oraz budowanie talent pipelines. Uczestnicy poznają różne metodologie oceny potencjału, techniki 9-box, oraz strategie rozwoju talentów. Prezentowane będą case studies programów talent mapping, narzędzia do wizualizacji, oraz metody integracji z succession planning. Webinar zawiera szablony oceny, narzędzia analityczne, oraz praktyczne wskazówki dotyczące różnych poziomów organizacji.",
+    "category_slug": "talent-sukcesja",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-11-01",
+    "speakers": ["Grzegorz Zieliński", "Marcin Kamiński"],
+    "tags": ["talent mapping", "high potential", "9-box", "assessment", "pipeline"]
+  },
+  {
+    "title": "Widełki płacowe - projektowanie i komunikowanie",
+    "description": "Szczegółowy przewodnik po projektowaniu widełek płacowych i ich transparentnym komunikowaniu. Webinar obejmuje metodologie ustalania widełek, analizę rynku, techniki komunikowania wynagrodzeń, oraz strategie budowania zaufania. Uczestnicy poznają różne modele widełek, techniki benchmarkingu, oraz metody angażowania pracowników w dyskusje o wynagrodzeniach. Prezentowane będą case studies programów transparentności płac, narzędzia do analizy, oraz strategie budowania kultury otwartości. Webinar zawiera szablony komunikacji, narzędzia analityczne, oraz praktyczne wskazówki dotyczące różnych branż.",
+    "category_slug": "wynagrodzenia-benefity",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-11-05",
+    "speakers": ["Michał Wójcik", "Marcin Kowalczyk"],
+    "tags": ["widełki płacowe", "transparentność", "benchmarking", "komunikacja", "zaufanie"]
+  },
+  {
+    "title": "PPK i PPE - programy emerytalne w praktyce",
+    "description": "Kompleksowy przewodnik po programach PPK i PPE oraz ich implementacji w organizacji. Webinar obejmuje wymagania prawne, procedury wdrażania, komunikację z pracownikami, oraz zarządzanie programami. Uczestnicy poznają różne modele programów emerytalnych, techniki edukacji pracowników, oraz strategie angażowania w oszczędzanie. Prezentowane będą case studies udanych programów emerytalnych, narzędzia do zarządzania, oraz metody mierzenia uczestnictwa. Webinar zawiera szablony komunikacji, narzędzia edukacyjne, oraz praktyczne wskazówki dotyczące różnych grup pracowników.",
+    "category_slug": "wynagrodzenia-benefity",
+    "duration_ms": 2000000,
+    "recorded_date": "2024-11-08",
+    "speakers": ["Michał Wójcik", "Piotr Wiśniewski"],
+    "tags": ["PPK", "PPE", "emerytura", "oszczędzanie", "edukacja"]
+  },
+  {
+    "title": "Kafeteria benefitów - projektowanie elastycznych pakietów",
+    "description": "Praktyczny przewodnik po projektowaniu i zarządzaniu kafeterią benefitów w organizacji. Webinar obejmuje identyfikację potrzeb pracowników, wybór benefitów, techniki personalizacji, oraz mierzenie satysfakcji. Uczestnicy poznają różne modele kafeterii, techniki angażowania pracowników, oraz strategie budowania atrakcyjnych pakietów. Prezentowane będą case studies udanych programów kafeterii, narzędzia do zarządzania, oraz metody optymalizacji kosztów. Webinar zawiera szablony benefitów, narzędzia analityczne, oraz praktyczne wskazówki dotyczące różnych grup demograficznych.",
+    "category_slug": "wynagrodzenia-benefity",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-11-12",
+    "speakers": ["Michał Wójcik", "Katarzyna Nowak"],
+    "tags": ["kafeteria", "benefity", "personalizacja", "satysfakcja", "optymalizacja"]
+  },
+  {
+    "title": "Unconscious bias - rozpoznawanie i przeciwdziałanie",
+    "description": "Szczegółowy przewodnik po rozpoznawaniu i przeciwdziałaniu unconscious bias w procesach HR. Webinar obejmuje identyfikację różnych typów bias, techniki self-awareness, strategie eliminacji, oraz budowanie kultury inkluzji. Uczestnicy poznają różne narzędzia do oceny bias, techniki szkoleniowe, oraz metody monitorowania postępów. Prezentowane będą case studies programów przeciwdziałania bias, narzędzia do assessmentu, oraz strategie budowania świadomości. Webinar zawiera szablony szkoleń, narzędzia do pomiaru, oraz praktyczne wskazówki dotyczące różnych procesów HR.",
+    "category_slug": "diversity-inclusion",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-11-15",
+    "speakers": ["Agnieszka Kamińska", "Agnieszka Nowak"],
+    "tags": ["unconscious bias", "self-awareness", "eliminacja", "inkluzyjność", "świadomość"]
+  },
+  {
+    "title": "Inclusive leadership - przywództwo inkluzywne",
+    "description": "Kompleksowy przewodnik po rozwijaniu kompetencji inclusive leadership w organizacji. Webinar obejmuje definicje inclusive leadership, techniki rozwoju, strategie wdrażania, oraz mierzenie skuteczności. Uczestnicy poznają różne modele przywództwa inkluzywnego, techniki coachingu, oraz strategie budowania kultury równości. Prezentowane będą case studies programów inclusive leadership, narzędzia do rozwoju, oraz metody angażowania menedżerów. Webinar zawiera szablony rozwoju, narzędzia do oceny, oraz praktyczne wskazówki dotyczące różnych poziomów zarządzania.",
+    "category_slug": "diversity-inclusion",
+    "duration_ms": 2500000,
+    "recorded_date": "2024-11-18",
+    "speakers": ["Agnieszka Kamińska", "Grzegorz Zieliński"],
+    "tags": ["inclusive leadership", "przywództwo", "coaching", "równość", "menedżerowie"]
+  },
+  {
+    "title": "Wypalenie zawodowe - identyfikacja i przeciwdziałanie",
+    "description": "Praktyczny przewodnik po identyfikacji objawów wypalenia zawodowego i budowaniu strategii przeciwdziałania. Webinar obejmuje wczesne sygnały wypalenia, techniki diagnozy, programy prewencyjne, oraz wsparcie dla pracowników. Uczestnicy poznają różne modele wypalenia, techniki interwencji, oraz strategie budowania odporności. Prezentowane będą case studies programów przeciwdziałania wypaleniu, narzędzia do monitorowania, oraz metody budowania kultury well-being. Webinar zawiera szablony interwencji, narzędzia do oceny, oraz praktyczne wskazówki dotyczące różnych grup pracowników.",
+    "category_slug": "wellbeing-bhp",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-11-22",
+    "speakers": ["Katarzyna Dąbrowska", "Tomasz Wiśniewski"],
+    "tags": ["wypalenie zawodowe", "diagnoza", "prewencja", "odporność", "well-being"]
+  },
+  {
+    "title": "Zdrowie psychiczne w pracy - wsparcie i interwencje",
+    "description": "Szczegółowy przewodnik po wspieraniu zdrowia psychicznego pracowników i budowaniu programów wsparcia. Webinar obejmuje identyfikację problemów psychicznych, techniki wsparcia, programy EAP, oraz strategie destygmatyzacji. Uczestnicy poznają różne modele wsparcia psychicznego, techniki rozmów, oraz strategie budowania kultury otwartości. Prezentowane będą case studies programów wsparcia psychicznego, narzędzia do monitorowania, oraz metody angażowania pracowników. Webinar zawiera szablony programów, narzędzia edukacyjne, oraz praktyczne wskazówki dotyczące różnych sytuacji.",
+    "category_slug": "wellbeing-bhp",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-11-25",
+    "speakers": ["Katarzyna Dąbrowska", "Agnieszka Lewandowska"],
+    "tags": ["zdrowie psychiczne", "wsparcie", "EAP", "destygmatyzacja", "otwartość"]
+  },
+  {
+    "title": "Ergonomia biurowa - projektowanie zdrowych stanowisk",
+    "description": "Kompleksowy przewodnik po projektowaniu ergonomicznych stanowisk biurowych i wspieraniu zdrowia pracowników. Webinar obejmuje zasady ergonomii, audyty stanowisk, wybór mebli, oraz programy edukacyjne. Uczestnicy poznają różne standardy ergonomiczne, techniki oceny ryzyka, oraz strategie budowania kultury ergonomii. Prezentowane będą case studies programów ergonomicznych, narzędzia do audytu, oraz metody angażowania pracowników. Webinar zawiera szablony audytów, narzędzia do oceny, oraz praktyczne wskazówki dotyczące różnych typów stanowisk.",
+    "category_slug": "wellbeing-bhp",
+    "duration_ms": 2100000,
+    "recorded_date": "2024-11-28",
+    "speakers": ["Tomasz Wiśniewski", "Łukasz Nowak"],
+    "tags": ["ergonomia", "stanowiska biurowe", "audyty", "meble", "edukacja"]
+  },
+  {
+    "title": "Komunikacja wewnętrzna - strategie i narzędzia",
+    "description": "Szczegółowy przewodnik po projektowaniu strategii komunikacji wewnętrznej i wyborze odpowiednich narzędzi. Webinar obejmuje mapowanie kanałów komunikacji, projektowanie treści, techniki engagement, oraz mierzenie skuteczności. Uczestnicy poznają różne platformy komunikacyjne, techniki storytelling, oraz strategie budowania kultury otwartości. Prezentowane będą case studies udanych programów komunikacji, narzędzia do zarządzania treściami, oraz metody angażowania pracowników. Webinar zawiera szablony komunikacji, narzędzia analityczne, oraz praktyczne wskazówki dotyczące różnych grup pracowników.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-12-02",
+    "speakers": ["Natalia Wiśniewska", "Robert Nowak"],
+    "tags": ["komunikacja wewnętrzna", "kanały", "storytelling", "engagement", "otwartość"]
+  },
+  {
+    "title": "Wartości organizacyjne - żywe wartości w praktyce",
+    "description": "Praktyczny przewodnik po wdrażaniu wartości organizacyjnych w codzienną praktykę biznesową. Webinar obejmuje techniki living values, integrację z procesami HR, mierzenie wpływu wartości, oraz budowanie kultury opartej na wartościach. Uczestnicy poznają różne modele implementacji wartości, techniki angażowania pracowników, oraz strategie budowania tożsamości organizacyjnej. Prezentowane będą case studies programów wartości, narzędzia do pomiaru kultury, oraz metody budowania employer brand opartego na wartościach. Webinar zawiera szablony programów, narzędzia do oceny, oraz praktyczne wskazówki dotyczące różnych organizacji.",
+    "category_slug": "kultura-zaangazowanie",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-12-05",
+    "speakers": ["Katarzyna Kowalczyk", "Marcin Kamiński"],
+    "tags": ["wartości organizacyjne", "living values", "kultura", "tożsamość", "employer brand"]
+  },
+  {
+    "title": "ATS - wybór i implementacja systemów rekrutacyjnych",
+    "description": "Kompleksowy przewodnik po wyborze i implementacji systemów ATS w organizacji. Webinar obejmuje analizę potrzeb, porównanie platform, proces wdrożenia, oraz optymalizację procesów rekrutacyjnych. Uczestnicy poznają różne funkcje ATS, techniki integracji z innymi systemami, oraz strategie szkolenia użytkowników. Prezentowane będą case studies implementacji ATS, narzędzia do analizy ROI, oraz metody budowania efektywnych procesów rekrutacyjnych. Webinar zawiera checklisty wyboru, szablony wdrożenia, oraz praktyczne wskazówki dotyczące różnych branż.",
+    "category_slug": "rekrutacja-selekcja",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-12-08",
+    "speakers": ["Tomasz Lewandowski", "Jan Kowalski"],
+    "tags": ["ATS", "systemy rekrutacyjne", "implementacja", "optymalizacja", "ROI"]
+  },
+  {
+    "title": "Blended learning - hybrydowe podejście do szkoleń",
+    "description": "Szczegółowy przewodnik po projektowaniu programów blended learning łączących różne metody nauki. Webinar obejmuje identyfikację potrzeb szkoleniowych, wybór metod, projektowanie ścieżek, oraz mierzenie skuteczności. Uczestnicy poznają różne modele blended learning, techniki integracji metod, oraz strategie angażowania pracowników. Prezentowane będą case studies udanych programów blended learning, narzędzia do zarządzania, oraz metody budowania learning culture. Webinar zawiera szablony programów, narzędzia do analizy, oraz praktyczne wskazówki dotyczące różnych kompetencji.",
+    "category_slug": "szkolenia-rozwoj",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-12-12",
+    "speakers": ["Joanna Dąbrowska", "Beata Dąbrowska"],
+    "tags": ["blended learning", "hybrydowe", "metody nauki", "ścieżki", "learning culture"]
+  },
+  {
+    "title": "Reskilling - transformacja kompetencji pracowników",
+    "description": "Praktyczny przewodnik po projektowaniu programów reskilling i transformacji kompetencji w organizacji. Webinar obejmuje identyfikację luk kompetencyjnych, projektowanie programów, techniki angażowania, oraz mierzenie postępów. Uczestnicy poznają różne modele reskilling, techniki personalizacji programów, oraz strategie budowania kultury uczenia się. Prezentowane będą case studies udanych programów reskilling, narzędzia do zarządzania kompetencjami, oraz metody budowania agile workforce. Webinar zawiera szablony programów, narzędzia do oceny, oraz praktyczne wskazówki dotyczące różnych branż.",
+    "category_slug": "szkolenia-rozwoj",
+    "duration_ms": 2500000,
+    "recorded_date": "2024-12-15",
+    "speakers": ["Beata Dąbrowska", "Marcin Kamiński"],
+    "tags": ["reskilling", "transformacja", "kompetencje", "personalizacja", "agile workforce"]
+  },
+  {
+    "title": "Upskilling - rozwój istniejących kompetencji",
+    "description": "Kompleksowy przewodnik po projektowaniu programów upskilling i rozwoju istniejących kompetencji pracowników. Webinar obejmuje mapowanie kompetencji, identyfikację potrzeb rozwojowych, projektowanie ścieżek, oraz mierzenie ROI. Uczestnicy poznają różne metodologie upskilling, techniki angażowania pracowników, oraz strategie budowania learning culture. Prezentowane będą case studies udanych programów upskilling, narzędzia do zarządzania rozwojem, oraz metody budowania kompetencji przyszłości. Webinar zawiera szablony programów, narzędzia do analizy, oraz praktyczne wskazówki dotyczące różnych ról.",
+    "category_slug": "szkolenia-rozwoj",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-12-18",
+    "speakers": ["Joanna Dąbrowska", "Grzegorz Zieliński"],
+    "tags": ["upskilling", "rozwój", "kompetencje", "ścieżki", "kompetencje przyszłości"]
+  },
+  {
+    "title": "Plan sukcesji - strategiczne planowanie następców",
+    "description": "Szczegółowy przewodnik po tworzeniu i implementacji planów sukcesji w organizacji. Webinar obejmuje identyfikację kluczowych stanowisk, ocenę potencjału, projektowanie programów rozwojowych, oraz mierzenie gotowości. Uczestnicy poznają różne modele succession planning, techniki assessmentu, oraz strategie budowania bench strength. Prezentowane będą case studies udanych programów sukcesji, narzędzia do zarządzania talentami, oraz metody angażowania menedżerów. Webinar zawiera szablony planów, narzędzia do oceny, oraz praktyczne wskazówki dotyczące różnych poziomów organizacji.",
+    "category_slug": "talent-sukcesja",
+    "duration_ms": 2400000,
+    "recorded_date": "2024-12-22",
+    "speakers": ["Grzegorz Zieliński", "Paweł Wiśniewski"],
+    "tags": ["plan sukcesji", "następcy", "assessment", "bench strength", "menedżerowie"]
+  },
+  {
+    "title": "Zarządzanie talentami - strategiczne podejście",
+    "description": "Praktyczny przewodnik po budowaniu strategicznego podejścia do zarządzania talentami w organizacji. Webinar obejmuje identyfikację talentów, projektowanie programów rozwojowych, strategie retencji, oraz mierzenie wpływu. Uczestnicy poznają różne modele talent management, techniki angażowania, oraz strategie budowania kultury rozwoju. Prezentowane będą case studies udanych programów talent management, narzędzia do zarządzania, oraz metody budowania competitive advantage. Webinar zawiera szablony strategii, narzędzia do analizy, oraz praktyczne wskazówki dotyczące różnych organizacji.",
+    "category_slug": "talent-sukcesja",
+    "duration_ms": 2500000,
+    "recorded_date": "2024-12-25",
+    "speakers": ["Grzegorz Zieliński", "Marcin Kamiński", "Paweł Wiśniewski"],
+    "tags": ["zarządzanie talentami", "strategia", "rozwój", "retencja", "competitive advantage"]
+  },
+  {
+    "title": "Employee relations - budowanie pozytywnych relacji",
+    "description": "Kompleksowy przewodnik po budowaniu pozytywnych relacji z pracownikami i zarządzaniu konfliktami. Webinar obejmuje techniki komunikacji, strategie budowania zaufania, procedury rozwiązywania sporów, oraz programy wsparcia. Uczestnicy poznają różne modele employee relations, techniki mediacji, oraz strategie budowania kultury szacunku. Prezentowane będą case studies udanych programów employee relations, narzędzia do zarządzania relacjami, oraz metody budowania engagement. Webinar zawiera szablony procedur, narzędzia do komunikacji, oraz praktyczne wskazówki dotyczące różnych sytuacji.",
+    "category_slug": "employee-relations",
+    "duration_ms": 2300000,
+    "recorded_date": "2024-12-28",
+    "speakers": ["Agnieszka Lewandowska", "Natalia Wiśniewska"],
+    "tags": ["employee relations", "relacje", "zaufanie", "mediacja", "kultura szacunku"]
+  },
+  {
+    "title": "KPI HR - kluczowe wskaźniki efektywności",
+    "description": "Szczegółowy przewodnik po identyfikacji i mierzeniu kluczowych wskaźników efektywności HR. Webinar obejmuje wybór odpowiednich KPI, projektowanie dashboardów, analizę danych, oraz komunikowanie wyników. Uczestnicy poznają różne kategorie wskaźników HR, techniki benchmarkingu, oraz strategie budowania data-driven HR. Prezentowane będą case studies udanych programów KPI HR, narzędzia do analizy, oraz metody demonstrowania wartości HR. Webinar zawiera szablony dashboardów, narzędzia do pomiaru, oraz praktyczne wskazówki dotyczące różnych obszarów HR.",
+    "category_slug": "ocena-wynikow-feedback",
+    "duration_ms": 2200000,
+    "recorded_date": "2024-12-30",
+    "speakers": ["Piotr Dąbrowski", "Michał Dąbrowski"],
+    "tags": ["KPI", "wskaźniki", "dashboardy", "benchmarking", "data-driven HR"]
+  }
+]
