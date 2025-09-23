@@ -20,8 +20,9 @@ async def get_pool() -> asyncpg.Pool:
             except Exception as e:
                 if attempt == 9:  # ostatnia próba
                     raise e
-                print(f"DB connection attempt {attempt + 1} failed: {e}")
-                await asyncio.sleep(1)
+
+                print(f"DB connection attempt {attempt + 1} failed (start Docker): {e}")
+                await asyncio.sleep(0.3)
     return _pool
 
 async def close_pool():

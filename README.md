@@ -154,10 +154,6 @@ See [search_algorithms.md](docs/03_design/search_algorithms.md) for implementati
 
 MIT
 
-## 👤 Author
-
-[Your Name]
-
 ---
 
 *This is a portfolio project demonstrating full-stack development with ML-powered search.*

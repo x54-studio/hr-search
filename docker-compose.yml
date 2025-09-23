@@ -7,11 +7,11 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: hr_search
     ports:
-      - "5432:5432"
+      - "5431:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./backend/scripts/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
-      - ./backend/scripts/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+      - ./backend/scripts/setup/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+      - ./backend/scripts/setup/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d hr_search"]
       interval: 5s
