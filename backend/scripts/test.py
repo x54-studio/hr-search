@@ -8,12 +8,15 @@ import sys
 from pathlib import Path
 
 # Add backend to path so we can import modules
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Handle both running from backend/ and from project root
+script_dir = Path(__file__).parent
+backend_dir = script_dir.parent  # Go up from scripts to backend
+sys.path.insert(0, str(backend_dir))
 
 from app.db import get_pool, close_pool
 from app.search import search
 
-async def test_hr_terms():
+async def test_hr_terms(pool):
     """Test Polish HR terms."""
     print("🇵🇱 Testing Polish HR terms...")
     
@@ -30,7 +33,7 @@ async def test_hr_terms():
         else:
             print("❌ No results")
 
-async def test_it_terms():
+async def test_it_terms(pool):
     """Test IT-related terms."""
     print("\n💻 Testing IT-related terms...")
     
@@ -56,8 +59,8 @@ async def main():
         pool = await get_pool()
         print("✅ Connected to database")
         
-        await test_hr_terms()
-        await test_it_terms()
+        await test_hr_terms(pool)
+        await test_it_terms(pool)
         
         await close_pool()
         print("\n🔌 Database connection closed")

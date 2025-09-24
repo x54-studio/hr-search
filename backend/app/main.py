@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import logging
 from .db import get_pool, close_pool
 from .search import (
     search, autocomplete, search_by_category, search_by_speaker,
@@ -12,6 +13,12 @@ class UTF8JSONResponse(JSONResponse):
     media_type = "application/json; charset=utf-8"
 
 app = FastAPI(title="HR Search API", default_response_class=UTF8JSONResponse)
+
+# Basic logging configuration
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(name)s %(message)s'
+)
 
 # CORS - frontend będzie na localhost:5173 (Vite)
 app.add_middleware(
@@ -74,25 +81,25 @@ async def list_webinars(
 ):
     pool = await get_pool()
     
-    # If specific filters are provided, use targeted search
+    # If specific filters are provided, use targeted search with pagination
     if category:
-        results = await search_by_category(category, pool, limit)
+        webinars, total = await search_by_category(category, pool, offset=offset, limit=limit)
     elif speaker:
-        results = await search_by_speaker(speaker, pool, limit)
+        webinars, total = await search_by_speaker(speaker, pool, offset=offset, limit=limit)
     elif tags:
         tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
-        results = await search_by_tags(tag_list, pool, limit)
+        webinars, total = await search_by_tags(tag_list, pool, offset=offset, limit=limit)
     else:
-        # Default: recent webinars
-        results = await list_recent_webinars(pool, limit=limit)
+        # Default: recent webinars with pagination
+        webinars, total = await list_recent_webinars(pool, offset=offset, limit=limit)
     
-    # Apply offset/limit pagination
-    paginated_results = results[offset:offset + limit]
-    has_more = len(results) > offset + limit
+    has_more = (offset + len(webinars)) < total
     
     return {
-        "webinars": paginated_results,
-        "total": len(results),
+        "webinars": webinars,
+        "total": total,
+        "offset": offset,
+        "limit": limit,
         "hasMore": has_more
     }
 

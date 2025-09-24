@@ -8,7 +8,10 @@ import sys
 from pathlib import Path
 
 # Add backend to path so we can import modules
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Handle both running from backend/ and from project root
+script_dir = Path(__file__).parent
+backend_dir = script_dir.parent.parent  # Go up from scripts/maintenance to backend
+sys.path.insert(0, str(backend_dir))
 
 from app.db import get_pool, close_pool
 from app.search import generate_all_embeddings

@@ -53,6 +53,10 @@ CREATE TABLE IF NOT EXISTS webinars (
 CREATE INDEX IF NOT EXISTS idx_webinars_category ON webinars(category_id);
 CREATE INDEX IF NOT EXISTS idx_webinars_title_trgm ON webinars USING GIN(title gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_webinars_status ON webinars(status) WHERE status = 'published';
+-- Optimize ordering for recent listings
+CREATE INDEX IF NOT EXISTS idx_webinars_recorded_published
+ON webinars(recorded_date DESC)
+WHERE status = 'published';
 
 -- webinar_speakers (many-to-many)
 CREATE TABLE IF NOT EXISTS webinar_speakers (

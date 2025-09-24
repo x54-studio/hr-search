@@ -173,6 +173,8 @@ curl "http://localhost:8000/api/webinars?offset=20&limit=20"
 {
   "webinars": [...],
   "total": 45,
+  "offset": 20,
+  "limit": 20,
   "hasMore": true
 }
 ```

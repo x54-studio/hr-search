@@ -1,5 +1,6 @@
 import asyncpg
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
+import logging
 from sentence_transformers import SentenceTransformer
 import asyncio
 from .config import settings
@@ -23,7 +24,7 @@ def get_model() -> SentenceTransformer:
 def generate_embedding(text: str) -> List[float]:
     """Generate embedding for given text"""
     model = get_model()
-    return model.encode(text, normalize_embeddings=True).tolist()
+    return model.encode(text, normalize_embeddings=True, show_progress_bar=False).tolist()
 
 async def search(query: str, pool: asyncpg.Pool, limit: int = 20, debug: bool = False) -> List[Dict]:
     """
@@ -37,20 +38,22 @@ async def search(query: str, pool: asyncpg.Pool, limit: int = 20, debug: bool = 
     
     # Truncate very long queries
     query = query[:200].strip()
-    print(f"🔍 Searching for: '{query}' (semantic_threshold={settings.SEMANTIC_THRESHOLD}, fuzzy_threshold={settings.FUZZY_THRESHOLD}, debug={debug})")
+    logger = logging.getLogger("hr_search.search")
+    log = logger.info if debug else logger.debug
+    log(f"Searching for '{query}' (semantic_threshold={settings.SEMANTIC_THRESHOLD}, fuzzy_threshold={settings.FUZZY_THRESHOLD})")
     
     async with pool.acquire() as conn:
         # Generate embedding for query
-        print("📊 Generating embedding...")
+        log("Generating embedding")
         embedding_start = time.time()
         query_embedding = generate_embedding(query)
         embedding_time = time.time() - embedding_start
-        print(f"⏱️  Embedding generation took: {embedding_time:.3f}s")
-        print(f"ℹ️  Query embedding vector dims: {len(query_embedding)}")
-        print(f"ℹ️  Query embedding (first 5 values): {query_embedding[:5]}")
+        log(f"Embedding generated: duration_sec={round(embedding_time, 3)} dims={len(query_embedding)}")
+        if debug:
+            logger.info(f"Embedding preview: {[float(v) for v in query_embedding[:5]]}")
         
         # Try semantic search first
-        print("🔎 Running semantic search...")
+        log("Running semantic search")
         semantic_start = time.time()
         # Convert embedding to pgvector string format and cast in SQL
         embedding_str = '[' + ','.join(map(str, query_embedding)) + ']'
@@ -84,21 +87,17 @@ async def search(query: str, pool: asyncpg.Pool, limit: int = 20, debug: bool = 
             settings.SEMANTIC_THRESHOLD
         )
         semantic_time = time.time() - semantic_start
-        print(f"⏱️  Semantic search took: {semantic_time:.3f}s, found {len(results)} results")
+        log(f"Semantic search done: duration_sec={round(semantic_time, 3)} results={len(results)}")
         if debug and results:
-            print("🪵 Top semantic results (id, similarity, title):")
+            logger.info("Top semantic results (id, similarity, title):")
             for r in results[:10]:
-                print(f"   {r['id']}  sim={float(r['similarity']):.3f}  title={r['title']}")
+                logger.info(f"  {r['id']}  sim={float(r['similarity']):.3f}  title={r['title']}")
         
         # If no semantic results, try fuzzy search
         if not results:
             if debug:
-                print(f"🔍 No semantic results found with threshold {settings.SEMANTIC_THRESHOLD}")
-                print("🔍 This could mean:")
-                print("   - Threshold too high (try lowering SEMANTIC_THRESHOLD)")
-                print("   - No embeddings generated (run generate_embeddings.py)")
-                print("   - Query too specific or rare")
-            print("🔍 No semantic results, trying fuzzy search...")
+                logger.warning(f"No semantic results (threshold={settings.SEMANTIC_THRESHOLD})")
+            log("Trying fuzzy search")
             fuzzy_start = time.time()
             results = await conn.fetch(
                 """
@@ -128,14 +127,14 @@ async def search(query: str, pool: asyncpg.Pool, limit: int = 20, debug: bool = 
                 settings.FUZZY_THRESHOLD
             )
             fuzzy_time = time.time() - fuzzy_start
-            print(f"⏱️  Fuzzy search took: {fuzzy_time:.3f}s, found {len(results)} results")
+            log(f"Fuzzy search done: duration_sec={round(fuzzy_time, 3)} results={len(results)}")
             if debug and results:
-                print("🪵 Top fuzzy results (id, similarity, title):")
+                logger.info("Top fuzzy results (id, similarity, title):")
                 for r in results[:10]:
-                    print(f"   {r['id']}  sim={float(r['similarity']):.3f}  title={r['title']}")
+                    logger.info(f"  {r['id']}  sim={float(r['similarity']):.3f}  title={r['title']}")
         
         total_time = time.time() - start_time
-        print(f"✅ Total search time: {total_time:.3f}s")
+        log(f"Search finished: total_duration_sec={round(total_time, 3)}")
         
         return [dict(r) for r in results]
 
@@ -181,9 +180,20 @@ async def autocomplete(query: str, pool: asyncpg.Pool, limit: int = 10) -> List[
         
         return [dict(r) for r in results]
 
-async def search_by_category(category_slug: str, pool: asyncpg.Pool, limit: int = 20) -> List[Dict]:
-    """Search webinars by category"""
+async def search_by_category(category_slug: str, pool: asyncpg.Pool, offset: int = 0, limit: int = 20) -> Tuple[List[Dict], int]:
+    """Search webinars by category with pagination and total count."""
     async with pool.acquire() as conn:
+        total = await conn.fetchval(
+            """
+            SELECT COUNT(*)
+            FROM webinars w
+            JOIN categories c ON w.category_id = c.id
+            WHERE c.slug = $1
+              AND w.status = 'published'
+            """,
+            category_slug,
+        )
+
         results = await conn.fetch(
             """
             SELECT 
@@ -199,20 +209,33 @@ async def search_by_category(category_slug: str, pool: asyncpg.Pool, limit: int 
             LEFT JOIN webinar_tags wt ON w.id = wt.webinar_id
             LEFT JOIN tags t ON wt.tag_id = t.id
             WHERE c.slug = $1 
-            AND w.status = 'published'
+              AND w.status = 'published'
             GROUP BY w.id, w.title, w.description, w.duration_ms, w.recorded_date,
                      w.video_url, w.pdf_url, c.name
-            ORDER BY w.recorded_date DESC
-            LIMIT $2
+            ORDER BY w.recorded_date DESC NULLS LAST
+            LIMIT $2 OFFSET $3
             """,
             category_slug,
-            limit
+            limit,
+            offset,
         )
-        return [dict(r) for r in results]
+        return ([dict(r) for r in results], int(total or 0))
 
-async def search_by_speaker(speaker_name: str, pool: asyncpg.Pool, limit: int = 20) -> List[Dict]:
-    """Search webinars by speaker"""
+async def search_by_speaker(speaker_name: str, pool: asyncpg.Pool, offset: int = 0, limit: int = 20) -> Tuple[List[Dict], int]:
+    """Search webinars by speaker with pagination and total count."""
     async with pool.acquire() as conn:
+        total = await conn.fetchval(
+            """
+            SELECT COUNT(DISTINCT w.id)
+            FROM webinars w
+            JOIN webinar_speakers ws ON w.id = ws.webinar_id
+            JOIN speakers s ON ws.speaker_id = s.id
+            WHERE lower(s.name) LIKE '%' || lower($1) || '%'
+              AND w.status = 'published'
+            """,
+            speaker_name,
+        )
+
         results = await conn.fetch(
             """
             SELECT 
@@ -228,26 +251,40 @@ async def search_by_speaker(speaker_name: str, pool: asyncpg.Pool, limit: int = 
             LEFT JOIN webinar_tags wt ON w.id = wt.webinar_id
             LEFT JOIN tags t ON wt.tag_id = t.id
             WHERE lower(s.name) LIKE '%' || lower($1) || '%'
-            AND w.status = 'published'
+              AND w.status = 'published'
             GROUP BY w.id, w.title, w.description, w.duration_ms, w.recorded_date,
                      w.video_url, w.pdf_url, c.name
-            ORDER BY w.recorded_date DESC
-            LIMIT $2
+            ORDER BY w.recorded_date DESC NULLS LAST
+            LIMIT $2 OFFSET $3
             """,
             speaker_name,
-            limit
+            limit,
+            offset,
         )
-        return [dict(r) for r in results]
+        return ([dict(r) for r in results], int(total or 0))
 
-async def search_by_tags(tag_slugs: List[str], pool: asyncpg.Pool, limit: int = 20) -> List[Dict]:
-    """Search webinars by tags (OR logic)"""
+async def search_by_tags(tag_slugs: List[str], pool: asyncpg.Pool, offset: int = 0, limit: int = 20) -> Tuple[List[Dict], int]:
+    """Search webinars by tags (OR logic) with pagination and total count."""
     if not tag_slugs:
-        return []
+        return ([], 0)
     
     async with pool.acquire() as conn:
-        # Create placeholders for the IN clause
-        placeholders = ','.join([f'${i+2}' for i in range(len(tag_slugs))])
-        
+        # Total count placeholders: $1..$N for tag slugs
+        placeholders_count = ','.join([f'${i+1}' for i in range(len(tag_slugs))])
+        total = await conn.fetchval(
+            f"""
+            SELECT COUNT(DISTINCT w.id)
+            FROM webinars w
+            JOIN webinar_tags wt ON w.id = wt.webinar_id
+            JOIN tags t ON wt.tag_id = t.id
+            WHERE t.slug IN ({placeholders_count})
+              AND w.status = 'published'
+            """,
+            *tag_slugs,
+        )
+
+        # Data query placeholders: $1 limit, $2 offset, tags start from $3..$N
+        placeholders_data = ','.join([f'${i+3}' for i in range(len(tag_slugs))])
         results = await conn.fetch(
             f"""
             SELECT 
@@ -262,17 +299,18 @@ async def search_by_tags(tag_slugs: List[str], pool: asyncpg.Pool, limit: int = 
             LEFT JOIN categories c ON w.category_id = c.id
             LEFT JOIN webinar_speakers ws ON w.id = ws.webinar_id
             LEFT JOIN speakers s ON ws.speaker_id = s.id
-            WHERE t.slug IN ({placeholders})
-            AND w.status = 'published'
+            WHERE t.slug IN ({placeholders_data})
+              AND w.status = 'published'
             GROUP BY w.id, w.title, w.description, w.duration_ms, w.recorded_date,
                      w.video_url, w.pdf_url, c.name
-            ORDER BY w.recorded_date DESC
-            LIMIT $1
+            ORDER BY w.recorded_date DESC NULLS LAST
+            LIMIT $1 OFFSET $2
             """,
             limit,
-            *tag_slugs
+            offset,
+            *tag_slugs,
         )
-        return [dict(r) for r in results]
+        return ([dict(r) for r in results], int(total or 0))
 
 async def get_webinar_details(webinar_id: str, pool: asyncpg.Pool) -> Optional[Dict]:
     """Get full details of a specific webinar"""
@@ -322,10 +360,10 @@ async def generate_all_embeddings(pool: asyncpg.Pool):
         )
         
         if not webinars:
-            print("All webinars already have embeddings")
+            logging.getLogger("hr_search.search").info("All webinars already have embeddings")
             return
         
-        print(f"Generating embeddings for {len(webinars)} webinars...")
+        logging.getLogger("hr_search.search").info("Generating embeddings", extra={"count": len(webinars)})
         
         # Generate embeddings in batches
         batch_size = 32
@@ -343,7 +381,7 @@ async def generate_all_embeddings(pool: asyncpg.Pool):
                 texts, 
                 batch_size=batch_size,
                 normalize_embeddings=True,
-                show_progress_bar=True
+                show_progress_bar=False
             )
             
             # Store in database
@@ -363,7 +401,7 @@ async def generate_all_embeddings(pool: asyncpg.Pool):
                     embedding_str
                 )
         
-        print(f"Generated embeddings for {len(webinars)} webinars")
+        logging.getLogger("hr_search.search").info("Embeddings generated", extra={"count": len(webinars)})
 
 async def get_categories(pool: asyncpg.Pool) -> List[Dict]:
     """Get all categories with webinar count"""
@@ -432,9 +470,17 @@ async def get_popular_tags(pool: asyncpg.Pool, limit: int = 20) -> List[Dict]:
         )
         return [dict(r) for r in results]
 
-async def list_recent_webinars(pool: asyncpg.Pool, limit: int = 20) -> List[Dict]:
-    """Return most recent published webinars (fallback/default listing)."""
+async def list_recent_webinars(pool: asyncpg.Pool, offset: int = 0, limit: int = 20) -> Tuple[List[Dict], int]:
+    """Return most recent published webinars with pagination and total count."""
     async with pool.acquire() as conn:
+        total = await conn.fetchval(
+            """
+            SELECT COUNT(*)
+            FROM webinars w
+            WHERE w.status = 'published'
+            """,
+        )
+
         results = await conn.fetch(
             """
             SELECT 
@@ -453,8 +499,9 @@ async def list_recent_webinars(pool: asyncpg.Pool, limit: int = 20) -> List[Dict
             GROUP BY w.id, w.title, w.description, w.duration_ms, w.recorded_date,
                      w.video_url, w.pdf_url, c.name
             ORDER BY w.recorded_date DESC NULLS LAST, w.created_at DESC
-            LIMIT $1
+            LIMIT $1 OFFSET $2
             """,
-            limit
+            limit,
+            offset,
         )
-        return [dict(r) for r in results]
+        return ([dict(r) for r in results], int(total or 0))

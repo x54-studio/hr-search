@@ -7,7 +7,10 @@ import sys
 from pathlib import Path
 
 # Add backend to path so we can import modules
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Handle both running from backend/ and from project root
+script_dir = Path(__file__).parent
+backend_dir = script_dir.parent  # Go up from scripts to backend
+sys.path.insert(0, str(backend_dir))
 
 from app.db import get_pool, close_pool
 from app.search import search, autocomplete, get_categories, get_speakers
