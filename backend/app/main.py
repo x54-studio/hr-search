@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from contextlib import asynccontextmanager
 import logging
 from .db import get_pool, close_pool
 from .config import settings
@@ -13,7 +14,15 @@ from .search import (
 class UTF8JSONResponse(JSONResponse):
     media_type = "application/json; charset=utf-8"
 
-app = FastAPI(title="HR Search API", default_response_class=UTF8JSONResponse)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Initialize database connection pool
+    await get_pool()  # Includes retry logic
+    yield
+    # Shutdown: Close database connection pool
+    await close_pool()
+
+app = FastAPI(title="HR Search API", default_response_class=UTF8JSONResponse, lifespan=lifespan)
 
 # Basic logging configuration
 logging.basicConfig(
@@ -29,14 +38,6 @@ app.add_middleware(
     allow_methods=settings.CORS_ALLOW_METHODS,
     allow_headers=settings.CORS_ALLOW_HEADERS,
 )
-
-@app.on_event("startup")
-async def startup():
-    await get_pool()  # Z retry logic
-
-@app.on_event("shutdown")
-async def shutdown():
-    await close_pool()
 
 @app.get("/api/health")
 async def health():
