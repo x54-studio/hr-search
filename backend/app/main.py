@@ -3,10 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import logging
 from .db import get_pool, close_pool
+from .config import settings
 from .search import (
     search, autocomplete, search_by_category, search_by_speaker,
     search_by_tags, get_webinar_details, get_categories,
-    get_speakers, get_tags, get_popular_tags, list_recent_webinars
+    get_speakers, get_tags, get_popular_tags, list_recent_webinars, get_model
 )
 
 class UTF8JSONResponse(JSONResponse):
@@ -20,13 +21,13 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)s %(name)s %(message)s'
 )
 
-# CORS - frontend będzie na localhost:5173 (Vite)
+# CORS configured via environment (settings)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["*"],
+    allow_origins=settings.CORS_ALLOW_ORIGINS,
+    allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
+    allow_methods=settings.CORS_ALLOW_METHODS,
+    allow_headers=settings.CORS_ALLOW_HEADERS,
 )
 
 @app.on_event("startup")
@@ -40,6 +41,45 @@ async def shutdown():
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
+
+@app.get("/api/health/deep")
+async def health_deep():
+    db_ok = False
+    db_error = None
+    model_ok = False
+    model_error = None
+    model_name = settings.EMBEDDING_MODEL
+    model_dims = None
+
+    try:
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            await conn.fetchval("SELECT 1")
+        db_ok = True
+    except Exception as e:
+        db_error = str(e)
+
+    try:
+        model = get_model()
+        # Some models expose dimension via helper; fallback to None
+        try:
+            model_dims = int(getattr(model, "get_sentence_embedding_dimension", lambda: None)() or 0) or None
+        except Exception:
+            model_dims = None
+        model_ok = True
+    except Exception as e:
+        model_error = str(e)
+
+    status = "ok" if db_ok and model_ok else "degraded"
+    return {
+        "status": status,
+        "db": {"ok": db_ok, "error": db_error},
+        "model": {"ok": model_ok, "name": model_name, "dims": model_dims, "error": model_error},
+        "config": {
+            "semanticThreshold": settings.SEMANTIC_THRESHOLD,
+            "fuzzyThreshold": settings.FUZZY_THRESHOLD,
+        }
+    }
 
 @app.get("/api/search")
 async def search_endpoint(q: str = Query(..., min_length=1, max_length=200), limit: int = 20, debug: bool = False):
