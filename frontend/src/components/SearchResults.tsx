@@ -1,14 +1,30 @@
 import React from 'react';
 import type { SearchResult } from '../services/api';
-import { Calendar, Clock, Users, Tag } from 'lucide-react';
+import { Calendar, Clock, Users, Tag, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface SearchResultsProps {
   results: SearchResult[];
   loading: boolean;
   error: string | null;
+  errorCode?: string | null;
+  errorDetails?: Record<string, any> | null;
+  correctedQuery?: string | null;
+  originalQuery?: string | null;
+  onRetry?: () => void;
+  onCorrectedSearch?: (correctedQuery: string) => void;
 }
 
-export function SearchResults({ results, loading, error }: SearchResultsProps) {
+export function SearchResults({ 
+  results, 
+  loading, 
+  error, 
+  errorCode, 
+  errorDetails, 
+  correctedQuery,
+  originalQuery,
+  onRetry,
+  onCorrectedSearch
+}: SearchResultsProps) {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -21,8 +37,41 @@ export function SearchResults({ results, loading, error }: SearchResultsProps) {
   if (error) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600 mb-2">❌ Błąd wyszukiwania</div>
-        <div className="text-gray-600">{error}</div>
+        <div className="text-red-600 mb-4">
+          <AlertCircle className="w-12 h-12 mx-auto mb-2" />
+          <div className="text-lg font-semibold">Błąd wyszukiwania</div>
+        </div>
+        
+        <div className="text-gray-600 mb-4 max-w-md mx-auto">
+          <p className="mb-2">{error}</p>
+          
+          {errorCode && (
+            <p className="text-sm text-gray-500">
+              Kod błędu: {errorCode}
+            </p>
+          )}
+          
+          {errorDetails && Object.keys(errorDetails).length > 0 && (
+            <details className="text-sm text-gray-500 mt-2">
+              <summary className="cursor-pointer hover:text-gray-700">
+                Szczegóły błędu
+              </summary>
+              <pre className="mt-2 text-left bg-gray-100 p-2 rounded text-xs overflow-auto">
+                {JSON.stringify(errorDetails, null, 2)}
+              </pre>
+            </details>
+          )}
+        </div>
+        
+        {onRetry && (
+          <button
+            onClick={onRetry}
+            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Spróbuj ponownie
+          </button>
+        )}
       </div>
     );
   }
@@ -53,6 +102,31 @@ export function SearchResults({ results, loading, error }: SearchResultsProps) {
         Znaleziono {results.length} wyników
       </div>
       
+      {/* Spell correction suggestion */}
+      {correctedQuery && originalQuery && correctedQuery !== originalQuery && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="text-blue-800 text-sm">
+                <span className="font-medium">Czy chodziło Ci o:</span>
+                <span className="ml-2 font-semibold">"{correctedQuery}"</span>
+                <span className="ml-2 text-blue-600">
+                  (zamiast "{originalQuery}")
+                </span>
+              </div>
+            </div>
+            {onCorrectedSearch && (
+              <button
+                onClick={() => onCorrectedSearch(correctedQuery)}
+                className="ml-4 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+              >
+                Wyszukaj ponownie
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+      
       {results.map((result) => (
         <div key={result.id} className="result-card">
           <div className="flex justify-between items-start mb-2">
@@ -73,7 +147,7 @@ export function SearchResults({ results, loading, error }: SearchResultsProps) {
           )}
           
           <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-            {result.speakers.length > 0 && (
+            {result.speakers && result.speakers.length > 0 && (
               <div className="flex items-center">
                 <Users className="w-4 h-4 mr-1" />
                 {result.speakers.join(', ')}
@@ -95,7 +169,7 @@ export function SearchResults({ results, loading, error }: SearchResultsProps) {
             )}
           </div>
           
-          {result.tags.length > 0 && (
+          {result.tags && result.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-3">
               {result.tags.slice(0, 5).map((tag, index) => (
                 <span key={index} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded flex items-center">

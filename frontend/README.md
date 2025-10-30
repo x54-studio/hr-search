@@ -1,73 +1,79 @@
-# React + TypeScript + Vite
+# HR Search Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React-based frontend for the HR Knowledge Search System.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 18** - Modern React with hooks and concurrent features
+- **TypeScript** - Type safety and better developer experience
+- **Vite** - Fast build tool with hot module replacement
+- **Tailwind CSS** - Utility-first CSS framework for rapid styling
+- **Native fetch API** - No external HTTP client dependencies
 
-## React Compiler
+## Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── components/           # React components
+│   ├── SearchInput.tsx   # Main search input with autocomplete
+│   ├── SearchResults.tsx # Search results display
+│   └── SearchSuggestions.tsx # Autocomplete dropdown
+├── hooks/               # Custom React hooks
+│   └── useSearch.ts     # Search state management
+├── services/            # API communication
+│   └── api.ts          # HTTP client and types
+├── App.tsx             # Main application component
+└── main.tsx            # Application entry point
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js 18+ 
+- npm or yarn
+
+### Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
+
+### Development Server
+
+The frontend runs on `http://localhost:5173` by default and connects to the backend API at `http://localhost:8000`.
+
+## Features
+
+- **Semantic Search** - Search webinars using natural language
+- **Autocomplete** - Real-time search suggestions
+- **Spell Correction** - Automatic typo detection and correction
+- **Mobile Responsive** - Works on all device sizes
+- **Polish Language Support** - Optimized for Polish HR terminology
+
+## API Integration
+
+The frontend communicates with the FastAPI backend through:
+
+- `GET /api/search` - Main search endpoint
+- `GET /api/autocomplete` - Autocomplete suggestions
+- `GET /api/webinars` - Webinar listings with filters
+- `GET /api/categories` - Available categories
+- `GET /api/speakers` - Speaker information
+
+## Build Output
+
+Production builds are optimized for:
+- Minimal bundle size (< 500KB)
+- Fast loading on mobile devices
+- Static file serving from FastAPI backend

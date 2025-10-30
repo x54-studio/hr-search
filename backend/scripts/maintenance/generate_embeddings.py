@@ -1,40 +1,64 @@
 #!/usr/bin/env python3
-"""
-Generate embeddings for all webinars in the database.
-This script should be run after seeding sample data.
-"""
+"""Generate embeddings for all webinars using service layer."""
 import asyncio
 import sys
 from pathlib import Path
 
-# Add backend to path so we can import modules
-# Handle both running from backend/ and from project root
 script_dir = Path(__file__).parent
-backend_dir = script_dir.parent.parent  # Go up from scripts/maintenance to backend
+backend_dir = script_dir.parent.parent
 sys.path.insert(0, str(backend_dir))
 
-from app.db import get_pool, close_pool
-from app.search import generate_all_embeddings
+from app.config import settings
+from app.dependencies import DatabaseManager, ModelManager, get_embedding_service, get_embedding_repository
+from app.logging_config import setup_logging, get_logger
+
+logger = get_logger("generate_embeddings")
 
 async def main():
     """Generate embeddings for all webinars."""
-    print("🚀 Starting embedding generation...")
+    setup_logging(settings.LOG_LEVEL)
+    logger.info("Starting embedding generation...")
+    
+    pool = None
+    model_manager = None
     
     try:
-        pool = await get_pool()
-        print("✅ Connected to database")
+        # Initialize database
+        db_manager = DatabaseManager()
+        pool = await db_manager.create_pool()
+        logger.info("Database pool created")
+        
+        # Initialize model
+        model_manager = ModelManager()
+        await model_manager.initialize_model()
+        logger.info("Model initialized")
+        
+        # Create service
+        embedding_repo = get_embedding_repository(pool)
+        
+        # Create a simple app-like object for DI
+        class AppState:
+            pass
+        app = AppState()
+        app.state = AppState()
+        app.state.model_manager = model_manager
+        
+        embedding_service = get_embedding_service(embedding_repo, app)
         
         # Generate embeddings
-        await generate_all_embeddings(pool)
+        await embedding_service.generate_all_embeddings()
         
-        print("✅ Embedding generation completed!")
+        logger.info("Embedding generation completed successfully")
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        logger.error(f"Error: {e}", exc_info=True)
         raise
     finally:
-        await close_pool()
-        print("🔌 Database connection closed")
+        if model_manager:
+            await model_manager.cleanup_model()
+        if pool:
+            await pool.close()
+        logger.info("Cleanup completed")
 
 if __name__ == "__main__":
     asyncio.run(main())

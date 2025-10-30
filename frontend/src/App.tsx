@@ -1,4 +1,3 @@
-import React from 'react';
 import { SearchInput } from './components/SearchInput';
 import { SearchSuggestions } from './components/SearchSuggestions';
 import { SearchResults } from './components/SearchResults';
@@ -11,11 +10,20 @@ function App() {
     suggestions,
     loading,
     error,
+    errorCode,
+    errorDetails,
     showSuggestions,
+    correctedQuery,
+    originalQuery,
     handleQueryChange,
     handleSuggestionClick,
     clearSearch,
+    retrySearch,
   } = useSearch();
+
+  const handleCorrectedSearch = (correctedQuery: string) => {
+    handleQueryChange(correctedQuery);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -54,6 +62,12 @@ function App() {
           results={results}
           loading={loading}
           error={error}
+          errorCode={errorCode}
+          errorDetails={errorDetails}
+          correctedQuery={correctedQuery}
+          originalQuery={originalQuery}
+          onRetry={retrySearch}
+          onCorrectedSearch={handleCorrectedSearch}
         />
       </main>
 

@@ -1,384 +1,464 @@
-# API Documentation
+# HR Search API Documentation
 
-## Base Configuration
+## Overview
 
-### Base URL
+The HR Search API provides semantic search capabilities for HR webinars using machine learning embeddings and fuzzy matching fallback. The API is built with FastAPI and follows RESTful principles with comprehensive error handling.
+
+## Base URL
+
 ```
-Development: http://localhost:8000/api
-Production: https://hr-search.mikr.us/api
-```
-
-### Headers
-```http
-Content-Type: application/json
-Accept: application/json
+http://localhost:8000
 ```
 
-## Search Endpoints
+## Authentication
 
-### 1. Main Search
-`GET /api/search`
+Currently, the API does not require authentication (portfolio project). In production, implement proper authentication mechanisms.
 
-Semantic search using embeddings with fuzzy fallback.
+## Error Handling
 
-**Query Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| q | string | Yes | Search query (max 200 chars) |
-| limit | integer | No | Results limit (default: 20, max: 50) |
+The API uses a consistent error handling pattern with proper HTTP status codes:
 
-**Example Request:**
-```bash
-curl "http://localhost:8000/api/search?q=rekrutacja%20IT&limit=10"
+| Status Code | Description | Exception Type |
+|-------------|-------------|----------------|
+| 400 | Bad Request | ValidationError |
+| 404 | Not Found | SearchError |
+| 500 | Internal Server Error | SearchError |
+| 503 | Service Unavailable | SearchError |
+
+### Error Response Format
+
+All API endpoints return standardized error responses with the following format:
+
+```json
+{
+  "error": "ERROR_CODE",
+  "message": "Human-readable error message",
+  "details": {
+    "additional": "error context"
+  },
+  "timestamp": 1640995200.123,
+  "request_id": "abc12345"
+}
 ```
 
-**Success Response (200):**
+#### Error Response Fields
+
+- **error**: Machine-readable error code (string)
+- **message**: Human-readable error message (string)
+- **details**: Additional error context (object)
+- **timestamp**: Unix timestamp when error occurred (number)
+- **request_id**: Unique request identifier for tracing (string)
+
+#### Common Error Codes
+
+| Error Code | HTTP Status | Description |
+|------------|-------------|-------------|
+| `VALIDATION_ERROR` | 400 | Input validation failed |
+| `SEARCH_ERROR` | 404/500/503 | Search operation failed |
+| `INTERNAL_SERVER_ERROR` | 500 | Unexpected server error |
+
+#### Error Response Examples
+
+**Validation Error:**
+```json
+{
+  "error": "VALIDATION_ERROR",
+  "message": "Search query too long (max 200 characters)",
+  "details": {
+    "field": "query",
+    "value": "very long query...",
+    "max_length": 200
+  },
+  "timestamp": 1640995200.123,
+  "request_id": "abc12345"
+}
+```
+
+**Resource Not Found:**
+```json
+{
+  "error": "RESOURCE_NOT_FOUND",
+  "message": "Webinar not found",
+  "details": {
+    "resource_type": "webinar",
+    "resource_id": "non-existent-id"
+  },
+  "timestamp": 1640995200.123,
+  "request_id": "abc12345"
+}
+```
+
+**Database Error:**
+```json
+{
+  "error": "DATABASE_ERROR",
+  "message": "Database connection failed",
+  "details": {
+    "operation": "fetch",
+    "query": "SELECT * FROM webinars..."
+  },
+  "timestamp": 1640995200.123,
+  "request_id": "abc12345"
+}
+```
+
+#### Request ID Usage
+
+The `request_id` field is included in all error responses to help with debugging and tracing. You can use this ID to:
+
+1. **Correlate errors with logs**: Search application logs using the request ID
+2. **Debug issues**: Reference the request ID when reporting bugs
+3. **Track request flow**: Follow a request through multiple services
+
+Example log entry:
+```
+2024-01-01 12:00:00 ERROR [request_id=abc12345] Database query execution failed: fetch
+```
+
+## Endpoints
+
+### Health Check
+
+#### GET /api/health
+
+Basic health check endpoint.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
+#### GET /api/health/deep
+
+Comprehensive health check including database and ML model status.
+
+**Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "database": {
+    "status": "connected",
+    "pool_size": 10,
+    "active_connections": 3
+  },
+  "model": {
+    "status": "loaded",
+    "name": "paraphrase-multilingual-MiniLM-L12-v2",
+    "dimensions": 384
+  }
+}
+```
+
+### Search
+
+#### GET /api/search
+
+Perform spell-corrected semantic search with fuzzy fallback and speaker name search.
+
+**Search Behavior:**
+1. **Semantic Search**: Uses ML embeddings to find semantically similar content
+2. **Fuzzy Fallback**: If no semantic results, uses fuzzy text matching
+3. **Speaker Search**: If no fuzzy results, searches by speaker names (exact and partial matches)
+
+**Parameters:**
+- `q` (string, required): Search query (1-200 characters)
+- `limit` (integer, optional): Maximum results (default: 20, max: 50)
+- `debug` (boolean, optional): Enable debug logging (default: false)
+
+**Example Requests:**
+```
+# Search by webinar content
+GET /api/search?q=leadership development&limit=10
+
+# Search by speaker name (full name)
+GET /api/search?q=Agnieszka Kamińska&limit=5
+
+# Search by speaker first name
+GET /api/search?q=Agnieszka&limit=10
+
+# Search by speaker last name
+GET /api/search?q=Kowalski&limit=5
+```
+
+**Response:**
 ```json
 {
   "results": [
     {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "title": "Skuteczna rekrutacja w IT",
-      "description": "Jak prowadzić rekrutację specjalistów IT...",
-      "category": "Rekrutacja",
-      "speakers": ["Jan Kowalski", "Anna Nowak"],
-      "tags": ["rekrutacja", "IT", "rozmowa kwalifikacyjna"],
-      "duration_ms": 2700000,
-      "recorded_date": "2024-01-15",
+      "id": "uuid",
+      "title": "Leadership Development Workshop",
+      "description": "Comprehensive leadership training...",
+      "duration_ms": 3600000,
+      "recorded_date": "2024-01-10T14:00:00Z",
       "video_url": "https://example.com/video.mp4",
-      "pdf_url": "https://example.com/slides.pdf"
+      "pdf_url": "https://example.com/slides.pdf",
+      "category_name": "Leadership",
+      "similarity": 0.85,
+      "speakers": ["John Doe", "Jane Smith"],
+      "tags": ["leadership", "development", "workshop"]
     }
   ],
-  "count": 10
+  "count": 1,
+  "corrected_query": "leadership development",
+  "original_query": "leadrship development"
 }
 ```
 
-**No Results (200):**
-```json
-{
-  "results": [],
-  "count": 0,
-  "message": "Nie znaleziono wyników"
-}
-```
+**Spell Correction:**
+- If the system detects a typo and corrects it, `corrected_query` will contain the corrected version
+- If no correction is applied, `corrected_query` will be `null`
+- The frontend can use this information to show "Did you mean..." suggestions
 
-**Error Response (400):**
-```json
-{
-  "detail": "Query cannot be empty"
-}
-```
+### Autocomplete
 
-### 2. Autocomplete
-`GET /api/autocomplete`
+#### GET /api/autocomplete
 
-Real-time suggestions from webinars, speakers, and tags.
+Get autocomplete suggestions from webinars, speakers, and tags.
 
-**Query Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| q | string | Yes | Partial query (min 1 char) |
-| limit | integer | No | Max suggestions (default: 10) |
+**Parameters:**
+- `q` (string, required): Partial query text (1-200 characters)
+- `limit` (integer, optional): Maximum suggestions (default: 10, max: 20)
 
 **Example Request:**
-```bash
-curl "http://localhost:8000/api/autocomplete?q=mot"
+```
+GET /api/autocomplete?q=lead&limit=5
 ```
 
-**Success Response (200):**
+**Response:**
 ```json
 {
   "suggestions": [
     {
-      "text": "Motywacja pracowników",
-      "type": "webinar"
+      "suggestion": "Leadership Development",
+      "type": "webinar",
+      "priority": 1
     },
     {
-      "text": "Motywowanie zespołu",
-      "type": "webinar"
-    },
-    {
-      "text": "motywacja",
-      "type": "tag"
+      "suggestion": "Leadership Skills",
+      "type": "tag",
+      "priority": 3
     }
   ]
 }
 ```
 
-## Webinar Endpoints
+### Webinars
 
-### 3. Get Webinar Details
-`GET /api/webinars/{id}`
+#### GET /api/webinars/{webinar_id}
 
-Get full details of a specific webinar.
+Get detailed information about a specific webinar.
 
-**Path Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| id | UUID | Yes | Webinar ID |
+**Parameters:**
+- `webinar_id` (string, required): UUID of the webinar
 
 **Example Request:**
-```bash
-curl "http://localhost:8000/api/webinars/550e8400-e29b-41d4-a716-446655440000"
+```
+GET /api/webinars/123e4567-e89b-12d3-a456-426614174000
 ```
 
-**Success Response (200):**
+**Response:**
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "title": "Skuteczna rekrutacja w IT",
-  "description": "Kompleksowy przewodnik po rekrutacji specjalistów IT w 2024 roku...",
-  "category": "Rekrutacja",
-  "speakers": ["Jan Kowalski", "Anna Nowak"],
-  "tags": ["rekrutacja", "IT", "rozmowa kwalifikacyjna"],
-  "duration_ms": 2700000,
-  "recorded_date": "2024-01-15",
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Leadership Development Workshop",
+  "description": "Comprehensive leadership training...",
+  "duration_ms": 3600000,
+  "recorded_date": "2024-01-10T14:00:00Z",
   "video_url": "https://example.com/video.mp4",
-  "pdf_url": "https://example.com/slides.pdf"
+  "pdf_url": "https://example.com/slides.pdf",
+  "status": "published",
+  "category_name": "Leadership",
+  "speakers": ["John Doe", "Jane Smith"],
+  "tags": ["leadership", "development", "workshop"]
 }
 ```
 
-**Not Found (404):**
+#### GET /api/webinars
+
+List webinars with optional filtering and pagination.
+
+**Parameters:**
+- `category` (string, optional): Filter by category slug
+- `speaker` (string, optional): Filter by speaker name
+- `tags` (string, optional): Comma-separated tag slugs
+- `offset` (integer, optional): Number of records to skip (default: 0)
+- `limit` (integer, optional): Maximum records (default: 20, max: 50)
+
+**Example Requests:**
+```
+GET /api/webinars?category=leadership&limit=10
+GET /api/webinars?speaker=John Doe&offset=0&limit=20
+GET /api/webinars?tags=leadership,development&limit=15
+```
+
+**Response:**
 ```json
 {
-  "detail": "Webinar not found"
-}
-```
-
-### 4. List Webinars
-`GET /api/webinars`
-
-List webinars with optional filters.
-
-**Query Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| category | string | No | Filter by category slug |
-| speaker | string | No | Filter by speaker name |
-| tags | string | No | Filter by tag slugs (comma-separated, OR logic) |
-| offset | integer | No | Skip first N results (default: 0) |
-| limit | integer | No | Max items to return (default: 20, max: 100) |
-
-**Example Request:**
-```bash
-# First batch
-curl "http://localhost:8000/api/webinars?limit=20"
-
-# Load more (next 20)
-curl "http://localhost:8000/api/webinars?offset=20&limit=20"
-```
-
-**Success Response (200):**
-```json
-{
-  "webinars": [...],
-  "total": 45,
-  "offset": 20,
-  "limit": 20,
-  "hasMore": true
-}
-```
-
-## Metadata Endpoints
-
-### 5. List Categories
-`GET /api/categories`
-
-Get all categories with webinar count.
-
-**Example Request:**
-```bash
-curl "http://localhost:8000/api/categories"
-```
-
-**Success Response (200):**
-```json
-{
-  "categories": [
+  "webinars": [
     {
-      "slug": "rekrutacja",
-      "name": "Rekrutacja",
-      "count": 23
-    },
-    {
-      "slug": "onboarding",
-      "name": "Onboarding",
-      "count": 15
+      "id": "uuid",
+      "title": "Leadership Development Workshop",
+      "description": "Comprehensive leadership training...",
+      "duration_ms": 3600000,
+      "recorded_date": "2024-01-10T14:00:00Z",
+      "video_url": "https://example.com/video.mp4",
+      "pdf_url": "https://example.com/slides.pdf",
+      "category_name": "Leadership",
+      "speakers": ["John Doe", "Jane Smith"],
+      "tags": ["leadership", "development", "workshop"]
     }
-  ]
+  ],
+  "total_count": 25
 }
 ```
 
-### 6. List Speakers
-`GET /api/speakers`
+### Categories
 
-Get all speakers with webinar count.
+#### GET /api/categories
 
-**Example Request:**
-```bash
-curl "http://localhost:8000/api/speakers"
-```
+Get all categories with webinar counts.
 
-**Success Response (200):**
+**Response:**
 ```json
-{
-  "speakers": [
-    {
-      "name": "Jan Kowalski",
-      "bio": "Ekspert HR z 15-letnim doświadczeniem",
-      "count": 8
-    },
-    {
-      "name": "Anna Nowak",
-      "bio": "Specjalistka od rekrutacji IT",
-      "count": 5
-    }
-  ]
-}
+[
+  {
+    "id": "uuid",
+    "name": "Leadership",
+    "slug": "leadership",
+    "description": "Leadership and management topics",
+    "webinar_count": 15
+  }
+]
 ```
 
-### 7. Popular Tags
-`GET /api/tags/popular`
+### Tags
 
-Get most used tags.
+#### GET /api/tags
 
-**Query Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| limit | integer | No | Number of tags (default: 20) |
+Get all tags with webinar counts.
 
-**Example Request:**
-```bash
-curl "http://localhost:8000/api/tags/popular?limit=10"
-```
+**Parameters:**
+- `limit` (integer, optional): Maximum tags (default: 100, max: 500)
 
-**Success Response (200):**
+**Response:**
 ```json
-{
-  "tags": [
-    {
-      "slug": "rekrutacja",
-      "name": "rekrutacja",
-      "count": 45
-    },
-    {
-      "slug": "motywacja",
-      "name": "motywacja",
-      "count": 32
-    }
-  ]
-}
+[
+  {
+    "id": "uuid",
+    "name": "leadership",
+    "slug": "leadership",
+    "webinar_count": 12
+  }
+]
 ```
 
-## Error Handling
+#### GET /api/tags/popular
 
-### Error Response Format
-FastAPI automatically returns errors in this format:
+Get most used tags ordered by usage count.
+
+**Parameters:**
+- `limit` (integer, optional): Maximum tags (default: 20, max: 100)
+
+**Response:**
 ```json
-{
-  "detail": "Error message here"
-}
+[
+  {
+    "id": "uuid",
+    "name": "leadership",
+    "slug": "leadership",
+    "webinar_count": 25
+  }
+]
 ```
 
-### HTTP Status Codes
-| Code | Meaning | When Used |
-|------|---------|-----------|
-| 200 | OK | Successful request |
-| 400 | Bad Request | Invalid parameters |
-| 404 | Not Found | Resource doesn't exist |
-| 422 | Unprocessable Entity | Validation error |
-| 500 | Internal Server Error | Server error |
+### Speakers
 
-## Performance Expectations
+#### GET /api/speakers
 
-| Endpoint | Target Response Time |
-|----------|---------------------|
-| /search | < 300ms |
-| /autocomplete | < 100ms |
-| /webinars/{id} | < 50ms |
-| Other endpoints | < 100ms |
+Get all speakers with webinar counts.
 
-## CORS Configuration
+**Parameters:**
+- `limit` (integer, optional): Maximum speakers (default: 100, max: 500)
 
-```python
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_methods=["GET"],
-    allow_headers=["*"]
-)
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "John Doe",
+    "bio": "Senior Leadership Consultant",
+    "webinar_count": 8
+  }
+]
 ```
 
 ## Rate Limiting
 
-Not implemented (internal tool for trusted users).
+Currently, no rate limiting is implemented. In production, implement appropriate rate limiting based on your requirements.
 
-## Authentication
+## CORS
 
-Not required (deployed within company VPN).
+CORS is configured via environment variables. Default configuration allows all origins for development.
 
-## OpenAPI Documentation
+## Logging
 
-FastAPI automatically generates interactive API documentation:
-- Development: http://localhost:8000/docs
-- Alternative UI: http://localhost:8000/redoc
+The API uses structured JSON logging with the following levels:
+- `INFO`: Normal operations
+- `WARNING`: Fallback operations (e.g., fuzzy search fallback)
+- `ERROR`: Operation failures
+- `DEBUG`: Detailed operation information (when debug=true)
 
-## Example Usage
+## Performance Considerations
 
-### JavaScript
-```javascript
-async function searchWebinars(query) {
-  const params = new URLSearchParams({
-    q: query,
-    limit: 10
-  });
-  
-  const response = await fetch(
-    `http://localhost:8000/api/search?${params}`
-  );
-  
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  
-  return await response.json();
-}
+- **Spell Correction**: Quick fuzzy pre-check (limit=3) before expensive semantic search
+- **Semantic Search**: Uses vector similarity with pgvector extension
+- **Fuzzy Search**: Fallback using PostgreSQL trigram matching
+- **Connection Pooling**: Database connections are pooled for efficiency
+- **Model Caching**: ML models are loaded once and cached in memory
+- **Response Times**: Target <300ms for search, <100ms for autocomplete
+- **Spell Correction Overhead**: Minimal impact (~10-20ms) due to optimized fuzzy pre-check
 
-// Usage
-(async () => {
-  try {
-    const data = await searchWebinars("rekrutacja");
-    console.log(`Found ${data.count} webinars`);
-    data.results.forEach(webinar => {
-      console.log(`- ${webinar.title}`);
-    });
-  } catch (error) {
-    console.error('Search failed:', error);
-  }
-})();
-```
+## Development
 
-### cURL
+### Local Setup
+
 ```bash
-# Search
-curl -X GET "http://localhost:8000/api/search?q=motywacja&limit=5"
+# Install dependencies
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
 
-# Autocomplete
-curl -X GET "http://localhost:8000/api/autocomplete?q=rek"
+# Setup database
+python scripts/setup/init.sql
+python scripts/data/generate_sample.py
+python scripts/maintenance/generate_embeddings.py
 
-# Get specific webinar
-curl -X GET "http://localhost:8000/api/webinars/550e8400-e29b-41d4-a716-446655440000"
-
-# List categories
-curl -X GET "http://localhost:8000/api/categories"
+# Run development server
+python -m app.main
 ```
 
-## Notes
+### Testing
 
-1. All endpoints return JSON
-2. All dates are in ISO 8601 format (YYYY-MM-DD)
-3. All durations are in milliseconds
-4. Empty arrays are returned instead of null
-5. UUIDs are returned as strings
+```bash
+# Run all tests
+python -m pytest tests/ -v
+
+# Run specific test categories
+python -m pytest tests/unit/ -v
+python -m pytest tests/integration/ -v
+python -m pytest tests/performance/ -v
+```
+
+## Architecture
+
+The API follows Clean Architecture principles with:
+
+- **Repository Layer**: Data access abstraction
+- **Service Layer**: Business logic encapsulation  
+- **API Layer**: HTTP endpoint handling
+- **Dependency Injection**: Testable, maintainable code
+
+For detailed architecture documentation, see `docs/04_implementation/REFACTORED_ARCHITECTURE.md`.

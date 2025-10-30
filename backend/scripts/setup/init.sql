@@ -87,5 +87,6 @@ CREATE TABLE IF NOT EXISTS webinar_embeddings (
 );
 
 CREATE INDEX IF NOT EXISTS idx_embeddings_vector ON webinar_embeddings USING hnsw (vector vector_cosine_ops);
+CREATE INDEX IF NOT EXISTS idx_embeddings_webinar_id ON webinar_embeddings(webinar_id);
 
 

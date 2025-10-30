@@ -1,5 +1,7 @@
 # Database Schema Design
 
+> **Note**: This schema has been simplified to follow KISS principles. See [DATABASE_SIMPLIFICATION.md](../04_implementation/DATABASE_SIMPLIFICATION.md) for details on removed indexes.
+
 ## Extensions
 ```sql
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

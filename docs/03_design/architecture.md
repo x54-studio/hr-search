@@ -90,8 +90,6 @@ sequenceDiagram
     par Parallel queries
         A->>DB: Vector search (cosine similarity)
     and
-        A->>DB: Text search (to_tsquery)
-    and
         A->>DB: Fuzzy search (pg_trgm)
     end
     

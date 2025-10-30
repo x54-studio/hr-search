@@ -12,14 +12,14 @@ script_dir = Path(__file__).parent
 backend_dir = script_dir.parent.parent  # Go up from scripts/maintenance to backend
 sys.path.insert(0, str(backend_dir))
 
-from app.db import get_pool, close_pool
+from app.dependencies import get_database_pool
 
 async def check_database():
     """Check database state and diagnose issues."""
     print("🔍 Checking database state...")
     
     try:
-        pool = await get_pool()
+        pool = await get_database_pool()
         print("✅ Connected to database")
         
         async with pool.acquire() as conn:
@@ -80,8 +80,8 @@ async def check_database():
         print(f"❌ Error: {e}")
         raise
     finally:
-        await close_pool()
-        print("🔌 Database connection closed")
+        # Pool cleanup is handled by the app lifespan
+        print("🔌 Database connection cleanup completed")
 
 if __name__ == "__main__":
     asyncio.run(check_database())

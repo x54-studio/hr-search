@@ -79,8 +79,9 @@ python scripts/test_search.py
 ### 3. Start the API Server
 
 ```bash
-cd backend
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd backend ;
+.\.venv\Scripts\activate ; 
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 ;
 ```
 
 ## Performance Characteristics
@@ -107,12 +108,12 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ## Configuration
 
-The search behavior can be tuned by modifying these constants in `search.py`:
+The search behavior can be tuned by modifying these settings in `app/config.py`:
 
-- `SIMILARITY_THRESHOLD_SEMANTIC = 0.7` - Minimum similarity for semantic results
-- `SIMILARITY_THRESHOLD_FUZZY = 0.3` - Minimum similarity for fuzzy results
-- `BATCH_SIZE = 32` - Batch size for embedding generation
-- `MAX_QUERY_LENGTH = 200` - Maximum query length
+- `SEMANTIC_THRESHOLD = 0.3` - Minimum similarity for semantic results
+- `FUZZY_THRESHOLD = 0.2` - Minimum similarity for fuzzy results
+- `EMBEDDING_BATCH_SIZE = 32` - Batch size for embedding generation
+- `MAX_SEARCH_RESULTS = 50` - Maximum search results
 
 ## Future Improvements
 

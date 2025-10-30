@@ -2,7 +2,9 @@
 
 ## Overview
 
-Comprehensive test suite for the HR Search backend system covering unit tests, integration tests, and database operations.
+Simplified test suite for the HR Search backend system covering essential search functionality.
+
+**Current Status**: ✅ **~15-20 essential tests**
 
 ## Test Structure
 
@@ -10,13 +12,11 @@ Comprehensive test suite for the HR Search backend system covering unit tests, i
 backend/tests/
 ├── conftest.py              # Pytest configuration and fixtures
 ├── unit/
-│   └── test_search.py      # Search algorithm unit tests
-├── integration/
-│   ├── test_api.py         # API endpoint integration tests
-│   └── test_database.py    # Database integration tests
-└── fixtures/
-    ├── sample_data.py      # Test data generators
-    └── mock_responses.py   # API response mocks
+│   ├── test_embedding_service.py   # Embedding service unit tests
+│   └── test_search_service.py       # Search service unit tests
+└── integration/
+    ├── conftest.py          # Integration test configuration
+    └── test_search_flow.py  # End-to-end search flow tests
 ```
 
 ## Running Tests
@@ -43,11 +43,8 @@ pytest tests/unit/
 # Integration tests only
 pytest tests/integration/
 
-# Database tests only
-pytest tests/integration/test_database.py
-
-# API tests only
-pytest tests/integration/test_api.py
+# Search flow tests only
+pytest tests/integration/test_search_flow.py
 ```
 
 ### Run with Coverage
@@ -58,10 +55,10 @@ pytest --cov=app --cov-report=html
 ### Run Specific Tests
 ```bash
 # Run specific test file
-pytest tests/unit/test_search.py
+pytest tests/unit/test_search_service.py
 
 # Run specific test function
-pytest tests/unit/test_search.py::TestSearch::test_search_empty_query
+pytest tests/unit/test_search_service.py::TestSearchService::test_search_semantic_success
 
 # Run tests matching pattern
 pytest -k "test_search"
@@ -69,26 +66,27 @@ pytest -k "test_search"
 
 ## Test Categories
 
-### Unit Tests (`tests/unit/`)
-- **Search Algorithm Tests**: Test core search functionality
-  - Embedding generation
-  - Semantic search with thresholds
+### Unit Tests (`tests/unit/`) - ~8 tests total
+- **Search Service Tests** (8 tests): Core search functionality
+  - Semantic search success
   - Fuzzy search fallback
-  - Autocomplete suggestions
-  - Category/speaker/tag filtering
-
-### Integration Tests (`tests/integration/`)
-- **API Tests**: Test FastAPI endpoints
-  - Request/response validation
+  - Spell correction
+  - Input validation
   - Error handling
-  - CORS configuration
-  - Parameter validation
-  
-- **Database Tests**: Test database operations
-  - Connection management
-  - Schema validation
-  - Index performance
-  - Constraint validation
+  - Autocomplete functionality
+
+- **Embedding Service Tests** (3 tests): ML model management
+  - Model lazy loading
+  - Embedding generation
+  - Input validation
+  - Error handling
+
+### Integration Tests (`tests/integration/`) - ~4 tests total
+- **Search Flow Tests**: End-to-end search functionality
+  - Complete search pipeline testing
+  - API endpoint testing
+  - Health check testing
+  - Integration between all components
 
 ## Test Configuration
 
@@ -104,7 +102,6 @@ Tests automatically:
 - Create test database connections
 - Clean up test data after each test
 - Validate database schema and extensions
-- Test performance characteristics
 
 ## Test Data
 
@@ -118,18 +115,6 @@ Tests include realistic Polish HR content for:
 - Semantic search validation
 - Language-specific testing
 - Real-world scenario testing
-
-## Performance Testing
-
-### Database Performance
-- Vector similarity query performance (< 100ms)
-- Trigram similarity query performance (< 50ms)
-- Index validation and optimization
-
-### API Performance
-- Response time validation
-- Concurrent request handling
-- Error response timing
 
 ## Continuous Integration
 
@@ -177,23 +162,24 @@ pytest --pdb
 
 ### Specific Test Debugging
 ```bash
-pytest tests/unit/test_search.py::TestSearch::test_search_empty_query -v -s
+pytest tests/unit/test_search_service.py::TestSearchService::test_search_semantic_success -v -s
 ```
 
-## Test Maintenance
+## Test Development Patterns
 
-### Adding New Tests
-1. Create test file in appropriate directory
-2. Use existing fixtures from `conftest.py`
-3. Follow naming convention: `test_*.py`
-4. Add appropriate markers for test categorization
-
-### Test Data Management
-- Use fixtures for consistent test data
-- Clean up test data in `conftest.py`
-- Avoid hardcoded test data in individual tests
-
-### Performance Considerations
-- Use `@pytest.mark.slow` for slow tests
-- Mock external dependencies when possible
-- Use test database for integration tests
+### Simple Mock Setup
+```python
+@pytest.fixture
+def mock_pool():
+    """Create a mock database pool."""
+    mock_pool = Mock()
+    mock_conn = Mock()
+    mock_conn.fetchval = AsyncMock(return_value=0)
+    mock_conn.fetch = AsyncMock(return_value=[])
+    mock_conn.execute = AsyncMock(return_value=None)
+    mock_conn.fetchrow = AsyncMock(return_value=None)
+    
+    # Set up the pool to return our mock connection
+    mock_pool.acquire.return_value.__aenter__.return_value = mock_conn
+    return mock_pool, mock_conn
+```

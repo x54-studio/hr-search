@@ -7,13 +7,11 @@ import pytest
 import asyncpg
 import sys
 from pathlib import Path
-from typing import AsyncGenerator
 
 # Add the backend directory to Python path
 backend_dir = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(backend_dir))
 
-from app.db import get_pool, close_pool
 from app.config import settings
 
 
@@ -29,10 +27,15 @@ def event_loop():
 @pytest.mark.asyncio
 async def real_db_pool():
     """Create a real database connection pool for integration testing."""
-    # Ensure we're using the real database URL
-    pool = await get_pool()
+    # Create pool directly for integration tests
+    pool = await asyncpg.create_pool(
+        dsn=settings.DATABASE_URL,
+        min_size=1,
+        max_size=5,
+        command_timeout=10,
+    )
     yield pool
-    await close_pool()
+    await pool.close()
 
 
 @pytest.fixture
