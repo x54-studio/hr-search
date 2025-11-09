@@ -24,9 +24,11 @@ interface SearchFiltersProps {
   selectedCategories: string[];
   selectedSpeakers: string[];
   selectedTags: string[];
+  selectedDateRange: string | null;
   onCategoryChange: (categories: string[]) => void;
   onSpeakerChange: (speakers: string[]) => void;
   onTagChange: (tags: string[]) => void;
+  onDateRangeChange: (range: string | null) => void;
   onClearAll: () => void;
   onFilterDataReady?: (data: {
     categoryMap: Map<string, string>; // name -> slug
@@ -38,9 +40,11 @@ export function SearchFilters({
   selectedCategories,
   selectedSpeakers,
   selectedTags,
+  selectedDateRange,
   onCategoryChange,
   onSpeakerChange,
   onTagChange,
+  onDateRangeChange,
   onClearAll,
   onFilterDataReady,
 }: SearchFiltersProps) {
@@ -50,6 +54,7 @@ export function SearchFilters({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState({
+    dateRange: true,
     categories: true,
     speakers: true,
     tags: true,
@@ -124,9 +129,10 @@ export function SearchFilters({
 
   const hasActiveFilters = selectedCategories.length > 0 || 
                            selectedSpeakers.length > 0 || 
-                           selectedTags.length > 0;
+                           selectedTags.length > 0 ||
+                           selectedDateRange !== null;
 
-  const toggleSection = (section: 'categories' | 'speakers' | 'tags') => {
+  const toggleSection = (section: 'dateRange' | 'categories' | 'speakers' | 'tags') => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section],
@@ -163,7 +169,7 @@ export function SearchFilters({
           <h2 className="text-lg font-semibold text-gray-900">Filtry</h2>
           {hasActiveFilters && (
             <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-              {selectedCategories.length + selectedSpeakers.length + selectedTags.length}
+              {selectedCategories.length + selectedSpeakers.length + selectedTags.length + (selectedDateRange ? 1 : 0)}
             </span>
           )}
         </div>
@@ -178,7 +184,77 @@ export function SearchFilters({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Date Range Section */}
+        <div className="border rounded-lg">
+          <button
+            onClick={() => toggleSection('dateRange')}
+            className="w-full flex items-center justify-between p-3 text-left hover:bg-gray-50 transition-colors"
+          >
+            <span className="font-medium text-gray-900">
+              Okres
+              {selectedDateRange && (
+                <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                  1
+                </span>
+              )}
+            </span>
+            <span className="text-gray-400 text-sm">
+              {expandedSections.dateRange ? '−' : '+'}
+            </span>
+          </button>
+          {expandedSections.dateRange && (
+            <div className="p-3 border-t">
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="dateRange"
+                    value=""
+                    checked={selectedDateRange === null}
+                    onChange={() => onDateRangeChange(null)}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                  <span className="text-sm font-medium text-gray-900">Wszystkie</span>
+                </label>
+                <label className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="dateRange"
+                    value="last_30_days"
+                    checked={selectedDateRange === 'last_30_days'}
+                    onChange={() => onDateRangeChange('last_30_days')}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                  <span className="text-sm font-medium text-gray-900">Ostatnie 30 dni</span>
+                </label>
+                <label className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="dateRange"
+                    value="last_90_days"
+                    checked={selectedDateRange === 'last_90_days'}
+                    onChange={() => onDateRangeChange('last_90_days')}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                  <span className="text-sm font-medium text-gray-900">Ostatnie 90 dni</span>
+                </label>
+                <label className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+                  <input
+                    type="radio"
+                    name="dateRange"
+                    value="last_365_days"
+                    checked={selectedDateRange === 'last_365_days'}
+                    onChange={() => onDateRangeChange('last_365_days')}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                  <span className="text-sm font-medium text-gray-900">Ostatnie 365 dni</span>
+                </label>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Categories Section */}
         <div className="border rounded-lg">
           <button

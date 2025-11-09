@@ -63,10 +63,10 @@ get_embedding_service_dependency = create_embedding_service_dependency(app)
 # before other middleware processes the request
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.security.cors_allow_origins,
-    allow_credentials=settings.security.cors_allow_credentials,
-    allow_methods=settings.security.cors_allow_methods,
-    allow_headers=settings.security.cors_allow_headers,
+    allow_origins=settings.CORS_ALLOW_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
 )
 
 
@@ -487,6 +487,7 @@ async def list_webinars(
     category: str = Query(None),
     speaker: str = Query(None),
     tags: str = Query(None),
+    date_range: str = Query(None),
     offset: int = Query(0, ge=0),
     limit: int = Query(
         default=20,
@@ -505,6 +506,8 @@ async def list_webinars(
             category=category,
             speaker=speaker,
             tags=tag_list,
+            date_range=date_range,
+            content_type=None,
             offset=offset,
             limit=limit,
         )
@@ -517,6 +520,7 @@ async def list_webinars(
                 "category": category,
                 "speaker": speaker,
                 "tags": tags,
+                "date_range": date_range,
                 "offset": offset,
                 "limit": limit,
                 "webinars_count": len(webinars),
@@ -544,6 +548,7 @@ async def list_webinars(
                 "category": category,
                 "speaker": speaker,
                 "tags": tags,
+                "date_range": date_range,
                 "offset": offset,
                 "limit": limit,
             },

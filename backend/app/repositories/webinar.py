@@ -6,7 +6,8 @@ and relationship management with categories, speakers, and tags.
 """
 
 import asyncpg
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
+from datetime import date, timedelta
 
 
 class WebinarRepository:
@@ -14,6 +15,47 @@ class WebinarRepository:
 
     def __init__(self, pool: asyncpg.Pool):
         self.pool = pool
+
+    def _parse_date_range(self, date_range: str) -> Tuple[date, date]:
+        """
+        Parse date range string into start and end dates.
+
+        Args:
+            date_range: One of 'last_30_days', 'last_90_days', 'last_365_days'
+
+        Returns:
+            Tuple of (start_date, end_date) where end_date is today
+
+        Raises:
+            ValueError: If date_range is not recognized
+        """
+        today = date.today()
+        if date_range == 'last_30_days':
+            start_date = today - timedelta(days=30)
+        elif date_range == 'last_90_days':
+            start_date = today - timedelta(days=90)
+        elif date_range == 'last_365_days':
+            start_date = today - timedelta(days=365)
+        else:
+            raise ValueError(f"Invalid date_range: {date_range}. Must be one of: last_30_days, last_90_days, last_365_days")
+        return start_date, today
+
+    def _get_content_type_condition(self, content_type: Optional[str]) -> str:
+        """
+        Get SQL condition for content type filtering.
+
+        Args:
+            content_type: One of 'webinar', 'pdf', or None
+
+        Returns:
+            SQL WHERE condition string for content type filtering
+        """
+        if content_type == 'webinar':
+            return " AND w.video_url IS NOT NULL"
+        elif content_type == 'pdf':
+            return " AND w.pdf_url IS NOT NULL AND w.video_url IS NULL"
+        else:
+            return ""
 
     async def _fetch(self, query: str, *args) -> List[Dict]:
         """Execute query and return results as list of dictionaries."""
@@ -159,7 +201,8 @@ class WebinarRepository:
         return result
 
     async def get_by_category(
-        self, category_slug: str, offset: int, limit: int
+        self, category_slug: str, offset: int, limit: int, date_range: Optional[str] = None,
+        content_type: Optional[str] = None
     ) -> Tuple[List[Dict], int]:
         """
         Get webinars by category with pagination.
@@ -168,23 +211,38 @@ class WebinarRepository:
             category_slug: Category slug identifier
             offset: Number of records to skip
             limit: Maximum number of records to return
+            date_range: Optional date range filter ('last_30_days', 'last_90_days', 'last_365_days')
+            content_type: Optional content type filter ('webinar', 'pdf')
 
         Returns:
             Tuple of (webinar_list, total_count)
         """
+        # Build date filter condition
+        date_condition = ""
+        date_params = []
+        if date_range:
+            start_date, end_date = self._parse_date_range(date_range)
+            date_condition = " AND w.recorded_date >= $2 AND w.recorded_date <= $3"
+            date_params = [start_date, end_date]
+
+        # Build content type filter condition
+        type_condition = self._get_content_type_condition(content_type)
+
         # Count total records
-        count_query = """
+        count_query = f"""
         SELECT COUNT(*)
         FROM webinars w
         JOIN categories c ON w.category_id = c.id
         WHERE c.slug = $1
-          AND w.status = 'published'
+          AND w.status = 'published'{date_condition}{type_condition}
         """
-        total_result = await self._fetch_one(count_query, category_slug)
+        count_args = [category_slug] + date_params
+        total_result = await self._fetch_one(count_query, *count_args)
         total = total_result['count'] if total_result else 0
 
         # Get paginated results
-        data_query = """
+        param_offset = 1 + len(date_params)
+        data_query = f"""
         SELECT 
             w.id, w.title, w.description, w.duration_ms, w.recorded_date,
             w.video_url, w.pdf_url,
@@ -198,18 +256,19 @@ class WebinarRepository:
         LEFT JOIN webinar_tags wt ON w.id = wt.webinar_id
         LEFT JOIN tags t ON wt.tag_id = t.id
         WHERE c.slug = $1 
-          AND w.status = 'published'
+          AND w.status = 'published'{date_condition}{type_condition}
         GROUP BY w.id, w.title, w.description, w.duration_ms, w.recorded_date,
                  w.video_url, w.pdf_url, c.name
         ORDER BY w.recorded_date DESC NULLS LAST
-        LIMIT $2 OFFSET $3
+        LIMIT ${param_offset + 1} OFFSET ${param_offset + 2}
         """
 
-        results = await self._fetch(data_query, category_slug, limit, offset)
+        results = await self._fetch(data_query, category_slug, *date_params, limit, offset)
         return results, int(total)
 
     async def get_by_speaker(
-        self, speaker_name: str, offset: int, limit: int
+        self, speaker_name: str, offset: int, limit: int, date_range: Optional[str] = None,
+        content_type: Optional[str] = None
     ) -> Tuple[List[Dict], int]:
         """
         Get webinars by speaker with pagination.
@@ -218,24 +277,39 @@ class WebinarRepository:
             speaker_name: Speaker name (partial match)
             offset: Number of records to skip
             limit: Maximum number of records to return
+            date_range: Optional date range filter ('last_30_days', 'last_90_days', 'last_365_days')
+            content_type: Optional content type filter ('webinar', 'pdf')
 
         Returns:
             Tuple of (webinar_list, total_count)
         """
+        # Build date filter condition
+        date_condition = ""
+        date_params = []
+        if date_range:
+            start_date, end_date = self._parse_date_range(date_range)
+            date_condition = " AND w.recorded_date >= $2 AND w.recorded_date <= $3"
+            date_params = [start_date, end_date]
+
+        # Build content type filter condition
+        type_condition = self._get_content_type_condition(content_type)
+
         # Count total records
-        count_query = """
+        count_query = f"""
         SELECT COUNT(DISTINCT w.id)
         FROM webinars w
         JOIN webinar_speakers ws ON w.id = ws.webinar_id
         JOIN speakers s ON ws.speaker_id = s.id
         WHERE lower(s.name) LIKE '%' || lower($1) || '%'
-          AND w.status = 'published'
+          AND w.status = 'published'{date_condition}{type_condition}
         """
-        total_result = await self._fetch_one(count_query, speaker_name)
+        count_args = [speaker_name] + date_params
+        total_result = await self._fetch_one(count_query, *count_args)
         total = total_result['count'] if total_result else 0
 
         # Get paginated results
-        data_query = """
+        param_offset = 1 + len(date_params)
+        data_query = f"""
         SELECT 
             w.id, w.title, w.description, w.duration_ms, w.recorded_date,
             w.video_url, w.pdf_url,
@@ -249,18 +323,19 @@ class WebinarRepository:
         LEFT JOIN webinar_tags wt ON w.id = wt.webinar_id
         LEFT JOIN tags t ON wt.tag_id = t.id
         WHERE lower(s.name) LIKE '%' || lower($1) || '%'
-          AND w.status = 'published'
+          AND w.status = 'published'{date_condition}{type_condition}
         GROUP BY w.id, w.title, w.description, w.duration_ms, w.recorded_date,
                  w.video_url, w.pdf_url, c.name
         ORDER BY w.recorded_date DESC NULLS LAST
-        LIMIT $2 OFFSET $3
+        LIMIT ${param_offset + 1} OFFSET ${param_offset + 2}
         """
 
-        results = await self._fetch(data_query, speaker_name, limit, offset)
+        results = await self._fetch(data_query, speaker_name, *date_params, limit, offset)
         return results, int(total)
 
     async def get_by_tags(
-        self, tag_slugs: List[str], offset: int, limit: int
+        self, tag_slugs: List[str], offset: int, limit: int, date_range: Optional[str] = None,
+        content_type: Optional[str] = None
     ) -> Tuple[List[Dict], int]:
         """
         Get webinars by tags with pagination.
@@ -269,24 +344,39 @@ class WebinarRepository:
             tag_slugs: List of tag slug identifiers
             offset: Number of records to skip
             limit: Maximum number of records to return
+            date_range: Optional date range filter ('last_30_days', 'last_90_days', 'last_365_days')
+            content_type: Optional content type filter ('webinar', 'pdf')
 
         Returns:
             Tuple of (webinar_list, total_count)
         """
+        # Build date filter condition
+        date_condition = ""
+        date_params = []
+        if date_range:
+            start_date, end_date = self._parse_date_range(date_range)
+            date_condition = " AND w.recorded_date >= $2 AND w.recorded_date <= $3"
+            date_params = [start_date, end_date]
+
+        # Build content type filter condition
+        type_condition = self._get_content_type_condition(content_type)
+
         # Count total records
-        count_query = """
+        count_query = f"""
         SELECT COUNT(DISTINCT w.id)
         FROM webinars w
         JOIN webinar_tags wt ON w.id = wt.webinar_id
         JOIN tags t ON wt.tag_id = t.id
         WHERE t.slug = ANY($1::text[])
-          AND w.status = 'published'
+          AND w.status = 'published'{date_condition}{type_condition}
         """
-        total_result = await self._fetch_one(count_query, tag_slugs)
+        count_args = [tag_slugs] + date_params
+        total_result = await self._fetch_one(count_query, *count_args)
         total = total_result['count'] if total_result else 0
 
         # Get paginated results
-        data_query = """
+        param_offset = 1 + len(date_params)
+        data_query = f"""
         SELECT 
             w.id, w.title, w.description, w.duration_ms, w.recorded_date,
             w.video_url, w.pdf_url,
@@ -300,18 +390,19 @@ class WebinarRepository:
         LEFT JOIN webinar_speakers ws ON w.id = ws.webinar_id
         LEFT JOIN speakers s ON ws.speaker_id = s.id
         WHERE t.slug = ANY($1::text[])
-          AND w.status = 'published'
+          AND w.status = 'published'{date_condition}{type_condition}
         GROUP BY w.id, w.title, w.description, w.duration_ms, w.recorded_date,
                  w.video_url, w.pdf_url, c.name
         ORDER BY w.recorded_date DESC NULLS LAST
-        LIMIT $2 OFFSET $3
+        LIMIT ${param_offset + 1} OFFSET ${param_offset + 2}
         """
 
-        results = await self._fetch(data_query, tag_slugs, limit, offset)
+        results = await self._fetch(data_query, tag_slugs, *date_params, limit, offset)
         return results, int(total)
 
     async def get_recent(
-        self, offset: int, limit: int
+        self, offset: int, limit: int, date_range: Optional[str] = None,
+        content_type: Optional[str] = None
     ) -> Tuple[List[Dict], int]:
         """
         Get most recent published webinars with pagination.
@@ -319,39 +410,74 @@ class WebinarRepository:
         Args:
             offset: Number of records to skip
             limit: Maximum number of records to return
+            date_range: Optional date range filter ('last_30_days', 'last_90_days', 'last_365_days')
+            content_type: Optional content type filter ('webinar', 'pdf')
 
         Returns:
             Tuple of (webinar_list, total_count)
         """
+        # Build date filter condition
+        date_condition = ""
+        date_params = []
+        if date_range:
+            start_date, end_date = self._parse_date_range(date_range)
+            date_condition = " AND w.recorded_date >= $1 AND w.recorded_date <= $2"
+            date_params = [start_date, end_date]
+
+        # Build content type filter condition
+        type_condition = self._get_content_type_condition(content_type)
+
         # Count total records
-        count_query = """
+        count_query = f"""
         SELECT COUNT(*)
         FROM webinars w
-        WHERE w.status = 'published'
+        WHERE w.status = 'published'{date_condition}{type_condition}
         """
-        total_result = await self._fetch_one(count_query)
+        total_result = await self._fetch_one(count_query, *date_params) if date_params else await self._fetch_one(count_query)
         total = total_result['count'] if total_result else 0
 
         # Get paginated results
-        data_query = """
-        SELECT 
-            w.id, w.title, w.description, w.duration_ms, w.recorded_date,
-            w.video_url, w.pdf_url,
-            c.name as category_name,
-            array_agg(DISTINCT s.name) FILTER (WHERE s.name IS NOT NULL) as speakers,
-            array_agg(DISTINCT t.name) FILTER (WHERE t.name IS NOT NULL) as tags
-        FROM webinars w
-        LEFT JOIN categories c ON w.category_id = c.id
-        LEFT JOIN webinar_speakers ws ON w.id = ws.webinar_id
-        LEFT JOIN speakers s ON ws.speaker_id = s.id
-        LEFT JOIN webinar_tags wt ON w.id = wt.webinar_id
-        LEFT JOIN tags t ON wt.tag_id = t.id
-        WHERE w.status = 'published'
-        GROUP BY w.id, w.title, w.description, w.duration_ms, w.recorded_date,
-                 w.video_url, w.pdf_url, c.name
-        ORDER BY w.recorded_date DESC NULLS LAST, w.created_at DESC
-        LIMIT $1 OFFSET $2
-        """
+        if date_params:
+            data_query = f"""
+            SELECT 
+                w.id, w.title, w.description, w.duration_ms, w.recorded_date,
+                w.video_url, w.pdf_url,
+                c.name as category_name,
+                array_agg(DISTINCT s.name) FILTER (WHERE s.name IS NOT NULL) as speakers,
+                array_agg(DISTINCT t.name) FILTER (WHERE t.name IS NOT NULL) as tags
+            FROM webinars w
+            LEFT JOIN categories c ON w.category_id = c.id
+            LEFT JOIN webinar_speakers ws ON w.id = ws.webinar_id
+            LEFT JOIN speakers s ON ws.speaker_id = s.id
+            LEFT JOIN webinar_tags wt ON w.id = wt.webinar_id
+            LEFT JOIN tags t ON wt.tag_id = t.id
+            WHERE w.status = 'published'{date_condition}{type_condition}
+            GROUP BY w.id, w.title, w.description, w.duration_ms, w.recorded_date,
+                     w.video_url, w.pdf_url, c.name
+            ORDER BY w.recorded_date DESC NULLS LAST, w.created_at DESC
+            LIMIT $3 OFFSET $4
+            """
+            results = await self._fetch(data_query, *date_params, limit, offset)
+        else:
+            data_query = f"""
+            SELECT 
+                w.id, w.title, w.description, w.duration_ms, w.recorded_date,
+                w.video_url, w.pdf_url,
+                c.name as category_name,
+                array_agg(DISTINCT s.name) FILTER (WHERE s.name IS NOT NULL) as speakers,
+                array_agg(DISTINCT t.name) FILTER (WHERE t.name IS NOT NULL) as tags
+            FROM webinars w
+            LEFT JOIN categories c ON w.category_id = c.id
+            LEFT JOIN webinar_speakers ws ON w.id = ws.webinar_id
+            LEFT JOIN speakers s ON ws.speaker_id = s.id
+            LEFT JOIN webinar_tags wt ON w.id = wt.webinar_id
+            LEFT JOIN tags t ON wt.tag_id = t.id
+            WHERE w.status = 'published'{type_condition}
+            GROUP BY w.id, w.title, w.description, w.duration_ms, w.recorded_date,
+                     w.video_url, w.pdf_url, c.name
+            ORDER BY w.recorded_date DESC NULLS LAST, w.created_at DESC
+            LIMIT $1 OFFSET $2
+            """
+            results = await self._fetch(data_query, limit, offset)
 
-        results = await self._fetch(data_query, limit, offset)
         return results, int(total)

@@ -458,6 +458,8 @@ class SearchService(LoggingMixin):
         tags: Optional[List[str]] = None,
         offset: int = 0,
         limit: int = 20,
+        date_range: Optional[str] = None,
+        content_type: Optional[str] = None,
     ) -> Tuple[List[Dict], int]:
         """
         List webinars with optional filtering and pagination.
@@ -468,6 +470,8 @@ class SearchService(LoggingMixin):
             tags: Filter by tag slugs
             offset: Number of records to skip
             limit: Maximum number of records
+            date_range: Optional date range filter ('last_30_days', 'last_90_days', 'last_365_days')
+            content_type: Optional content type filter ('webinar', 'pdf')
 
         Returns:
             Tuple of (webinar_list, total_count)
@@ -488,19 +492,33 @@ class SearchService(LoggingMixin):
                 value=limit,
             )
 
+        if date_range and date_range not in ('last_30_days', 'last_90_days', 'last_365_days'):
+            raise ValidationError(
+                f"Invalid date_range: {date_range}. Must be one of: last_30_days, last_90_days, last_365_days",
+                field="date_range",
+                value=date_range,
+            )
+
+        if content_type and content_type not in ('webinar', 'pdf'):
+            raise ValidationError(
+                f"Invalid content_type: {content_type}. Must be one of: webinar, pdf",
+                field="content_type",
+                value=content_type,
+            )
+
         try:
             if category:
                 return await self.webinar_repo.get_by_category(
-                    category, offset, limit
+                    category, offset, limit, date_range, content_type
                 )
             elif speaker:
                 return await self.webinar_repo.get_by_speaker(
-                    speaker, offset, limit
+                    speaker, offset, limit, date_range, content_type
                 )
             elif tags:
-                return await self.webinar_repo.get_by_tags(tags, offset, limit)
+                return await self.webinar_repo.get_by_tags(tags, offset, limit, date_range, content_type)
             else:
-                return await self.webinar_repo.get_recent(offset, limit)
+                return await self.webinar_repo.get_recent(offset, limit, date_range, content_type)
 
         except Exception as e:
             self.log_error(
@@ -512,6 +530,8 @@ class SearchService(LoggingMixin):
                     "tags": tags,
                     "offset": offset,
                     "limit": limit,
+                    "date_range": date_range,
+                    "content_type": content_type,
                 },
             )
             raise SearchError(

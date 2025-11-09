@@ -1,4 +1,3 @@
-import React from 'react';
 import type { AutocompleteSuggestion } from '../services/api';
 
 interface SearchSuggestionsProps {

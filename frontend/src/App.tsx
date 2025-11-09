@@ -19,6 +19,7 @@ function App() {
     selectedCategories,
     selectedSpeakers,
     selectedTags,
+    selectedDateRange,
     handleQueryChange,
     handleSuggestionClick,
     clearSearch,
@@ -26,6 +27,7 @@ function App() {
     handleCategoryChange,
     handleSpeakerChange,
     handleTagChange,
+    handleDateRangeChange,
     clearFilters,
     handleFilterDataReady,
   } = useSearch();
@@ -71,9 +73,11 @@ function App() {
           selectedCategories={selectedCategories}
           selectedSpeakers={selectedSpeakers}
           selectedTags={selectedTags}
+          selectedDateRange={selectedDateRange}
           onCategoryChange={handleCategoryChange}
           onSpeakerChange={handleSpeakerChange}
           onTagChange={handleTagChange}
+          onDateRangeChange={handleDateRangeChange}
           onClearAll={clearFilters}
           onFilterDataReady={handleFilterDataReady}
         />

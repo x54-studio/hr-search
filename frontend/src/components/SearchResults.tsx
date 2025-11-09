@@ -1,4 +1,3 @@
-import React from 'react';
 import type { SearchResult } from '../services/api';
 import { Calendar, Clock, Users, Tag, AlertCircle, RefreshCw } from 'lucide-react';
 

@@ -41,44 +41,6 @@ class Settings(BaseSettings):
         description="Allowed CORS origins"
     )
 
-    # Backward compatibility properties
-    @property
-    def database(self):
-        """Backward compatibility for database settings."""
-        return type('DatabaseSettings', (), {
-            'url': self.DATABASE_URL,
-            'pool_min_size': self.DB_POOL_MIN_SIZE,
-            'pool_max_size': self.DB_POOL_MAX_SIZE,
-        })()
-
-    @property
-    def ml(self):
-        """Backward compatibility for ML settings."""
-        return type('MLSettings', (), {
-            'embedding_model': self.EMBEDDING_MODEL,
-            'hf_home': self.HF_HOME,
-        })()
-
-    @property
-    def search(self):
-        """Backward compatibility for search settings."""
-        return type('SearchSettings', (), {
-            'semantic_threshold': self.SEMANTIC_THRESHOLD,
-            'fuzzy_threshold': self.FUZZY_THRESHOLD,
-            'max_results': self.MAX_SEARCH_RESULTS,
-            'max_autocomplete_results': self.MAX_AUTOCOMPLETE_RESULTS,
-        })()
-
-    @property
-    def security(self):
-        """Backward compatibility for security settings."""
-        return type('SecuritySettings', (), {
-            'cors_allow_origins': self.CORS_ALLOW_ORIGINS,
-            'cors_allow_credentials': True,
-            'cors_allow_methods': ["GET", "POST"],
-            'cors_allow_headers': ["*"],
-        })()
-
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

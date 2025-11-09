@@ -175,6 +175,7 @@ class ApiService {
     category?: string;
     speaker?: string;
     tags?: string;
+    date_range?: string;
     offset?: number;
     limit?: number;
   } = {}): Promise<{
@@ -184,7 +185,7 @@ class ApiService {
     limit: number;
     hasMore: boolean;
   }> {
-    const { category, speaker, tags, offset = 0, limit = 20 } = params;
+    const { category, speaker, tags, date_range, offset = 0, limit = 20 } = params;
     
     if (offset < 0) {
       throw new ApiError('VALIDATION_ERROR', 'Offset must be non-negative', { field: 'offset', value: offset });
@@ -202,6 +203,7 @@ class ApiService {
     if (category) queryParams.category = category;
     if (speaker) queryParams.speaker = speaker;
     if (tags) queryParams.tags = tags;
+    if (date_range) queryParams.date_range = date_range;
     
     return this.request('/webinars', queryParams);
   }

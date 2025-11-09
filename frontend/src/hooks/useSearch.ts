@@ -16,6 +16,7 @@ export interface SearchState {
   selectedCategories: string[];
   selectedSpeakers: string[];
   selectedTags: string[];
+  selectedDateRange: string | null;
 }
 
 export interface SearchActions {
@@ -27,6 +28,7 @@ export interface SearchActions {
   handleCategoryChange: (categories: string[]) => void;
   handleSpeakerChange: (speakers: string[]) => void;
   handleTagChange: (tags: string[]) => void;
+  handleDateRangeChange: (range: string | null) => void;
   clearFilters: () => void;
   handleFilterDataReady: (data: { categoryMap: Map<string, string>; tagMap: Map<string, string> }) => void;
 }
@@ -45,6 +47,7 @@ export function useSearch(): SearchState & SearchActions {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSpeakers, setSelectedSpeakers] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedDateRange, setSelectedDateRange] = useState<string | null>(null);
   const [categoryNameToSlug, setCategoryNameToSlug] = useState<Map<string, string>>(new Map());
   const [tagNameToSlug, setTagNameToSlug] = useState<Map<string, string>>(new Map());
 
@@ -72,10 +75,15 @@ export function useSearch(): SearchState & SearchActions {
     setSelectedTags(tags);
   }, []);
 
+  const handleDateRangeChange = useCallback((range: string | null) => {
+    setSelectedDateRange(range);
+  }, []);
+
   const clearFilters = useCallback(() => {
     setSelectedCategories([]);
     setSelectedSpeakers([]);
     setSelectedTags([]);
+    setSelectedDateRange(null);
   }, []);
 
   // Handler to receive filter data maps from SearchFilters component
@@ -131,7 +139,7 @@ export function useSearch(): SearchState & SearchActions {
   // Proper search function that can be called directly
   const search = useCallback(async (searchQuery: string) => {
     const hasQuery = searchQuery.trim().length > 0;
-    const hasFilters = selectedCategories.length > 0 || selectedSpeakers.length > 0 || selectedTags.length > 0;
+    const hasFilters = selectedCategories.length > 0 || selectedSpeakers.length > 0 || selectedTags.length > 0 || selectedDateRange !== null;
 
     // No query and no filters: clear results
     if (!hasQuery && !hasFilters) {
@@ -168,60 +176,71 @@ export function useSearch(): SearchState & SearchActions {
         setCorrectedQuery(null);
         setOriginalQuery(null);
 
-        // Backend supports single values, so we need to handle multiple selections
-        // Strategy: make calls for each filter type and merge results
-        const allResults: SearchResult[] = [];
-        const seenIds = new Set<string>();
-
-        // Fetch by categories
-        for (const category of selectedCategories) {
+        // If only date_range is selected, fetch all webinars with date filter
+        if (selectedDateRange && selectedCategories.length === 0 && selectedSpeakers.length === 0 && selectedTags.length === 0) {
           try {
-            const response = await apiService.listWebinars({ category, limit: 50 });
-            response.webinars.forEach(webinar => {
-              if (!seenIds.has(webinar.id)) {
-                seenIds.add(webinar.id);
-                allResults.push(webinar);
-              }
-            });
+            const response = await apiService.listWebinars({ date_range: selectedDateRange || undefined, limit: 50 });
+            searchResults = response.webinars;
           } catch (err) {
-            // Continue with other filters if one fails
-            console.error(`Failed to fetch category "${category}":`, err);
+            console.error(`Failed to fetch webinars with date_range "${selectedDateRange}":`, err);
+            searchResults = [];
           }
-        }
+        } else {
+          // Backend supports single values, so we need to handle multiple selections
+          // Strategy: make calls for each filter type and merge results
+          const allResults: SearchResult[] = [];
+          const seenIds = new Set<string>();
 
-        // Fetch by speakers
-        for (const speaker of selectedSpeakers) {
-          try {
-            const response = await apiService.listWebinars({ speaker, limit: 50 });
-            response.webinars.forEach(webinar => {
-              if (!seenIds.has(webinar.id)) {
-                seenIds.add(webinar.id);
-                allResults.push(webinar);
-              }
-            });
-          } catch (err) {
-            console.error(`Failed to fetch speaker ${speaker}:`, err);
+          // Fetch by categories
+          for (const category of selectedCategories) {
+            try {
+              const response = await apiService.listWebinars({ category, date_range: selectedDateRange || undefined, limit: 50 });
+              response.webinars.forEach(webinar => {
+                if (!seenIds.has(webinar.id)) {
+                  seenIds.add(webinar.id);
+                  allResults.push(webinar);
+                }
+              });
+            } catch (err) {
+              // Continue with other filters if one fails
+              console.error(`Failed to fetch category "${category}":`, err);
+            }
           }
-        }
 
-        // Fetch by tags (backend accepts comma-separated, but we'll do one at a time for consistency)
-        for (const tag of selectedTags) {
-          try {
-            // URLSearchParams will automatically encode the tag slug
-            const response = await apiService.listWebinars({ tags: tag, limit: 50 });
-            response.webinars.forEach(webinar => {
-              if (!seenIds.has(webinar.id)) {
-                seenIds.add(webinar.id);
-                allResults.push(webinar);
-              }
-            });
-          } catch (err) {
-            console.error(`Failed to fetch tag "${tag}":`, err);
-            // Continue with other tags if one fails
+          // Fetch by speakers
+          for (const speaker of selectedSpeakers) {
+            try {
+              const response = await apiService.listWebinars({ speaker, date_range: selectedDateRange || undefined, limit: 50 });
+              response.webinars.forEach(webinar => {
+                if (!seenIds.has(webinar.id)) {
+                  seenIds.add(webinar.id);
+                  allResults.push(webinar);
+                }
+              });
+            } catch (err) {
+              console.error(`Failed to fetch speaker ${speaker}:`, err);
+            }
           }
-        }
 
-        searchResults = allResults;
+          // Fetch by tags (backend accepts comma-separated, but we'll do one at a time for consistency)
+          for (const tag of selectedTags) {
+            try {
+              // URLSearchParams will automatically encode the tag slug
+              const response = await apiService.listWebinars({ tags: tag, date_range: selectedDateRange || undefined, limit: 50 });
+              response.webinars.forEach(webinar => {
+                if (!seenIds.has(webinar.id)) {
+                  seenIds.add(webinar.id);
+                  allResults.push(webinar);
+                }
+              });
+            } catch (err) {
+              console.error(`Failed to fetch tag "${tag}":`, err);
+              // Continue with other tags if one fails
+            }
+          }
+
+          searchResults = allResults;
+        }
       }
 
       // Apply client-side filters if query exists (semantic search results)
@@ -252,12 +271,12 @@ export function useSearch(): SearchState & SearchActions {
     } finally {
       setLoading(false);
     }
-  }, [clearError, setApiError, selectedCategories, selectedSpeakers, selectedTags, applyFilters]);
+  }, [clearError, setApiError, selectedCategories, selectedSpeakers, selectedTags, selectedDateRange, applyFilters]);
 
   // Debounced search - triggers on query or filter changes
   useEffect(() => {
     const hasQuery = query.trim().length > 0;
-    const hasFilters = selectedCategories.length > 0 || selectedSpeakers.length > 0 || selectedTags.length > 0;
+    const hasFilters = selectedCategories.length > 0 || selectedSpeakers.length > 0 || selectedTags.length > 0 || selectedDateRange !== null;
 
     // No query and no filters: clear results
     if (!hasQuery && !hasFilters) {
@@ -275,11 +294,10 @@ export function useSearch(): SearchState & SearchActions {
     }, hasQuery ? 100 : 0); // 100ms debounce for query, immediate for filters
 
     return () => clearTimeout(timeoutId);
-  }, [query, selectedCategories, selectedSpeakers, selectedTags, search]);
+  }, [query, selectedCategories, selectedSpeakers, selectedTags, selectedDateRange, search]);
 
   const retrySearch = useCallback(() => {
     if (query.trim()) {
-      // Use the proper search function instead of hacky setTimeout
       search(query);
     }
   }, [query, search]);
@@ -306,6 +324,7 @@ export function useSearch(): SearchState & SearchActions {
     setSelectedCategories([]);
     setSelectedSpeakers([]);
     setSelectedTags([]);
+    setSelectedDateRange(null);
     clearError();
   }, [clearError]);
 
@@ -323,6 +342,7 @@ export function useSearch(): SearchState & SearchActions {
     selectedCategories,
     selectedSpeakers,
     selectedTags,
+    selectedDateRange,
     handleQueryChange,
     handleSuggestionClick,
     clearSearch,
@@ -331,6 +351,7 @@ export function useSearch(): SearchState & SearchActions {
     handleCategoryChange,
     handleSpeakerChange,
     handleTagChange,
+    handleDateRangeChange,
     clearFilters,
     handleFilterDataReady,
   };
