@@ -1,6 +1,7 @@
 import { SearchInput } from './components/SearchInput';
 import { SearchSuggestions } from './components/SearchSuggestions';
 import { SearchResults } from './components/SearchResults';
+import { SearchFilters } from './components/SearchFilters';
 import { useSearch } from './hooks/useSearch';
 
 function App() {
@@ -15,10 +16,18 @@ function App() {
     showSuggestions,
     correctedQuery,
     originalQuery,
+    selectedCategories,
+    selectedSpeakers,
+    selectedTags,
     handleQueryChange,
     handleSuggestionClick,
     clearSearch,
     retrySearch,
+    handleCategoryChange,
+    handleSpeakerChange,
+    handleTagChange,
+    clearFilters,
+    handleFilterDataReady,
   } = useSearch();
 
   const handleCorrectedSearch = (correctedQuery: string) => {
@@ -56,6 +65,18 @@ function App() {
             onSuggestionClick={handleSuggestionClick}
           />
         </div>
+
+        {/* Filters Section */}
+        <SearchFilters
+          selectedCategories={selectedCategories}
+          selectedSpeakers={selectedSpeakers}
+          selectedTags={selectedTags}
+          onCategoryChange={handleCategoryChange}
+          onSpeakerChange={handleSpeakerChange}
+          onTagChange={handleTagChange}
+          onClearAll={clearFilters}
+          onFilterDataReady={handleFilterDataReady}
+        />
 
         {/* Results Section */}
         <SearchResults

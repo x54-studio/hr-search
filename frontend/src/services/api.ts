@@ -147,15 +147,15 @@ class ApiService {
     return this.request<SearchResult>(`/webinars/${id}`);
   }
 
-  async getCategories(): Promise<{ categories: Array<{ slug: string; name: string; count: number }> }> {
+  async getCategories(): Promise<{ categories: Array<{ slug: string; name: string; webinar_count: number }> }> {
     return this.request('/categories');
   }
 
-  async getSpeakers(): Promise<{ speakers: Array<{ name: string; bio?: string; count: number }> }> {
+  async getSpeakers(): Promise<{ speakers: Array<{ name: string; bio?: string; webinar_count: number }> }> {
     return this.request('/speakers');
   }
 
-  async getTags(limit = 100): Promise<{ tags: Array<{ slug: string; name: string; count: number }> }> {
+  async getTags(limit = 100): Promise<{ tags: Array<{ slug: string; name: string; webinar_count: number }> }> {
     if (limit < 1 || limit > 500) {
       throw new ApiError('VALIDATION_ERROR', 'Limit must be between 1 and 500', { field: 'limit', value: limit });
     }
@@ -163,7 +163,7 @@ class ApiService {
     return this.request('/tags', { limit: limit.toString() });
   }
 
-  async getPopularTags(limit = 20): Promise<{ tags: Array<{ slug: string; name: string; count: number }> }> {
+  async getPopularTags(limit = 20): Promise<{ tags: Array<{ slug: string; name: string; webinar_count: number }> }> {
     if (limit < 1 || limit > 100) {
       throw new ApiError('VALIDATION_ERROR', 'Limit must be between 1 and 100', { field: 'limit', value: limit });
     }
@@ -190,8 +190,8 @@ class ApiService {
       throw new ApiError('VALIDATION_ERROR', 'Offset must be non-negative', { field: 'offset', value: offset });
     }
     
-    if (limit < 1 || limit > 100) {
-      throw new ApiError('VALIDATION_ERROR', 'Limit must be between 1 and 100', { field: 'limit', value: limit });
+    if (limit < 1 || limit > 50) {
+      throw new ApiError('VALIDATION_ERROR', 'Limit must be between 1 and 50', { field: 'limit', value: limit });
     }
     
     const queryParams: Record<string, string> = {
