@@ -1,4 +1,19 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+// Auto-detect API URL based on current hostname
+const getApiBaseUrl = (): string => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  
+  // If running on localhost, use localhost for API
+  // If running on IP, use same IP for API
+  const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
+  const port = '8000';
+  
+  return `${protocol}//${hostname}:${port}/api`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export interface SearchResult {
   id: string;

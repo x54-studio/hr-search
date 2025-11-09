@@ -1,12 +1,26 @@
+import { useEffect, useRef } from 'react';
 import type { AutocompleteSuggestion } from '../services/api';
 
 interface SearchSuggestionsProps {
   suggestions: AutocompleteSuggestion[];
   visible: boolean;
   onSuggestionClick: (suggestion: string) => void;
+  highlightedIndex?: number;
 }
 
-export function SearchSuggestions({ suggestions, visible, onSuggestionClick }: SearchSuggestionsProps) {
+export function SearchSuggestions({ suggestions, visible, onSuggestionClick, highlightedIndex = -1 }: SearchSuggestionsProps) {
+  const highlightedRef = useRef<HTMLButtonElement>(null);
+
+  // Scroll highlighted item into view
+  useEffect(() => {
+    if (highlightedIndex >= 0 && highlightedRef.current) {
+      highlightedRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  }, [highlightedIndex]);
+
   if (!visible || suggestions.length === 0) return null;
 
   return (
@@ -14,8 +28,13 @@ export function SearchSuggestions({ suggestions, visible, onSuggestionClick }: S
       {suggestions.map((suggestion, index) => (
         <button
           key={index}
+          ref={index === highlightedIndex ? highlightedRef : null}
           onClick={() => onSuggestionClick(suggestion.suggestion)}
-          className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
+          className={`w-full px-4 py-3 text-left transition-colors border-b border-gray-100 last:border-b-0 ${
+            index === highlightedIndex
+              ? 'bg-blue-50 hover:bg-blue-100'
+              : 'hover:bg-gray-50'
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="text-gray-900">{suggestion.suggestion}</span>

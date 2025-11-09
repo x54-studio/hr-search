@@ -6,15 +6,79 @@ interface SearchInputProps {
   onChange: (value: string) => void;
   onClear: () => void;
   placeholder?: string;
+  suggestions?: Array<{ suggestion: string }>;
+  showSuggestions?: boolean;
+  onSuggestionSelect?: (suggestion: string) => void;
+  onSelectedIndexChange?: (index: number) => void;
 }
 
-export function SearchInput({ value, onChange, onClear, placeholder = "Szukaj webinaru, tematu lub prelegenta..." }: SearchInputProps) {
+export function SearchInput({ 
+  value, 
+  onChange, 
+  onClear, 
+  placeholder = "Szukaj webinaru, tematu lub prelegenta...",
+  suggestions = [],
+  showSuggestions = false,
+  onSuggestionSelect,
+  onSelectedIndexChange
+}: SearchInputProps) {
   const [focused, setFocused] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Reset selected index when suggestions change
+  useEffect(() => {
+    setSelectedIndex(-1);
+    onSelectedIndexChange?.(-1);
+  }, [suggestions.length, value, onSelectedIndexChange]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || suggestions.length === 0) {
+      if (e.key === 'Escape') {
+        onClear();
+        inputRef.current?.blur();
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex((prev) => {
+          const newIndex = prev < suggestions.length - 1 ? prev + 1 : 0;
+          onSelectedIndexChange?.(newIndex);
+          return newIndex;
+        });
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex((prev) => {
+          const newIndex = prev > 0 ? prev - 1 : suggestions.length - 1;
+          onSelectedIndexChange?.(newIndex);
+          return newIndex;
+        });
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < suggestions.length && onSuggestionSelect) {
+          onSuggestionSelect(suggestions[selectedIndex].suggestion);
+          setSelectedIndex(-1);
+          onSelectedIndexChange?.(-1);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        onClear();
+        inputRef.current?.blur();
+        setSelectedIndex(-1);
+        onSelectedIndexChange?.(-1);
+        break;
+    }
+  };
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !showSuggestions) {
         onClear();
         inputRef.current?.blur();
       }
@@ -22,7 +86,7 @@ export function SearchInput({ value, onChange, onClear, placeholder = "Szukaj we
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClear]);
+  }, [onClear, showSuggestions]);
 
   return (
     <div className="relative w-full max-w-2xl mx-auto">
@@ -33,6 +97,7 @@ export function SearchInput({ value, onChange, onClear, placeholder = "Szukaj we
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
           onFocus={() => setFocused(true)}
           onBlur={() => setTimeout(() => setFocused(false), 200)}
           placeholder={placeholder}

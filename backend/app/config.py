@@ -4,8 +4,8 @@ Application configuration using Pydantic Settings.
 Simplified flat configuration for portfolio project.
 """
 
-from typing import List
-from pydantic import Field
+from typing import List, Union
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -36,15 +36,24 @@ class Settings(BaseSettings):
 
     # API
     LOG_LEVEL: str = Field(default="INFO", description="Logging level")
-    CORS_ALLOW_ORIGINS: List[str] = Field(
+    CORS_ALLOW_ORIGINS: Union[List[str], str] = Field(
         default=["http://localhost:5173"],
-        description="Allowed CORS origins"
+        description="Allowed CORS origins (comma-separated string or list)"
     )
+    
+    @field_validator('CORS_ALLOW_ORIGINS', mode='before')
+    @classmethod
+    def parse_cors_origins(cls, v: Union[List[str], str]) -> List[str]:
+        """Parse CORS_ALLOW_ORIGINS from comma-separated string or list."""
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
+        extra="ignore",  # Ignore unknown fields from .env (e.g., DATABASE__POOL_MIN_SIZE)
     )
 
 

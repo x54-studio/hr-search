@@ -171,6 +171,7 @@ class AutocompleteRepository(LoggingMixin):
     async def get_suggestions(self, query: str, limit: int) -> List[Dict]:
         """
         Get autocomplete suggestions from webinars, speakers, and tags.
+        Uses prefix matching first, then fuzzy search as fallback for typos.
         
         Args:
             query: Partial query text for prefix matching
@@ -179,11 +180,12 @@ class AutocompleteRepository(LoggingMixin):
         Returns:
             List of suggestions with 'suggestion', 'type', and 'priority' fields
         """
+        # First try prefix matching
         query_sql = """
         (
             SELECT title as suggestion, 'webinar' as type, 1 as priority
             FROM webinars
-            WHERE lower(title) LIKE lower($1) || '%' 
+            WHERE lower(unaccent(title)) LIKE lower(unaccent($1)) || '%' 
             AND status = 'published'
             LIMIT 3
         )
@@ -191,17 +193,61 @@ class AutocompleteRepository(LoggingMixin):
         (
             SELECT name as suggestion, 'speaker' as type, 2 as priority
             FROM speakers
-            WHERE lower(name) LIKE lower($1) || '%'
+            WHERE lower(unaccent(name)) LIKE lower(unaccent($1)) || '%'
             LIMIT 3
         )
         UNION ALL
         (
             SELECT name as suggestion, 'tag' as type, 3 as priority
             FROM tags
-            WHERE lower(name) LIKE lower($1) || '%'
+            WHERE lower(unaccent(name)) LIKE lower(unaccent($1)) || '%'
             LIMIT 3
         )
         ORDER BY priority, suggestion
         LIMIT $2
         """
-        return await self._fetch(query_sql, query, limit)
+        results = await self._fetch(query_sql, query, limit)
+        
+        # If prefix matching found results, return them
+        if len(results) > 0:
+            return results
+        
+        # Fallback to fuzzy search for typos (only for queries >= 3 chars)
+        if len(query.strip()) >= 3:
+            fuzzy_sql = """
+            (
+                SELECT title as suggestion, 'webinar' as type, 1 as priority,
+                       similarity(lower(unaccent(title)), lower(unaccent($1))) as sim
+                FROM webinars
+                WHERE similarity(lower(unaccent(title)), lower(unaccent($1))) > 0.3
+                  AND status = 'published'
+                ORDER BY sim DESC
+                LIMIT 3
+            )
+            UNION ALL
+            (
+                SELECT name as suggestion, 'speaker' as type, 2 as priority,
+                       similarity(lower(unaccent(name)), lower(unaccent($1))) as sim
+                FROM speakers
+                WHERE similarity(lower(unaccent(name)), lower(unaccent($1))) > 0.3
+                ORDER BY sim DESC
+                LIMIT 3
+            )
+            UNION ALL
+            (
+                SELECT name as suggestion, 'tag' as type, 3 as priority,
+                       similarity(lower(unaccent(name)), lower(unaccent($1))) as sim
+                FROM tags
+                WHERE similarity(lower(unaccent(name)), lower(unaccent($1))) > 0.3
+                ORDER BY sim DESC
+                LIMIT 3
+            )
+            ORDER BY priority, sim DESC
+            LIMIT $2
+            """
+            fuzzy_results = await self._fetch(fuzzy_sql, query, limit)
+            if len(fuzzy_results) > 0:
+                # Remove 'sim' field from results
+                return [{k: v for k, v in r.items() if k != 'sim'} for r in fuzzy_results]
+        
+        return results

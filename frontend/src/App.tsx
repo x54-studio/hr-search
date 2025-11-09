@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { SearchInput } from './components/SearchInput';
 import { SearchSuggestions } from './components/SearchSuggestions';
 import { SearchResults } from './components/SearchResults';
@@ -32,6 +33,13 @@ function App() {
     handleFilterDataReady,
   } = useSearch();
 
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+
+  // Reset highlighted index when suggestions change
+  useEffect(() => {
+    setHighlightedIndex(-1);
+  }, [suggestions.length, query]);
+
   const handleCorrectedSearch = (correctedQuery: string) => {
     handleQueryChange(correctedQuery);
   };
@@ -60,11 +68,16 @@ function App() {
             value={query}
             onChange={handleQueryChange}
             onClear={clearSearch}
+            suggestions={suggestions}
+            showSuggestions={showSuggestions && query.length > 0}
+            onSuggestionSelect={handleSuggestionClick}
+            onSelectedIndexChange={setHighlightedIndex}
           />
           <SearchSuggestions
             suggestions={suggestions}
             visible={showSuggestions && query.length > 0}
             onSuggestionClick={handleSuggestionClick}
+            highlightedIndex={highlightedIndex}
           />
         </div>
 

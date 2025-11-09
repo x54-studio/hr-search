@@ -57,6 +57,12 @@ class SearchService(LoggingMixin):
         """
         Perform spell-corrected semantic search.
 
+        Uses a single fuzzy search call for both spell correction and fallback:
+        1. Fuzzy search with full parameters (limit, dynamic threshold)
+        2. Extract corrected query from fuzzy results if similarity > 0.85
+        3. Semantic search with corrected query
+        4. If no semantic results, use fuzzy results as fallback
+
         Args:
             query: Search query text
             limit: Maximum number of results
@@ -107,21 +113,23 @@ class SearchService(LoggingMixin):
         )
 
         try:
-            # Step 1: Quick fuzzy check for spell correction
+            # Step 1: Fuzzy search with full parameters (for spell correction + potential fallback)
+            # Lower threshold for short queries (better typo tolerance)
+            # Short words in long titles have lower similarity scores
+            # For queries < 8 characters, use 0.1 instead of 0.2
+            fuzzy_threshold = settings.FUZZY_THRESHOLD
+            if len(query.strip()) < 8:
+                fuzzy_threshold = 0.1
+
             fuzzy_start = time.time()
-            fuzzy_suggestions = await self.webinar_repo.search_fuzzy(
-                query, limit=3, threshold=0.6
+            fuzzy_results = await self.webinar_repo.search_fuzzy(
+                query, limit=limit, threshold=fuzzy_threshold
             )
             fuzzy_time = time.time() - fuzzy_start
 
-            # If fuzzy finds close matches, extract corrected term
-            if (
-                fuzzy_suggestions
-                and fuzzy_suggestions[0].get("similarity", 0) > 0.85
-            ):
-                corrected_query = self._extract_correction(
-                    query, fuzzy_suggestions
-                )
+            # Extract corrected query from fuzzy results
+            if fuzzy_results and fuzzy_results[0].get("similarity", 0) > 0.85:
+                corrected_query = self._extract_correction(query, fuzzy_results)
                 if corrected_query != query:
                     self.log_info(
                         "Spell correction applied",
@@ -131,6 +139,8 @@ class SearchService(LoggingMixin):
                             "fuzzy_duration_sec": round(fuzzy_time, 3),
                         },
                     )
+            else:
+                corrected_query = query
 
             # Step 2: Always run semantic search (with corrected query)
             embedding_start = time.time()
@@ -166,26 +176,15 @@ class SearchService(LoggingMixin):
                 },
             )
 
-            # If no semantic results, try fuzzy search as fallback
+            # If no semantic results, use fuzzy results (already fetched)
+            search_type = "semantic"
             if not results:
                 self.log_warning(
-                    "No semantic results found, trying fuzzy search fallback",
+                    "No semantic results found, using fuzzy search results",
                     extra={"semantic_threshold": settings.SEMANTIC_THRESHOLD},
                 )
-
-                fuzzy_fallback_start = time.time()
-                results = await self.webinar_repo.search_fuzzy(
-                    corrected_query, limit, settings.FUZZY_THRESHOLD
-                )
-
-                fuzzy_fallback_time = time.time() - fuzzy_fallback_start
-                self.log_info(
-                    "Fuzzy search fallback completed",
-                    extra={
-                        "duration_sec": round(fuzzy_fallback_time, 3),
-                        "results_count": len(results),
-                    },
-                )
+                results = fuzzy_results
+                search_type = "fuzzy"
 
             # If still no results, try speaker name search
             if not results:
@@ -217,11 +216,7 @@ class SearchService(LoggingMixin):
                 extra={
                     "total_duration_sec": round(total_time, 3),
                     "results_count": len(results),
-                    "search_type": (
-                        "semantic"
-                        if results and "similarity" in results[0]
-                        else "fuzzy"
-                    ),
+                    "search_type": search_type,
                     "original_query": query,
                     "corrected_query": corrected_query,
                     "correction_applied": corrected_query != query,

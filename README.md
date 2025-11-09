@@ -14,7 +14,9 @@
 - **Polish + English** - Handles mixed HR terminology ("exit interview", "zwolnienie lekarskie")
 - **Instant Autocomplete** - Suggestions from webinars, speakers, and tags
 - **Fuzzy Matching Fallback** - Fallback search when semantic search finds no results
-- **Smart Filters** - By category, speaker, tags (with OR logic for multiple tags)
+- **Smart Filters** - Filter by category, speaker, tags (with OR logic for multiple tags), and date range
+- **Date Range Filtering** - Filter webinars by last 30, 90, or 365 days
+- **Keyboard Navigation** - Arrow keys to navigate suggestions, Enter to select, Escape to close
 - **Mobile First** - Responsive design, touch-friendly interface
 
 ## 🛠 Tech Stack
@@ -90,7 +92,10 @@ docs/
 - `GET /api/search?q=Agnieszka` - Speaker name search
 - `GET /api/autocomplete?q=mot` - Real-time suggestions
 - `GET /api/webinars/{id}` - Webinar details
-- `GET /api/webinars?tags=rekrutacja,motywacja` - List with filters
+- `GET /api/webinars?tags=rekrutacja,motywacja` - List with tag filters
+- `GET /api/webinars?category=rekrutacja&date_range=last_30_days` - List with category and date filters
+- `GET /api/webinars?speaker=Jan+Kowalski&date_range=last_90_days` - List with speaker and date filters
+- `GET /api/webinars?date_range=last_365_days` - List filtered by date range (last_30_days, last_90_days, last_365_days)
 - `GET /api/categories` - All categories
 - `GET /api/speakers` - All speakers
 
