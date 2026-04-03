@@ -27,7 +27,7 @@ export function SearchSuggestions({ suggestions, visible, onSuggestionClick, hig
     <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
       {suggestions.map((suggestion, index) => (
         <button
-          key={index}
+          key={`${suggestion.suggestion}-${suggestion.type}`}
           ref={index === highlightedIndex ? highlightedRef : null}
           onClick={() => onSuggestionClick(suggestion.suggestion)}
           className={`w-full px-4 py-3 text-left transition-colors border-b border-gray-100 last:border-b-0 ${

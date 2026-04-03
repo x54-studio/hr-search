@@ -28,9 +28,11 @@ build/
 # IDE
 .vscode/
 .cursor/
+.claude/
 .idea/
 *.swp
 *.swo
+CLAUDE.md
 
 # OS
 .DS_Store

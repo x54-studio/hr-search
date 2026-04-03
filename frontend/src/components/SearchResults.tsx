@@ -171,7 +171,7 @@ export function SearchResults({
           {result.tags && result.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-3">
               {result.tags.slice(0, 5).map((tag, index) => (
-                <span key={index} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded flex items-center">
+                <span key={tag} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded flex items-center">
                   <Tag className="w-3 h-3 mr-1" />
                   {tag}
                 </span>
