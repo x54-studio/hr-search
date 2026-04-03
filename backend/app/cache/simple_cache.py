@@ -8,6 +8,7 @@ and suitable for small to medium workloads without external dependencies.
 import time
 import threading
 import hashlib
+import inspect
 import json
 from typing import Dict, Any, Optional, Callable
 from functools import wraps
@@ -203,7 +204,7 @@ def cached(ttl: int = 300, key_prefix: str = ""):
             return result
         
         # Return appropriate wrapper based on function type
-        if hasattr(func, '__code__') and func.__code__.co_flags & 0x80:  # CO_ITERABLE_COROUTINE
+        if inspect.iscoroutinefunction(func):
             return async_wrapper
         else:
             return sync_wrapper
