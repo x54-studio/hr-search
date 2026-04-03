@@ -1,79 +1,24 @@
-# HR Search Frontend
+# Frontend
 
-React-based frontend for the HR Knowledge Search System.
+React 18 + TypeScript + Vite + Tailwind CSS.
 
-## Tech Stack
+## Setup
 
-- **React 18** - Modern React with hooks and concurrent features
-- **TypeScript** - Type safety and better developer experience
-- **Vite** - Fast build tool with hot module replacement
-- **Tailwind CSS** - Utility-first CSS framework for rapid styling
-- **Native fetch API** - No external HTTP client dependencies
+```bash
+npm install
+npm run dev       # Dev server at http://localhost:5173
+npm run build     # Production build
+npm run lint      # ESLint
+```
 
-## Project Structure
+Expects backend running at http://localhost:8000.
+
+## Structure
 
 ```
 src/
-├── components/           # React components
-│   ├── SearchInput.tsx   # Main search input with autocomplete
-│   ├── SearchResults.tsx # Search results display
-│   └── SearchSuggestions.tsx # Autocomplete dropdown
-├── hooks/               # Custom React hooks
-│   └── useSearch.ts     # Search state management
-├── services/            # API communication
-│   └── api.ts          # HTTP client and types
-├── App.tsx             # Main application component
-└── main.tsx            # Application entry point
+  components/   SearchInput, SearchResults, SearchSuggestions, SearchFilters
+  hooks/        useSearch (main search state/logic)
+  services/     API client (native fetch, no axios)
+  App.tsx       Root component
 ```
-
-## Development
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-
-### Setup
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-```
-
-### Development Server
-
-The frontend runs on `http://localhost:5173` by default and connects to the backend API at `http://localhost:8000`.
-
-## Features
-
-- **Semantic Search** - Search webinars using natural language
-- **Autocomplete** - Real-time search suggestions
-- **Spell Correction** - Automatic typo detection and correction
-- **Mobile Responsive** - Works on all device sizes
-- **Polish Language Support** - Optimized for Polish HR terminology
-
-## API Integration
-
-The frontend communicates with the FastAPI backend through:
-
-- `GET /api/search` - Main search endpoint
-- `GET /api/autocomplete` - Autocomplete suggestions
-- `GET /api/webinars` - Webinar listings with filters
-- `GET /api/categories` - Available categories
-- `GET /api/speakers` - Speaker information
-
-## Build Output
-
-Production builds are optimized for:
-- Minimal bundle size (< 500KB)
-- Fast loading on mobile devices
-- Static file serving from FastAPI backend
