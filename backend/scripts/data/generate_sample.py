@@ -17,14 +17,16 @@ script_dir = Path(__file__).parent
 backend_dir = script_dir.parent.parent  # Go up from scripts/data to backend
 sys.path.insert(0, str(backend_dir))
 
-from app.dependencies import get_database_pool
+from app.dependencies import DatabaseManager
 
 async def load_sample_data():
     """Load sample data from JSON files into database."""
     print("🚀 Starting sample data generation...")
-    
+
+    pool = None
     try:
-        pool = await get_database_pool()
+        db_manager = DatabaseManager()
+        pool = await db_manager.create_pool()
         print("✅ Connected to database")
         
         # Load JSON files
@@ -41,6 +43,12 @@ async def load_sample_data():
         print(f"📄 Loaded {len(webinars)} webinars")
         
         async with pool.acquire() as conn:
+            # Check if webinars already exist
+            existing = await conn.fetchval("SELECT COUNT(*) FROM webinars")
+            if existing > 0:
+                print(f"⚠️  Database already has {existing} webinars, skipping. Use docker compose down -v to reset.")
+                return
+
             # Insert speakers
             print("👥 Inserting speakers...")
             for speaker in speakers:
@@ -120,7 +128,8 @@ async def load_sample_data():
         print(f"❌ Error: {e}")
         raise
     finally:
-        # Pool cleanup is handled by the app lifespan
+        if pool:
+            await pool.close()
         print("🔌 Database connection cleanup completed")
 
 if __name__ == "__main__":
