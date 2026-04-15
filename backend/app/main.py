@@ -33,7 +33,7 @@ class UTF8JSONResponse(JSONResponse):
 async def lifespan(app: FastAPI):
     """Application lifespan manager with proper error handling."""
     logger.info(
-        "Starting HR Search API",
+        "Starting Search API",
         extra={
             "version": "1.0.0",
             "log_level": settings.LOG_LEVEL,
@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="HR Search API",
+    title=settings.DOMAIN_TITLE + " API",
     default_response_class=UTF8JSONResponse,
     lifespan=lifespan,
     version="1.0.0",
@@ -73,10 +73,10 @@ app.add_middleware(
 
 # Global exception handler
 @app.exception_handler(SearchException)
-async def hr_search_exception_handler(
+async def search_exception_handler(
     request: Request, exc: SearchException
 ):
-    """Handle custom HR Search exceptions with standardized format."""
+    """Handle custom Search exceptions with standardized format."""
     # Get request ID from context or generate one
     request_id = get_request_id() or str(uuid.uuid4())[:8]
     
@@ -85,7 +85,7 @@ async def hr_search_exception_handler(
         exc.request_id = request_id
     
     logger.error(
-        "HR Search exception occurred",
+        "Search exception occurred",
         extra={
             "error_code": exc.error_code,
             "error_details": exc.details,
@@ -453,41 +453,51 @@ async def autocomplete_endpoint(
         raise SearchError(f"Autocomplete endpoint failed: {str(e)}", query=q)
 
 
-@app.get("/api/webinars/{webinar_id}")
-async def get_webinar(
-    webinar_id: str,
+@app.get("/api/config")
+async def get_config():
+    """Public config for frontend (domain title, available source types, etc.)."""
+    return {
+        "title": settings.DOMAIN_TITLE,
+        "source_types": ["webinar", "youtube", "article", "paper"],
+    }
+
+
+@app.get("/api/items/{item_id}")
+async def get_item(
+    item_id: str,
     search_service: SearchService = Depends(get_search_service_dependency),
 ):
-    """Get webinar details endpoint with proper error handling."""
+    """Get item details endpoint with proper error handling."""
     try:
-        webinar = await search_service.get_webinar_details(webinar_id)
+        item = await search_service.get_item_details(item_id)
 
         logger.info(
-            "Webinar details retrieved successfully",
-            extra={"webinar_id": webinar_id},
+            "Item details retrieved successfully",
+            extra={"item_id": item_id},
         )
 
-        return webinar
+        return item
 
     except SearchError:
         raise
     except Exception as e:
         logger.error(
-            "Get webinar endpoint failed",
+            "Get item endpoint failed",
             exc_info=e,
-            extra={"webinar_id": webinar_id},
+            extra={"item_id": item_id},
         )
         raise SearchError(
-            f"Get webinar endpoint failed: {str(e)}", query=webinar_id
+            f"Get item endpoint failed: {str(e)}", query=item_id
         )
 
 
-@app.get("/api/webinars")
-async def list_webinars(
+@app.get("/api/items")
+async def list_items(
     category: str = Query(None),
     speaker: str = Query(None),
     tags: str = Query(None),
     date_range: str = Query(None),
+    source_type: str = Query(None),
     offset: int = Query(0, ge=0),
     limit: int = Query(
         default=20,
@@ -496,40 +506,41 @@ async def list_webinars(
     ),
     search_service: SearchService = Depends(get_search_service_dependency),
 ):
-    """List webinars endpoint with proper error handling."""
+    """List items endpoint with proper error handling."""
     try:
         tag_list = None
         if tags:
             tag_list = [tag.strip() for tag in tags.split(",") if tag.strip()]
 
-        webinars, total = await search_service.list_webinars(
+        items, total = await search_service.list_items(
             category=category,
             speaker=speaker,
             tags=tag_list,
             date_range=date_range,
-            content_type=None,
+            source_type=source_type,
             offset=offset,
             limit=limit,
         )
 
-        has_more = (offset + len(webinars)) < total
+        has_more = (offset + len(items)) < total
 
         logger.info(
-            "Webinars listed successfully",
+            "Items listed successfully",
             extra={
                 "category": category,
                 "speaker": speaker,
                 "tags": tags,
                 "date_range": date_range,
+                "source_type": source_type,
                 "offset": offset,
                 "limit": limit,
-                "webinars_count": len(webinars),
+                "items_count": len(items),
                 "total": total,
             },
         )
 
         return {
-            "webinars": webinars,
+            "items": items,
             "total": total,
             "offset": offset,
             "limit": limit,
@@ -542,18 +553,19 @@ async def list_webinars(
         raise
     except Exception as e:
         logger.error(
-            "List webinars endpoint failed",
+            "List items endpoint failed",
             exc_info=e,
             extra={
                 "category": category,
                 "speaker": speaker,
                 "tags": tags,
                 "date_range": date_range,
+                "source_type": source_type,
                 "offset": offset,
                 "limit": limit,
             },
         )
-        raise SearchError(f"List webinars endpoint failed: {str(e)}")
+        raise SearchError(f"List items endpoint failed: {str(e)}")
 
 
 @app.get("/api/categories")
