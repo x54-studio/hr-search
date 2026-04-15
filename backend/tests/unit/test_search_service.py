@@ -237,8 +237,8 @@ class TestSearchService:
         assert "Search operation failed" in str(exc_info.value)
     
     @pytest.mark.asyncio
-    async def test_list_webinars_with_date_range(self, search_service, mock_repositories):
-        """Test list_webinars with date_range filter."""
+    async def test_list_items_with_date_range(self, search_service, mock_repositories):
+        """Test list_items with date_range filter."""
         # Setup
         mock_results = [{"id": "1", "title": "Recent Webinar"}]
         mock_total = 1
@@ -246,7 +246,7 @@ class TestSearchService:
         mock_repositories['item_repo'].get_recent.return_value = (mock_results, mock_total)
         
         # Execute
-        results, total = await search_service.list_webinars(
+        results, total = await search_service.list_items(
             date_range="last_30_days",
             offset=0,
             limit=20
@@ -260,17 +260,17 @@ class TestSearchService:
         )
     
     @pytest.mark.asyncio
-    async def test_list_webinars_date_range_validation(self, search_service):
+    async def test_list_items_date_range_validation(self, search_service):
         """Test date_range validation."""
         with pytest.raises(ValidationError) as exc_info:
-            await search_service.list_webinars(date_range="invalid_range")
+            await search_service.list_items(date_range="invalid_range")
         
         assert "Invalid date_range" in str(exc_info.value)
         assert exc_info.value.details.get("field") == "date_range"
     
     @pytest.mark.asyncio
-    async def test_list_webinars_category_with_date_range(self, search_service, mock_repositories):
-        """Test list_webinars with category and date_range."""
+    async def test_list_items_category_with_date_range(self, search_service, mock_repositories):
+        """Test list_items with category and date_range."""
         # Setup
         mock_results = [{"id": "1", "title": "Category Webinar"}]
         mock_total = 1
@@ -278,7 +278,7 @@ class TestSearchService:
         mock_repositories['item_repo'].get_by_category.return_value = (mock_results, mock_total)
         
         # Execute
-        results, total = await search_service.list_webinars(
+        results, total = await search_service.list_items(
             category="test-category",
             date_range="last_90_days",
             offset=0,
@@ -293,8 +293,8 @@ class TestSearchService:
         )
     
     @pytest.mark.asyncio
-    async def test_list_webinars_speaker_with_date_range(self, search_service, mock_repositories):
-        """Test list_webinars with speaker and date_range."""
+    async def test_list_items_speaker_with_date_range(self, search_service, mock_repositories):
+        """Test list_items with speaker and date_range."""
         # Setup
         mock_results = [{"id": "1", "title": "Speaker Webinar"}]
         mock_total = 1
@@ -302,7 +302,7 @@ class TestSearchService:
         mock_repositories['item_repo'].get_by_speaker.return_value = (mock_results, mock_total)
         
         # Execute
-        results, total = await search_service.list_webinars(
+        results, total = await search_service.list_items(
             speaker="Test Speaker",
             date_range="last_365_days",
             offset=0,
@@ -317,8 +317,8 @@ class TestSearchService:
         )
     
     @pytest.mark.asyncio
-    async def test_list_webinars_tags_with_date_range(self, search_service, mock_repositories):
-        """Test list_webinars with tags and date_range."""
+    async def test_list_items_tags_with_date_range(self, search_service, mock_repositories):
+        """Test list_items with tags and date_range."""
         # Setup
         mock_results = [{"id": "1", "title": "Tagged Webinar"}]
         mock_total = 1
@@ -326,7 +326,7 @@ class TestSearchService:
         mock_repositories['item_repo'].get_by_tags.return_value = (mock_results, mock_total)
         
         # Execute
-        results, total = await search_service.list_webinars(
+        results, total = await search_service.list_items(
             tags=["tag1", "tag2"],
             date_range="last_30_days",
             offset=0,
@@ -341,8 +341,8 @@ class TestSearchService:
         )
     
     @pytest.mark.asyncio
-    async def test_list_webinars_with_content_type(self, search_service, mock_repositories):
-        """Test list_webinars with content_type filter."""
+    async def test_list_items_with_source_type(self, search_service, mock_repositories):
+        """Test list_items with source_type filter."""
         # Setup
         mock_results = [{"id": "1", "title": "Webinar Video"}]
         mock_total = 1
@@ -350,8 +350,8 @@ class TestSearchService:
         mock_repositories['item_repo'].get_recent.return_value = (mock_results, mock_total)
         
         # Execute
-        results, total = await search_service.list_webinars(
-            content_type="webinar",
+        results, total = await search_service.list_items(
+            source_type="webinar",
             offset=0,
             limit=20
         )
@@ -364,17 +364,8 @@ class TestSearchService:
         )
     
     @pytest.mark.asyncio
-    async def test_list_webinars_content_type_validation(self, search_service):
-        """Test content_type validation."""
-        with pytest.raises(ValidationError) as exc_info:
-            await search_service.list_webinars(content_type="invalid_type")
-        
-        assert "Invalid content_type" in str(exc_info.value)
-        assert exc_info.value.details.get("field") == "content_type"
-    
-    @pytest.mark.asyncio
-    async def test_list_webinars_category_with_content_type(self, search_service, mock_repositories):
-        """Test list_webinars with category and content_type."""
+    async def test_list_items_category_with_source_type(self, search_service, mock_repositories):
+        """Test list_items with category and source_type."""
         # Setup
         mock_results = [{"id": "1", "title": "PDF Document"}]
         mock_total = 1
@@ -382,9 +373,9 @@ class TestSearchService:
         mock_repositories['item_repo'].get_by_category.return_value = (mock_results, mock_total)
         
         # Execute
-        results, total = await search_service.list_webinars(
+        results, total = await search_service.list_items(
             category="test-category",
-            content_type="pdf",
+            source_type="pdf",
             offset=0,
             limit=20
         )
@@ -397,8 +388,8 @@ class TestSearchService:
         )
     
     @pytest.mark.asyncio
-    async def test_list_webinars_with_date_range_and_content_type(self, search_service, mock_repositories):
-        """Test list_webinars with both date_range and content_type."""
+    async def test_list_items_with_date_range_and_source_type(self, search_service, mock_repositories):
+        """Test list_items with both date_range and source_type."""
         # Setup
         mock_results = [{"id": "1", "title": "Recent Webinar"}]
         mock_total = 1
@@ -406,9 +397,9 @@ class TestSearchService:
         mock_repositories['item_repo'].get_recent.return_value = (mock_results, mock_total)
         
         # Execute
-        results, total = await search_service.list_webinars(
+        results, total = await search_service.list_items(
             date_range="last_30_days",
-            content_type="webinar",
+            source_type="webinar",
             offset=0,
             limit=20
         )

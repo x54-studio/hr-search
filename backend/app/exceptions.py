@@ -1,5 +1,5 @@
 """
-Custom exception classes for HR Search application.
+Custom exception classes for the Search application.
 
 This module defines a hierarchy of custom exceptions that provide
 structured error handling with consistent formatting and context.
@@ -9,21 +9,21 @@ import time
 from typing import Any, Dict, Optional
 
 
-class HRSearchException(Exception):
+class SearchException(Exception):
     """
-    Base exception class for all HR Search application errors.
-    
+    Base exception class for all Search application errors.
+
     Provides structured error information with:
     - Error code for programmatic handling
     - Human-readable message
     - Additional context in details
     - Timestamp and request ID for tracing
     """
-    
+
     def __init__(
         self,
         message: str,
-        error_code: str = "HR_SEARCH_ERROR",
+        error_code: str = "SEARCH_ERROR",
         details: Optional[Dict[str, Any]] = None,
         request_id: Optional[str] = None,
         cause: Optional[Exception] = None,
@@ -51,7 +51,7 @@ class HRSearchException(Exception):
         return f"{self.error_code}: {self.message}"
 
 
-class ValidationError(HRSearchException):
+class ValidationError(SearchException):
     """
     Exception raised for input validation errors.
     
@@ -79,7 +79,7 @@ class ValidationError(HRSearchException):
         )
 
 
-class SearchError(HRSearchException):
+class SearchError(SearchException):
     """
     Exception raised for search-related errors.
     
@@ -109,7 +109,7 @@ class SearchError(HRSearchException):
         )
 
 
-class DatabaseError(HRSearchException):
+class DatabaseError(SearchException):
     """
     Exception raised for database-related errors.
     
@@ -136,7 +136,7 @@ class DatabaseError(HRSearchException):
         )
 
 
-class ResourceNotFoundError(HRSearchException):
+class ResourceNotFoundError(SearchException):
     """
     Exception raised when a requested resource is not found.
     
@@ -164,7 +164,7 @@ class ResourceNotFoundError(HRSearchException):
         )
 
 
-class EmbeddingError(HRSearchException):
+class EmbeddingError(SearchException):
     """
     Exception raised for embedding/model-related errors.
     
@@ -191,7 +191,7 @@ class EmbeddingError(HRSearchException):
         )
 
 
-class ConfigurationError(HRSearchException):
+class ConfigurationError(SearchException):
     """
     Exception raised for configuration-related errors.
     

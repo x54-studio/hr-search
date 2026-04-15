@@ -8,7 +8,7 @@ from typing import List, Dict
 from .config import settings
 from .logging_config import setup_logging, get_logger, set_request_id, get_request_id
 from .exceptions import (
-    HRSearchException,
+    SearchException,
     SearchError,
     ValidationError,
 )
@@ -72,9 +72,9 @@ app.add_middleware(
 
 
 # Global exception handler
-@app.exception_handler(HRSearchException)
+@app.exception_handler(SearchException)
 async def hr_search_exception_handler(
-    request: Request, exc: HRSearchException
+    request: Request, exc: SearchException
 ):
     """Handle custom HR Search exceptions with standardized format."""
     # Get request ID from context or generate one

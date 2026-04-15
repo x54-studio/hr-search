@@ -106,7 +106,7 @@ class EmbeddingService(LoggingMixin):
 
     async def generate_all_embeddings(self) -> None:
         """
-        Generate embeddings for all published webinars without embeddings.
+        Generate embeddings for all published items without embeddings.
 
         Raises:
             SearchError: If embedding generation fails
@@ -114,24 +114,20 @@ class EmbeddingService(LoggingMixin):
         try:
             model = self.get_model()
 
-            # Get all webinars without embeddings
-            webinars = await self.embedding_repo.get_webinars_without_embeddings()
+            items = await self.embedding_repo.get_items_without_embeddings()
 
-            if not webinars:
-                self.log_info("All webinars already have embeddings")
+            if not items:
+                self.log_info("All items already have embeddings")
                 return
 
-            self.log_info("Generating embeddings", extra={"count": len(webinars)})
+            self.log_info("Generating embeddings", extra={"count": len(items)})
 
-            # Generate embeddings in batches
             batch_size = settings.EMBEDDING_BATCH_SIZE
-            for i in range(0, len(webinars), batch_size):
-                batch = webinars[i : i + batch_size]
+            for i in range(0, len(items), batch_size):
+                batch = items[i : i + batch_size]
 
-                # Combine title and description for better context
                 texts = [f"{w['title']}. {w['description'] or ''}"[:100] for w in batch]
 
-                # Generate embeddings in thread pool
                 loop = asyncio.get_event_loop()
                 embeddings = await loop.run_in_executor(
                     None,
@@ -143,15 +139,14 @@ class EmbeddingService(LoggingMixin):
                     ),
                 )
 
-                # Store in database
-                for webinar, embedding in zip(batch, embeddings):
+                for item, embedding in zip(batch, embeddings):
                     await self.embedding_repo.insert_embedding(
-                        webinar["id"], "title", embedding.tolist()
+                        item["id"], "title", embedding.tolist()
                     )
 
             self.log_info(
                 "Embeddings generated successfully",
-                extra={"count": len(webinars)},
+                extra={"count": len(items)},
             )
 
         except Exception as e:
@@ -159,7 +154,7 @@ class EmbeddingService(LoggingMixin):
                 "Failed to generate embeddings",
                 exception=e,
                 extra={
-                    "webinar_count": (len(webinars) if "webinars" in locals() else 0)
+                    "item_count": (len(items) if "items" in locals() else 0)
                 },
             )
             raise SearchError(

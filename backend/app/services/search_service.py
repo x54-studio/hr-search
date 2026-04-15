@@ -2,7 +2,7 @@
 Search service containing business logic for search operations.
 
 Handles the orchestration of search algorithms, result ranking,
-and business rules for the HR Search application.
+and business rules for the Search application.
 """
 
 import time
@@ -294,37 +294,36 @@ class SearchService(LoggingMixin):
                 cause=e,
             )
 
-    async def get_webinar_details(self, webinar_id: str) -> Dict:
+    async def get_item_details(self, item_id: str) -> Dict:
         """
-        Get detailed information about a specific webinar.
+        Get detailed information about a specific item.
 
         Args:
-            webinar_id: UUID of the webinar
+            item_id: UUID of the item
 
         Returns:
-            Webinar details with speakers, tags, and category
+            Item details with speakers, tags, and category
 
         Raises:
-            SearchError: If webinar not found
-            SearchError: If operation fails
+            SearchError: If item not found or operation fails
         """
         try:
-            return await self.item_repo.get_by_id(webinar_id)
+            return await self.item_repo.get_by_id(item_id)
         except Exception as e:
             self.log_error(
-                "Get webinar details operation failed",
+                "Get item details operation failed",
                 exception=e,
-                extra={"webinar_id": webinar_id},
+                extra={"item_id": item_id},
             )
             raise SearchError(
-                f"Get webinar details operation failed: {str(e)}",
-                search_type="webinar_details",
+                f"Get item details operation failed: {str(e)}",
+                search_type="item_details",
             )
 
     @cached(ttl=600, key_prefix="categories")
     async def get_categories(self) -> List[Dict]:
         """
-        Get all categories with webinar counts.
+        Get all categories with item counts.
 
         Returns:
             List of categories with counts
@@ -346,7 +345,7 @@ class SearchService(LoggingMixin):
     @cached(ttl=300, key_prefix="speakers")
     async def get_speakers(self, limit: int = 100) -> List[Dict]:
         """
-        Get all speakers with webinar counts.
+        Get all speakers with item counts.
 
         Args:
             limit: Maximum number of speakers to return
@@ -380,7 +379,7 @@ class SearchService(LoggingMixin):
     @cached(ttl=300, key_prefix="tags")
     async def get_tags(self, limit: int = 100) -> List[Dict]:
         """
-        Get all tags with webinar counts.
+        Get all tags with item counts.
 
         Args:
             limit: Maximum number of tags to return
@@ -446,7 +445,7 @@ class SearchService(LoggingMixin):
                 search_type="popular_tags",
             ) from e
 
-    async def list_webinars(
+    async def list_items(
         self,
         category: Optional[str] = None,
         speaker: Optional[str] = None,
@@ -454,10 +453,10 @@ class SearchService(LoggingMixin):
         offset: int = 0,
         limit: int = 20,
         date_range: Optional[str] = None,
-        content_type: Optional[str] = None,
+        source_type: Optional[str] = None,
     ) -> Tuple[List[Dict], int]:
         """
-        List webinars with optional filtering and pagination.
+        List items with optional filtering and pagination.
 
         Args:
             category: Filter by category slug
@@ -466,10 +465,10 @@ class SearchService(LoggingMixin):
             offset: Number of records to skip
             limit: Maximum number of records
             date_range: Optional date range filter ('last_30_days', 'last_90_days', 'last_365_days')
-            content_type: Optional content type filter ('webinar', 'pdf')
+            source_type: Optional source type filter (e.g. 'webinar', 'youtube')
 
         Returns:
-            Tuple of (webinar_list, total_count)
+            Tuple of (item_list, total_count)
 
         Raises:
             ValidationError: If parameters are invalid
@@ -494,30 +493,23 @@ class SearchService(LoggingMixin):
                 value=date_range,
             )
 
-        if content_type and content_type not in ('webinar', 'pdf'):
-            raise ValidationError(
-                f"Invalid content_type: {content_type}. Must be one of: webinar, pdf",
-                field="content_type",
-                value=content_type,
-            )
-
         try:
             if category:
                 return await self.item_repo.get_by_category(
-                    category, offset, limit, date_range, content_type
+                    category, offset, limit, date_range, source_type
                 )
             elif speaker:
                 return await self.item_repo.get_by_speaker(
-                    speaker, offset, limit, date_range, content_type
+                    speaker, offset, limit, date_range, source_type
                 )
             elif tags:
-                return await self.item_repo.get_by_tags(tags, offset, limit, date_range, content_type)
+                return await self.item_repo.get_by_tags(tags, offset, limit, date_range, source_type)
             else:
-                return await self.item_repo.get_recent(offset, limit, date_range, content_type)
+                return await self.item_repo.get_recent(offset, limit, date_range, source_type)
 
         except Exception as e:
             self.log_error(
-                "Database operation failed during webinar listing",
+                "Database operation failed during item listing",
                 exception=e,
                 extra={
                     "category": category,
@@ -526,12 +518,12 @@ class SearchService(LoggingMixin):
                     "offset": offset,
                     "limit": limit,
                     "date_range": date_range,
-                    "content_type": content_type,
+                    "source_type": source_type,
                 },
             )
             raise SearchError(
-                f"Failed to list webinars: {str(e)}",
-                search_type="recent_webinars",
+                f"Failed to list items: {str(e)}",
+                search_type="list_items",
             ) from e
 
     def _extract_correction(
@@ -540,7 +532,7 @@ class SearchService(LoggingMixin):
         """
         Extract spell-corrected query from fuzzy search results.
 
-        Uses title words from top-matching webinars to identify correction.
+        Uses title words from top-matching items to identify correction.
 
         Args:
             original_query: The original search query
@@ -616,17 +608,16 @@ class SearchService(LoggingMixin):
         self, query: str, limit: int
     ) -> List[Dict]:
         """
-        Search for webinars by speaker name.
+        Search for items by speaker name.
 
         Args:
             query: Search query (speaker name)
             limit: Maximum number of results
 
         Returns:
-            List of webinar results matching the speaker name
+            List of item results matching the speaker name
         """
         try:
-            # First, find speakers matching the query
             matching_speakers = await self.speaker_repo.search_by_name(
                 query, limit=5
             )
@@ -634,36 +625,30 @@ class SearchService(LoggingMixin):
             if not matching_speakers:
                 return []
 
-            # Get webinars for each matching speaker
             all_results = []
-            seen_webinar_ids = set()
+            seen_ids = set()
 
             for speaker in matching_speakers:
                 speaker_name = speaker["suggestion"]
-                
-                # Get webinars for this speaker
-                speaker_webinars, _ = await self.item_repo.get_by_speaker(
+
+                speaker_items, _ = await self.item_repo.get_by_speaker(
                     speaker_name, offset=0, limit=limit
                 )
 
-                # Add unique webinars to results
-                for webinar in speaker_webinars:
-                    if webinar["id"] not in seen_webinar_ids:
-                        # Add similarity score for consistency with other search results
-                        webinar["similarity"] = 0.8  # High similarity for exact speaker match
-                        all_results.append(webinar)
-                        seen_webinar_ids.add(webinar["id"])
+                for item in speaker_items:
+                    if item["id"] not in seen_ids:
+                        item["similarity"] = 0.8
+                        all_results.append(item)
+                        seen_ids.add(item["id"])
 
-                        # Stop if we have enough results
                         if len(all_results) >= limit:
                             break
 
                 if len(all_results) >= limit:
                     break
 
-            # Sort by recorded_date DESC to show most recent first
             all_results.sort(
-                key=lambda x: x.get("recorded_date", ""), reverse=True
+                key=lambda x: x.get("published_date", ""), reverse=True
             )
 
             return all_results[:limit]

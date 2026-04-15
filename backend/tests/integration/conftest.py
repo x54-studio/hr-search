@@ -1,5 +1,5 @@
 """
-Integration test configuration and fixtures for HR Search backend.
+Integration test configuration and fixtures for Search backend.
 These tests connect to the real database.
 """
 import asyncio
@@ -54,10 +54,10 @@ async def cleanup_test_data(real_db_pool):
     # Clean up any test data created during tests
     async with real_db_pool.acquire() as conn:
         # Remove any test data created during tests
-        await conn.execute("DELETE FROM webinar_embeddings WHERE webinar_id LIKE 'test-%'")
-        await conn.execute("DELETE FROM webinar_tags WHERE webinar_id LIKE 'test-%'")
-        await conn.execute("DELETE FROM webinar_speakers WHERE webinar_id LIKE 'test-%'")
-        await conn.execute("DELETE FROM webinars WHERE id LIKE 'test-%'")
+        await conn.execute("DELETE FROM item_embeddings WHERE item_id LIKE 'test-%'")
+        await conn.execute("DELETE FROM item_tags WHERE item_id LIKE 'test-%'")
+        await conn.execute("DELETE FROM item_speakers WHERE item_id LIKE 'test-%'")
+        await conn.execute("DELETE FROM items WHERE id LIKE 'test-%'")
         await conn.execute("DELETE FROM speakers WHERE id LIKE 'test-%'")
         await conn.execute("DELETE FROM tags WHERE id LIKE 'test-%'")
         await conn.execute("DELETE FROM categories WHERE id LIKE 'test-%'")

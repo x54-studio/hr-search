@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     MAX_AUTOCOMPLETE_RESULTS: int = Field(default=10, description="Maximum autocomplete results")
     EMBEDDING_BATCH_SIZE: int = Field(default=32, description="Batch size for embedding generation")
 
+    # Domain
+    DOMAIN_TITLE: str = Field(default="HR Knowledge Search", description="Display title for the application")
+
     # API
     LOG_LEVEL: str = Field(default="INFO", description="Logging level")
     CORS_ALLOW_ORIGINS: Union[List[str], str] = Field(
