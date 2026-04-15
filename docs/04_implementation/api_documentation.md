@@ -1,8 +1,8 @@
-# HR Search API Documentation
+# Search API Documentation
 
 ## Overview
 
-The HR Search API provides semantic search capabilities for HR webinars using machine learning embeddings and fuzzy matching fallback. The API is built with FastAPI and follows RESTful principles with comprehensive error handling.
+The Search API provides semantic search capabilities for content items using machine learning embeddings and fuzzy matching fallback. The API is built with FastAPI and follows RESTful principles with comprehensive error handling. Domain is configurable via `DOMAIN_TITLE` setting (default: HR).
 
 ## Base URL
 
@@ -246,18 +246,32 @@ GET /api/autocomplete?q=lead&limit=5
 }
 ```
 
-### Webinars
+### Config
 
-#### GET /api/webinars/{webinar_id}
+#### GET /api/config
 
-Get detailed information about a specific webinar.
+Get application configuration for frontend.
+
+**Response:**
+```json
+{
+  "title": "HR Knowledge Search",
+  "source_types": ["webinar", "youtube", "article", "paper"]
+}
+```
+
+### Items
+
+#### GET /api/items/{item_id}
+
+Get detailed information about a specific item.
 
 **Parameters:**
-- `webinar_id` (string, required): UUID of the webinar
+- `item_id` (string, required): UUID of the item
 
 **Example Request:**
 ```
-GET /api/webinars/123e4567-e89b-12d3-a456-426614174000
+GET /api/items/123e4567-e89b-12d3-a456-426614174000
 ```
 
 **Response:**
@@ -267,9 +281,10 @@ GET /api/webinars/123e4567-e89b-12d3-a456-426614174000
   "title": "Leadership Development Workshop",
   "description": "Comprehensive leadership training...",
   "duration_ms": 3600000,
-  "recorded_date": "2024-01-10T14:00:00Z",
-  "video_url": "https://example.com/video.mp4",
-  "pdf_url": "https://example.com/slides.pdf",
+  "published_date": "2024-01-10",
+  "source_type": "webinar",
+  "source_url": "https://example.com/video.mp4",
+  "metadata": {"pdf_url": "https://example.com/slides.pdf"},
   "status": "published",
   "category_name": "Leadership",
   "speakers": ["John Doe", "Jane Smith"],
@@ -277,42 +292,48 @@ GET /api/webinars/123e4567-e89b-12d3-a456-426614174000
 }
 ```
 
-#### GET /api/webinars
+#### GET /api/items
 
-List webinars with optional filtering and pagination.
+List items with optional filtering and pagination.
 
 **Parameters:**
 - `category` (string, optional): Filter by category slug
 - `speaker` (string, optional): Filter by speaker name
 - `tags` (string, optional): Comma-separated tag slugs
+- `source_type` (string, optional): Filter by source type (e.g. 'webinar', 'youtube')
+- `date_range` (string, optional): Filter by date range ('last_30_days', 'last_90_days', 'last_365_days')
 - `offset` (integer, optional): Number of records to skip (default: 0)
 - `limit` (integer, optional): Maximum records (default: 20, max: 50)
 
 **Example Requests:**
 ```
-GET /api/webinars?category=leadership&limit=10
-GET /api/webinars?speaker=John Doe&offset=0&limit=20
-GET /api/webinars?tags=leadership,development&limit=15
+GET /api/items?category=leadership&limit=10
+GET /api/items?speaker=John Doe&offset=0&limit=20
+GET /api/items?source_type=webinar&date_range=last_90_days&limit=15
 ```
 
 **Response:**
 ```json
 {
-  "webinars": [
+  "items": [
     {
       "id": "uuid",
       "title": "Leadership Development Workshop",
       "description": "Comprehensive leadership training...",
       "duration_ms": 3600000,
-      "recorded_date": "2024-01-10T14:00:00Z",
-      "video_url": "https://example.com/video.mp4",
-      "pdf_url": "https://example.com/slides.pdf",
+      "published_date": "2024-01-10",
+      "source_type": "webinar",
+      "source_url": "https://example.com/video.mp4",
+      "metadata": {},
       "category_name": "Leadership",
       "speakers": ["John Doe", "Jane Smith"],
       "tags": ["leadership", "development", "workshop"]
     }
   ],
-  "total_count": 25
+  "total": 25,
+  "offset": 0,
+  "limit": 20,
+  "hasMore": true
 }
 ```
 
@@ -320,7 +341,7 @@ GET /api/webinars?tags=leadership,development&limit=15
 
 #### GET /api/categories
 
-Get all categories with webinar counts.
+Get all categories with item counts.
 
 **Response:**
 ```json
@@ -330,7 +351,7 @@ Get all categories with webinar counts.
     "name": "Leadership",
     "slug": "leadership",
     "description": "Leadership and management topics",
-    "webinar_count": 15
+    "item_count": 15
   }
 ]
 ```
@@ -339,7 +360,7 @@ Get all categories with webinar counts.
 
 #### GET /api/tags
 
-Get all tags with webinar counts.
+Get all tags with item counts.
 
 **Parameters:**
 - `limit` (integer, optional): Maximum tags (default: 100, max: 500)
@@ -351,7 +372,7 @@ Get all tags with webinar counts.
     "id": "uuid",
     "name": "leadership",
     "slug": "leadership",
-    "webinar_count": 12
+    "item_count": 12
   }
 ]
 ```
@@ -370,7 +391,7 @@ Get most used tags ordered by usage count.
     "id": "uuid",
     "name": "leadership",
     "slug": "leadership",
-    "webinar_count": 25
+    "item_count": 25
   }
 ]
 ```
@@ -379,7 +400,7 @@ Get most used tags ordered by usage count.
 
 #### GET /api/speakers
 
-Get all speakers with webinar counts.
+Get all speakers with item counts.
 
 **Parameters:**
 - `limit` (integer, optional): Maximum speakers (default: 100, max: 500)
@@ -391,7 +412,7 @@ Get all speakers with webinar counts.
     "id": "uuid",
     "name": "John Doe",
     "bio": "Senior Leadership Consultant",
-    "webinar_count": 8
+    "item_count": 8
   }
 ]
 ```

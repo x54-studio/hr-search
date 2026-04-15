@@ -17,13 +17,16 @@ Requires PostgreSQL with pgvector running (`docker compose up -d` from project r
 ```
 app/
   main.py           FastAPI app, routes, middleware
-  config.py         Pydantic settings (env-based)
+  config.py         Pydantic settings (env-based, includes DOMAIN_TITLE)
   dependencies.py   DI container
   repositories/     Data access (asyncpg, raw SQL)
+    item.py         Main content entity (items table with source_type + metadata JSONB)
+    category.py     Categories, speakers, tags, autocomplete
+    embedding.py    Vector embeddings (item_embeddings)
   services/         Business logic (SearchService, EmbeddingService)
   cache/            In-memory cache with TTL/LRU
 scripts/
-  setup/            init.sql, seed.sql (auto-run by docker-compose)
+  setup/            init.sql, seed.sql, reset_dev.sh
   data/             Sample data generator
   maintenance/      Embedding generation, DB optimization
 tests/

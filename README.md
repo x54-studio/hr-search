@@ -1,6 +1,6 @@
 # HR Knowledge Search
 
-Semantic search engine for HR webinar recordings. Handles Polish + English queries with typo correction, autocomplete, and filtering by category, speaker, tags, and date range.
+Domain-configurable semantic search engine. Handles Polish + English queries with typo correction, autocomplete, and filtering by category, speaker, tags, date range, and source type. Default domain: HR webinars and training materials.
 
 Built as a learning project to explore Python, FastAPI, and Linux after years of working with C#. Mostly AI-assisted boilerplate, reviewed and understood by me.
 
@@ -48,7 +48,9 @@ Backend: http://localhost:8000 | Frontend: http://localhost:5173
 |----------|-------------|
 | `GET /api/search?q=...` | Semantic search with spell correction |
 | `GET /api/autocomplete?q=...` | Real-time suggestions |
-| `GET /api/webinars` | List/filter by category, speaker, tags, date_range |
+| `GET /api/items` | List/filter by category, speaker, tags, date_range, source_type |
+| `GET /api/items/{id}` | Item details |
+| `GET /api/config` | Domain title and available source types |
 | `GET /api/health` | Health check |
 
 Full docs: [docs/04_implementation/api_documentation.md](docs/04_implementation/api_documentation.md)
