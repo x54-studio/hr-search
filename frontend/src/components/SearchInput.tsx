@@ -5,6 +5,7 @@ interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
   onClear: () => void;
+  onSubmit?: () => void;
   placeholder?: string;
   suggestions?: Array<{ suggestion: string }>;
   showSuggestions?: boolean;
@@ -12,17 +13,17 @@ interface SearchInputProps {
   onSelectedIndexChange?: (index: number) => void;
 }
 
-export function SearchInput({ 
-  value, 
-  onChange, 
-  onClear, 
-  placeholder = "Szukaj webinaru, tematu lub prelegenta...",
+export function SearchInput({
+  value,
+  onChange,
+  onClear,
+  onSubmit,
+  placeholder = "Szukaj tematu, prelegenta lub tagu...",
   suggestions = [],
   showSuggestions = false,
   onSuggestionSelect,
   onSelectedIndexChange
 }: SearchInputProps) {
-  const [focused, setFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -37,6 +38,9 @@ export function SearchInput({
       if (e.key === 'Escape') {
         onClear();
         inputRef.current?.blur();
+      } else if (e.key === 'Enter' && onSubmit) {
+        e.preventDefault();
+        onSubmit();
       }
       return;
     }
@@ -64,6 +68,8 @@ export function SearchInput({
           onSuggestionSelect(suggestions[selectedIndex].suggestion);
           setSelectedIndex(-1);
           onSelectedIndexChange?.(-1);
+        } else if (onSubmit) {
+          onSubmit();
         }
         break;
       case 'Escape':
@@ -98,8 +104,7 @@ export function SearchInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setTimeout(() => setFocused(false), 200)}
+          onBlur={() => {}}
           placeholder={placeholder}
           className="search-input pl-12 pr-12"
           autoComplete="off"

@@ -5,19 +5,19 @@ import { apiService, ApiError } from '../services/api';
 interface Category {
   slug: string;
   name: string;
-  webinar_count: number;
+  item_count: number;
 }
 
 interface Speaker {
   name: string;
   bio?: string;
-  webinar_count: number;
+  item_count: number;
 }
 
 interface Tag {
   slug: string;
   name: string;
-  webinar_count: number;
+  item_count: number;
 }
 
 interface SearchFiltersProps {
@@ -314,7 +314,7 @@ export function SearchFilters({
                             {category.name}
                           </span>
                           <span className="ml-2 text-xs text-gray-500">
-                            ({category.webinar_count})
+                            ({category.item_count})
                           </span>
                         </div>
                       </label>
@@ -385,7 +385,7 @@ export function SearchFilters({
                             {speaker.name}
                           </span>
                           <span className="ml-2 text-xs text-gray-500">
-                            ({speaker.webinar_count})
+                            ({speaker.item_count})
                           </span>
                         </div>
                       </label>
@@ -456,7 +456,7 @@ export function SearchFilters({
                             {tag.name}
                           </span>
                           <span className="ml-2 text-xs text-gray-500">
-                            ({tag.webinar_count})
+                            ({tag.item_count})
                           </span>
                         </div>
                       </label>
