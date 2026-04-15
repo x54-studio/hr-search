@@ -22,10 +22,10 @@ logger = setup_logging()
 # Index definitions for optimization
 OPTIMIZATION_INDEXES = [
     {
-        "name": "idx_webinars_search_polish",
+        "name": "idx_items_search_polish",
         "sql": """
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_webinars_search_polish 
-        ON webinars USING GIN(to_tsvector('polish', title || ' ' || COALESCE(description, '')))
+        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_items_search_polish 
+        ON items USING GIN(to_tsvector('polish', title || ' ' || COALESCE(description, '')))
         """,
         "description": "Full-text search index for Polish"
     },
@@ -33,16 +33,16 @@ OPTIMIZATION_INDEXES = [
         "name": "idx_embeddings_vector_cosine",
         "sql": """
         CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_embeddings_vector_cosine 
-        ON webinar_embeddings USING hnsw (vector vector_cosine_ops) 
+        ON item_embeddings USING hnsw (vector vector_cosine_ops) 
         WITH (m = 16, ef_construction = 64)
         """,
         "description": "Optimized vector operations index"
     },
     {
-        "name": "idx_webinars_category_date_published",
+        "name": "idx_items_category_date_published",
         "sql": """
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_webinars_category_date_published
-        ON webinars(category_id, recorded_date DESC)
+        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_items_category_date_published
+        ON items(category_id, published_date DESC)
         WHERE status = 'published'
         """,
         "description": "Composite index for category + date filtering"
@@ -80,10 +80,10 @@ OPTIMIZATION_INDEXES = [
         "description": "Tag name full-text search index"
     },
     {
-        "name": "idx_webinars_category_status_date",
+        "name": "idx_items_category_status_date",
         "sql": """
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_webinars_category_status_date
-        ON webinars(category_id, status, recorded_date DESC)
+        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_items_category_status_date
+        ON items(category_id, status, published_date DESC)
         """,
         "description": "Composite index for multi-criteria filtering"
     }
@@ -91,13 +91,13 @@ OPTIMIZATION_INDEXES = [
 
 # Tables to analyze after index creation
 TABLES_TO_ANALYZE = [
-    "webinars",
+    "items",
     "categories", 
     "speakers",
     "tags",
-    "webinar_speakers",
-    "webinar_tags",
-    "webinar_embeddings"
+    "item_speakers",
+    "item_tags",
+    "item_embeddings"
 ]
 
 

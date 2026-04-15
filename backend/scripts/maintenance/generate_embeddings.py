@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate embeddings for all webinars using service layer."""
+"""Generate embeddings for all items using service layer."""
 import asyncio
 import sys
 from pathlib import Path
@@ -15,7 +15,7 @@ from app.logging_config import setup_logging, get_logger
 logger = get_logger("generate_embeddings")
 
 async def main():
-    """Generate embeddings for all webinars."""
+    """Generate embeddings for all items."""
     setup_logging(settings.LOG_LEVEL)
     logger.info("Starting embedding generation...")
     

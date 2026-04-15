@@ -16,7 +16,7 @@ async def main() -> None:
     pool = await get_database_pool()
     try:
         async with pool.acquire() as conn:
-            await conn.execute('DELETE FROM webinar_embeddings')
+            await conn.execute('DELETE FROM item_embeddings')
             print('✅ Cleared existing embeddings')
     finally:
         # Pool cleanup is handled by the app lifespan

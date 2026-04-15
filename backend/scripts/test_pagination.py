@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-HTTP E2E test for /api/webinars pagination.
+HTTP E2E test for /api/items pagination.
 
 Requires API running locally on http://localhost:8000
 """
@@ -16,16 +16,16 @@ def assert_condition(condition: bool, message: str):
         sys.exit(1)
 
 def main():
-    print("🧪 Testing /api/webinars pagination (HTTP)...")
+    print("🧪 Testing /api/items pagination (HTTP)...")
 
     # First page
     params1 = {"offset": 0, "limit": 10}
-    r1 = requests.get(f"{BASE_URL}/webinars", params=params1, timeout=10)
+    r1 = requests.get(f"{BASE_URL}/items", params=params1, timeout=10)
     assert_condition(r1.status_code == 200, f"Unexpected status for page 1: {r1.status_code}")
     data1 = r1.json()
 
     total = data1.get("total", 0)
-    items1 = data1.get("webinars", [])
+    items1 = data1.get("items", [])
     has_more1 = data1.get("hasMore")
 
     print(f"   Total={total}, page1={len(items1)}, hasMore={has_more1}")
@@ -33,16 +33,16 @@ def main():
     assert_condition(len(items1) <= 10, "page1 should return <= limit items")
 
     if total == 0:
-        print("⚠️  No webinars available to fully test pagination.")
+        print("⚠️  No items available to fully test pagination.")
         print("✅ Basic pagination response shape verified.")
         return
 
     # Second page
     params2 = {"offset": len(items1), "limit": 10}
-    r2 = requests.get(f"{BASE_URL}/webinars", params=params2, timeout=10)
+    r2 = requests.get(f"{BASE_URL}/items", params=params2, timeout=10)
     assert_condition(r2.status_code == 200, f"Unexpected status for page 2: {r2.status_code}")
     data2 = r2.json()
-    items2 = data2.get("webinars", [])
+    items2 = data2.get("items", [])
     has_more2 = data2.get("hasMore")
 
     # Basic assertions
