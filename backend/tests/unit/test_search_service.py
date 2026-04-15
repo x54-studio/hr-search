@@ -19,7 +19,7 @@ class TestSearchService:
     def mock_repositories(self):
         """Create mock repositories."""
         return {
-            'webinar_repo': AsyncMock(),
+            'item_repo': AsyncMock(),
             'category_repo': AsyncMock(),
             'speaker_repo': AsyncMock(),
             'tag_repo': AsyncMock(),
@@ -36,7 +36,7 @@ class TestSearchService:
     def search_service(self, mock_repositories, mock_embedding_service):
         """Create SearchService instance with mocked dependencies."""
         return SearchService(
-            webinar_repo=mock_repositories['webinar_repo'],
+            item_repo=mock_repositories['item_repo'],
             category_repo=mock_repositories['category_repo'],
             speaker_repo=mock_repositories['speaker_repo'],
             tag_repo=mock_repositories['tag_repo'],
@@ -55,8 +55,8 @@ class TestSearchService:
         mock_results = [{"id": "1", "title": "ML Basics", "similarity": 0.8}]
         
         mock_embedding_service.generate_embedding.return_value = mock_embedding
-        mock_repositories['webinar_repo'].search_semantic.return_value = mock_results
-        mock_repositories['webinar_repo'].search_fuzzy.return_value = []  # No fuzzy suggestions
+        mock_repositories['item_repo'].search_semantic.return_value = mock_results
+        mock_repositories['item_repo'].search_fuzzy.return_value = []  # No fuzzy suggestions
         
         # Execute
         result = await search_service.search(query, limit)
@@ -68,7 +68,7 @@ class TestSearchService:
         assert result["corrected_query"] is None
         
         mock_embedding_service.generate_embedding.assert_called_once_with(query)
-        mock_repositories['webinar_repo'].search_semantic.assert_called_once()
+        mock_repositories['item_repo'].search_semantic.assert_called_once()
     
     @pytest.mark.asyncio
     async def test_search_fuzzy_fallback(self, search_service, mock_repositories, mock_embedding_service):
@@ -79,8 +79,8 @@ class TestSearchService:
         mock_fuzzy_results = [{"id": "1", "title": "ML Basics", "similarity": 0.6}]
         
         mock_embedding_service.generate_embedding.return_value = [0.1, 0.2, 0.3]
-        mock_repositories['webinar_repo'].search_semantic.return_value = []
-        mock_repositories['webinar_repo'].search_fuzzy.return_value = mock_fuzzy_results
+        mock_repositories['item_repo'].search_semantic.return_value = []
+        mock_repositories['item_repo'].search_fuzzy.return_value = mock_fuzzy_results
         
         # Execute
         result = await search_service.search(query, limit)
@@ -92,9 +92,9 @@ class TestSearchService:
         assert result["corrected_query"] is None
         
         # Verify fuzzy is called exactly once (not twice)
-        assert mock_repositories['webinar_repo'].search_fuzzy.call_count == 1
+        assert mock_repositories['item_repo'].search_fuzzy.call_count == 1
         # Verify it's called with full parameters (limit, not limit=3)
-        call_args_list = mock_repositories['webinar_repo'].search_fuzzy.call_args_list
+        call_args_list = mock_repositories['item_repo'].search_fuzzy.call_args_list
         assert len(call_args_list) == 1
         call = call_args_list[0]
         args, kwargs = call
@@ -116,8 +116,8 @@ class TestSearchService:
         mock_fuzzy_results = [{"id": "1", "title": "Machine Learning Basics", "similarity": 0.9}]
         
         mock_embedding_service.generate_embedding.return_value = mock_embedding
-        mock_repositories['webinar_repo'].search_semantic.return_value = mock_semantic_results
-        mock_repositories['webinar_repo'].search_fuzzy.return_value = mock_fuzzy_results
+        mock_repositories['item_repo'].search_semantic.return_value = mock_semantic_results
+        mock_repositories['item_repo'].search_fuzzy.return_value = mock_fuzzy_results
         
         # Execute
         result = await search_service.search(query, limit)
@@ -130,7 +130,7 @@ class TestSearchService:
         # Note: _extract_correction may or may not change query depending on implementation
         # At minimum, verify fuzzy was called with full parameters
         # The key verification is call_count == 1 (not 2)
-        assert mock_repositories['webinar_repo'].search_fuzzy.call_count == 1
+        assert mock_repositories['item_repo'].search_fuzzy.call_count == 1
         
         mock_embedding_service.generate_embedding.assert_called_once()
     
@@ -146,8 +146,8 @@ class TestSearchService:
         ]
         
         mock_embedding_service.generate_embedding.return_value = [0.1, 0.2, 0.3]
-        mock_repositories['webinar_repo'].search_semantic.return_value = []  # No semantic results
-        mock_repositories['webinar_repo'].search_fuzzy.return_value = mock_fuzzy_results
+        mock_repositories['item_repo'].search_semantic.return_value = []  # No semantic results
+        mock_repositories['item_repo'].search_fuzzy.return_value = mock_fuzzy_results
         
         # Execute
         result = await search_service.search(query, limit)
@@ -159,12 +159,12 @@ class TestSearchService:
         assert result["original_query"] == query
         
         # 2. Fuzzy is called exactly ONCE (not twice)
-        assert mock_repositories['webinar_repo'].search_fuzzy.call_count == 1
+        assert mock_repositories['item_repo'].search_fuzzy.call_count == 1
         
         # 3. Fuzzy is called with full parameters (limit, not limit=3)
         # The key verification is that it's called exactly once (not twice)
         # AsyncMock may not capture all positional args correctly, so we verify call_count
-        call_args_list = mock_repositories['webinar_repo'].search_fuzzy.call_args_list
+        call_args_list = mock_repositories['item_repo'].search_fuzzy.call_args_list
         assert len(call_args_list) == 1
         call = call_args_list[0]
         args, kwargs = call
@@ -243,7 +243,7 @@ class TestSearchService:
         mock_results = [{"id": "1", "title": "Recent Webinar"}]
         mock_total = 1
         
-        mock_repositories['webinar_repo'].get_recent.return_value = (mock_results, mock_total)
+        mock_repositories['item_repo'].get_recent.return_value = (mock_results, mock_total)
         
         # Execute
         results, total = await search_service.list_webinars(
@@ -255,7 +255,7 @@ class TestSearchService:
         # Verify
         assert results == mock_results
         assert total == mock_total
-        mock_repositories['webinar_repo'].get_recent.assert_called_once_with(
+        mock_repositories['item_repo'].get_recent.assert_called_once_with(
             0, 20, "last_30_days", None
         )
     
@@ -275,7 +275,7 @@ class TestSearchService:
         mock_results = [{"id": "1", "title": "Category Webinar"}]
         mock_total = 1
         
-        mock_repositories['webinar_repo'].get_by_category.return_value = (mock_results, mock_total)
+        mock_repositories['item_repo'].get_by_category.return_value = (mock_results, mock_total)
         
         # Execute
         results, total = await search_service.list_webinars(
@@ -288,7 +288,7 @@ class TestSearchService:
         # Verify
         assert results == mock_results
         assert total == mock_total
-        mock_repositories['webinar_repo'].get_by_category.assert_called_once_with(
+        mock_repositories['item_repo'].get_by_category.assert_called_once_with(
             "test-category", 0, 20, "last_90_days", None
         )
     
@@ -299,7 +299,7 @@ class TestSearchService:
         mock_results = [{"id": "1", "title": "Speaker Webinar"}]
         mock_total = 1
         
-        mock_repositories['webinar_repo'].get_by_speaker.return_value = (mock_results, mock_total)
+        mock_repositories['item_repo'].get_by_speaker.return_value = (mock_results, mock_total)
         
         # Execute
         results, total = await search_service.list_webinars(
@@ -312,7 +312,7 @@ class TestSearchService:
         # Verify
         assert results == mock_results
         assert total == mock_total
-        mock_repositories['webinar_repo'].get_by_speaker.assert_called_once_with(
+        mock_repositories['item_repo'].get_by_speaker.assert_called_once_with(
             "Test Speaker", 0, 20, "last_365_days", None
         )
     
@@ -323,7 +323,7 @@ class TestSearchService:
         mock_results = [{"id": "1", "title": "Tagged Webinar"}]
         mock_total = 1
         
-        mock_repositories['webinar_repo'].get_by_tags.return_value = (mock_results, mock_total)
+        mock_repositories['item_repo'].get_by_tags.return_value = (mock_results, mock_total)
         
         # Execute
         results, total = await search_service.list_webinars(
@@ -336,7 +336,7 @@ class TestSearchService:
         # Verify
         assert results == mock_results
         assert total == mock_total
-        mock_repositories['webinar_repo'].get_by_tags.assert_called_once_with(
+        mock_repositories['item_repo'].get_by_tags.assert_called_once_with(
             ["tag1", "tag2"], 0, 20, "last_30_days", None
         )
     
@@ -347,7 +347,7 @@ class TestSearchService:
         mock_results = [{"id": "1", "title": "Webinar Video"}]
         mock_total = 1
         
-        mock_repositories['webinar_repo'].get_recent.return_value = (mock_results, mock_total)
+        mock_repositories['item_repo'].get_recent.return_value = (mock_results, mock_total)
         
         # Execute
         results, total = await search_service.list_webinars(
@@ -359,7 +359,7 @@ class TestSearchService:
         # Verify
         assert results == mock_results
         assert total == mock_total
-        mock_repositories['webinar_repo'].get_recent.assert_called_once_with(
+        mock_repositories['item_repo'].get_recent.assert_called_once_with(
             0, 20, None, "webinar"
         )
     
@@ -379,7 +379,7 @@ class TestSearchService:
         mock_results = [{"id": "1", "title": "PDF Document"}]
         mock_total = 1
         
-        mock_repositories['webinar_repo'].get_by_category.return_value = (mock_results, mock_total)
+        mock_repositories['item_repo'].get_by_category.return_value = (mock_results, mock_total)
         
         # Execute
         results, total = await search_service.list_webinars(
@@ -392,7 +392,7 @@ class TestSearchService:
         # Verify
         assert results == mock_results
         assert total == mock_total
-        mock_repositories['webinar_repo'].get_by_category.assert_called_once_with(
+        mock_repositories['item_repo'].get_by_category.assert_called_once_with(
             "test-category", 0, 20, None, "pdf"
         )
     
@@ -403,7 +403,7 @@ class TestSearchService:
         mock_results = [{"id": "1", "title": "Recent Webinar"}]
         mock_total = 1
         
-        mock_repositories['webinar_repo'].get_recent.return_value = (mock_results, mock_total)
+        mock_repositories['item_repo'].get_recent.return_value = (mock_results, mock_total)
         
         # Execute
         results, total = await search_service.list_webinars(
@@ -416,6 +416,6 @@ class TestSearchService:
         # Verify
         assert results == mock_results
         assert total == mock_total
-        mock_repositories['webinar_repo'].get_recent.assert_called_once_with(
+        mock_repositories['item_repo'].get_recent.assert_called_once_with(
             0, 20, "last_30_days", "webinar"
         )

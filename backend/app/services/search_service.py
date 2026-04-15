@@ -18,7 +18,7 @@ from ..exceptions import (
 from ..logging_config import LoggingMixin, get_request_id
 from ..config import settings
 from ..repositories import (
-    WebinarRepository,
+    ItemRepository,
     CategoryRepository,
     SpeakerRepository,
     TagRepository,
@@ -33,7 +33,7 @@ class SearchService(LoggingMixin):
 
     def __init__(
         self,
-        webinar_repo: WebinarRepository,
+        item_repo: ItemRepository,
         category_repo: CategoryRepository,
         speaker_repo: SpeakerRepository,
         tag_repo: TagRepository,
@@ -42,7 +42,7 @@ class SearchService(LoggingMixin):
         embedding_service: "EmbeddingService",
     ):
         """Initialize search service with required repositories."""
-        self.webinar_repo = webinar_repo
+        self.item_repo = item_repo
         self.category_repo = category_repo
         self.speaker_repo = speaker_repo
         self.tag_repo = tag_repo
@@ -122,7 +122,7 @@ class SearchService(LoggingMixin):
                 fuzzy_threshold = 0.1
 
             fuzzy_start = time.time()
-            fuzzy_results = await self.webinar_repo.search_fuzzy(
+            fuzzy_results = await self.item_repo.search_fuzzy(
                 query, limit=limit, threshold=fuzzy_threshold
             )
             fuzzy_time = time.time() - fuzzy_start
@@ -163,7 +163,7 @@ class SearchService(LoggingMixin):
 
             # Semantic search with corrected query
             semantic_start = time.time()
-            results = await self.webinar_repo.search_semantic(
+            results = await self.item_repo.search_semantic(
                 query_embedding, limit, settings.SEMANTIC_THRESHOLD
             )
 
@@ -309,7 +309,7 @@ class SearchService(LoggingMixin):
             SearchError: If operation fails
         """
         try:
-            return await self.webinar_repo.get_by_id(webinar_id)
+            return await self.item_repo.get_by_id(webinar_id)
         except Exception as e:
             self.log_error(
                 "Get webinar details operation failed",
@@ -503,17 +503,17 @@ class SearchService(LoggingMixin):
 
         try:
             if category:
-                return await self.webinar_repo.get_by_category(
+                return await self.item_repo.get_by_category(
                     category, offset, limit, date_range, content_type
                 )
             elif speaker:
-                return await self.webinar_repo.get_by_speaker(
+                return await self.item_repo.get_by_speaker(
                     speaker, offset, limit, date_range, content_type
                 )
             elif tags:
-                return await self.webinar_repo.get_by_tags(tags, offset, limit, date_range, content_type)
+                return await self.item_repo.get_by_tags(tags, offset, limit, date_range, content_type)
             else:
-                return await self.webinar_repo.get_recent(offset, limit, date_range, content_type)
+                return await self.item_repo.get_recent(offset, limit, date_range, content_type)
 
         except Exception as e:
             self.log_error(
@@ -642,7 +642,7 @@ class SearchService(LoggingMixin):
                 speaker_name = speaker["suggestion"]
                 
                 # Get webinars for this speaker
-                speaker_webinars, _ = await self.webinar_repo.get_by_speaker(
+                speaker_webinars, _ = await self.item_repo.get_by_speaker(
                     speaker_name, offset=0, limit=limit
                 )
 

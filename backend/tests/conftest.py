@@ -1,5 +1,5 @@
 """
-Test configuration and fixtures for HR Search backend.
+Test configuration and fixtures for Search backend.
 """
 import asyncio
 import pytest
@@ -50,19 +50,20 @@ def mock_embedding():
 
 
 @pytest.fixture
-def sample_webinar_data():
-    """Sample webinar data for testing."""
+def sample_item_data():
+    """Sample item data for testing."""
     return {
-        "id": "test-webinar-id",
-        "title": "Test Webinar Title",
-        "description": "Test webinar description",
+        "id": "test-item-id",
+        "title": "Test Item Title",
+        "description": "Test item description",
         "category_name": "Test Category",
         "speakers": ["Test Speaker"],
-        "tags": ["test", "webinar"],
+        "tags": ["test", "item"],
         "duration_ms": 1800000,
-        "recorded_date": "2024-01-01",
-        "video_url": "https://example.com/video.mp4",
-        "pdf_url": "https://example.com/slides.pdf"
+        "published_date": "2024-01-01",
+        "source_type": "webinar",
+        "source_url": "https://example.com/video.mp4",
+        "metadata": {"pdf_url": "https://example.com/slides.pdf"}
     }
 
 
@@ -71,7 +72,7 @@ def sample_search_results():
     """Sample search results for testing."""
     return [
         {
-            "id": "webinar-1",
+            "id": "item-1",
             "title": "Rekrutacja w IT",
             "description": "Jak rekrutować programistów",
             "category_name": "Rekrutacja",
@@ -80,7 +81,7 @@ def sample_search_results():
             "similarity": 0.85
         },
         {
-            "id": "webinar-2", 
+            "id": "item-2",
             "title": "Motywacja zespołu",
             "description": "Techniki motywowania pracowników",
             "category_name": "Zarządzanie",

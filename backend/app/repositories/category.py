@@ -21,17 +21,17 @@ class CategoryRepository(LoggingMixin):
     
     async def get_all_with_counts(self) -> List[Dict]:
         """
-        Get all categories with webinar counts.
-        
+        Get all categories with item counts.
+
         Returns:
-            List of categories with id, name, slug, and webinar_count
+            List of categories with id, name, slug, and item_count
         """
         query = """
-        SELECT 
+        SELECT
             c.id, c.name, c.slug,
-            COUNT(w.id) as webinar_count
+            COUNT(i.id) as item_count
         FROM categories c
-        LEFT JOIN webinars w ON c.id = w.category_id AND w.status = 'published'
+        LEFT JOIN items i ON c.id = i.category_id AND i.status = 'published'
         GROUP BY c.id, c.name, c.slug
         ORDER BY c.name
         """
@@ -52,23 +52,23 @@ class SpeakerRepository(LoggingMixin):
     
     async def get_all_with_counts(self, limit: int) -> List[Dict]:
         """
-        Get all speakers with webinar counts.
-        
+        Get all speakers with item counts.
+
         Args:
             limit: Maximum number of speakers to return
-            
+
         Returns:
-            List of speakers with id, name, bio, and webinar_count
+            List of speakers with id, name, bio, and item_count
         """
         query = """
-        SELECT 
+        SELECT
             s.id, s.name, s.bio,
-            COUNT(ws.webinar_id) as webinar_count
+            COUNT(isp.item_id) as item_count
         FROM speakers s
-        LEFT JOIN webinar_speakers ws ON s.id = ws.speaker_id
-        LEFT JOIN webinars w ON ws.webinar_id = w.id AND w.status = 'published'
+        LEFT JOIN item_speakers isp ON s.id = isp.speaker_id
+        LEFT JOIN items i ON isp.item_id = i.id AND i.status = 'published'
         GROUP BY s.id, s.name, s.bio
-        ORDER BY webinar_count DESC, s.name
+        ORDER BY item_count DESC, s.name
         LIMIT $1
         """
         return await self._fetch(query, limit)
@@ -110,23 +110,23 @@ class TagRepository(LoggingMixin):
     
     async def get_all_with_counts(self, limit: int) -> List[Dict]:
         """
-        Get all tags with webinar counts.
-        
+        Get all tags with item counts.
+
         Args:
             limit: Maximum number of tags to return
-            
+
         Returns:
-            List of tags with id, name, slug, and webinar_count
+            List of tags with id, name, slug, and item_count
         """
         query = """
-        SELECT 
+        SELECT
             t.id, t.name, t.slug,
-            COUNT(wt.webinar_id) as webinar_count
+            COUNT(it.item_id) as item_count
         FROM tags t
-        LEFT JOIN webinar_tags wt ON t.id = wt.tag_id
-        LEFT JOIN webinars w ON wt.webinar_id = w.id AND w.status = 'published'
+        LEFT JOIN item_tags it ON t.id = it.tag_id
+        LEFT JOIN items i ON it.item_id = i.id AND i.status = 'published'
         GROUP BY t.id, t.name, t.slug
-        ORDER BY webinar_count DESC, t.name
+        ORDER BY item_count DESC, t.name
         LIMIT $1
         """
         return await self._fetch(query, limit)
@@ -134,23 +134,23 @@ class TagRepository(LoggingMixin):
     async def get_popular(self, limit: int) -> List[Dict]:
         """
         Get popular tags ordered by usage count.
-        
+
         Args:
             limit: Maximum number of tags to return
-            
+
         Returns:
-            List of popular tags with id, name, slug, and webinar_count
+            List of popular tags with id, name, slug, and item_count
         """
         query = """
-        SELECT 
+        SELECT
             t.id, t.name, t.slug,
-            COUNT(wt.webinar_id) as webinar_count
+            COUNT(it.item_id) as item_count
         FROM tags t
-        JOIN webinar_tags wt ON t.id = wt.tag_id
-        JOIN webinars w ON wt.webinar_id = w.id AND w.status = 'published'
+        JOIN item_tags it ON t.id = it.tag_id
+        JOIN items i ON it.item_id = i.id AND i.status = 'published'
         GROUP BY t.id, t.name, t.slug
-        HAVING COUNT(wt.webinar_id) > 0
-        ORDER BY webinar_count DESC, t.name
+        HAVING COUNT(it.item_id) > 0
+        ORDER BY item_count DESC, t.name
         LIMIT $1
         """
         return await self._fetch(query, limit)
@@ -170,7 +170,7 @@ class AutocompleteRepository(LoggingMixin):
     
     async def get_suggestions(self, query: str, limit: int) -> List[Dict]:
         """
-        Get autocomplete suggestions from webinars, speakers, and tags.
+        Get autocomplete suggestions from items, speakers, and tags.
         Uses prefix matching first, then fuzzy search as fallback for typos.
         
         Args:
@@ -183,9 +183,9 @@ class AutocompleteRepository(LoggingMixin):
         # First try prefix matching
         query_sql = """
         (
-            SELECT title as suggestion, 'webinar' as type, 1 as priority
-            FROM webinars
-            WHERE lower(unaccent(title)) LIKE lower(unaccent($1)) || '%' 
+            SELECT title as suggestion, 'title' as type, 1 as priority
+            FROM items
+            WHERE lower(unaccent(title)) LIKE lower(unaccent($1)) || '%'
             AND status = 'published'
             LIMIT 3
         )
@@ -216,9 +216,9 @@ class AutocompleteRepository(LoggingMixin):
         if len(query.strip()) >= 3:
             fuzzy_sql = """
             (
-                SELECT title as suggestion, 'webinar' as type, 1 as priority,
+                SELECT title as suggestion, 'title' as type, 1 as priority,
                        similarity(lower(unaccent(title)), lower(unaccent($1))) as sim
-                FROM webinars
+                FROM items
                 WHERE similarity(lower(unaccent(title)), lower(unaccent($1))) > 0.3
                   AND status = 'published'
                 ORDER BY sim DESC
@@ -239,7 +239,7 @@ class AutocompleteRepository(LoggingMixin):
                        similarity(lower(unaccent(name)), lower(unaccent($1))) as sim
                 FROM tags
                 WHERE similarity(lower(unaccent(name)), lower(unaccent($1))) > 0.3
-                ORDER BY sim DESC
+                Order BY sim DESC
                 LIMIT 3
             )
             ORDER BY priority, sim DESC

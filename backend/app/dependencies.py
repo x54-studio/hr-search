@@ -18,7 +18,7 @@ from .config import settings
 from .exceptions import SearchError
 from .logging_config import get_logger
 from .repositories import (
-    WebinarRepository,
+    ItemRepository,
     CategoryRepository,
     SpeakerRepository,
     TagRepository,
@@ -285,9 +285,9 @@ async def warmup_pool(pool: asyncpg.Pool, target_size: int = 5) -> None:
             await pool.release(conn)
 
 
-def get_webinar_repository(pool: asyncpg.Pool) -> WebinarRepository:
-    """Create WebinarRepository instance."""
-    return WebinarRepository(pool)
+def get_item_repository(pool: asyncpg.Pool) -> ItemRepository:
+    """Create ItemRepository instance."""
+    return ItemRepository(pool)
 
 
 def get_category_repository(pool: asyncpg.Pool) -> CategoryRepository:
@@ -317,7 +317,7 @@ def get_embedding_repository(pool: asyncpg.Pool) -> EmbeddingRepository:
 
 # Service factory functions
 def get_search_service(
-    webinar_repo: WebinarRepository,
+    item_repo: ItemRepository,
     category_repo: CategoryRepository,
     speaker_repo: SpeakerRepository,
     tag_repo: TagRepository,
@@ -327,7 +327,7 @@ def get_search_service(
 ) -> SearchService:
     """Create SearchService instance with all dependencies."""
     return SearchService(
-        webinar_repo=webinar_repo,
+        item_repo=item_repo,
         category_repo=category_repo,
         speaker_repo=speaker_repo,
         tag_repo=tag_repo,
@@ -351,7 +351,7 @@ def get_search_service_dependency(app: "FastAPI") -> SearchService:
     pool = get_database_pool(app)
 
     # Create all repositories
-    webinar_repo = get_webinar_repository(pool)
+    item_repo = get_item_repository(pool)
     category_repo = get_category_repository(pool)
     speaker_repo = get_speaker_repository(pool)
     tag_repo = get_tag_repository(pool)
@@ -363,7 +363,7 @@ def get_search_service_dependency(app: "FastAPI") -> SearchService:
 
     # Create search service
     return get_search_service(
-        webinar_repo=webinar_repo,
+        item_repo=item_repo,
         category_repo=category_repo,
         speaker_repo=speaker_repo,
         tag_repo=tag_repo,

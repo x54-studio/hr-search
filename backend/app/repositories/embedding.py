@@ -32,87 +32,87 @@ class EmbeddingRepository:
         async with self.pool.acquire() as conn:
             await conn.execute(query, *args)
 
-    async def get_webinars_without_embeddings(self, embedding_type: str = 'title') -> List[Dict]:
+    async def get_items_without_embeddings(self, embedding_type: str = 'title') -> List[Dict]:
         """
-        Get all published webinars that don't have embeddings yet.
+        Get all published items that don't have embeddings yet.
 
         Returns:
-            List of webinar records without embeddings
+            List of item records without embeddings
         """
         query = """
-        SELECT w.id, w.title, w.description 
-        FROM webinars w
-        WHERE w.status = 'published'
+        SELECT i.id, i.title, i.description
+        FROM items i
+        WHERE i.status = 'published'
         AND NOT EXISTS (
-            SELECT 1 FROM webinar_embeddings e 
-            WHERE e.webinar_id = w.id 
+            SELECT 1 FROM item_embeddings e
+            WHERE e.item_id = i.id
             AND e.embedding_type = $1
         )
-        ORDER BY w.created_at DESC
+        ORDER BY i.created_at DESC
         """
 
         return await self._fetch(query, embedding_type)
 
     async def insert_embedding(
-        self, webinar_id: str, embedding_type: str, embedding: List[float]
+        self, item_id: str, embedding_type: str, embedding: List[float]
     ) -> None:
         """
-        Insert or update an embedding for a webinar.
+        Insert or update an embedding for an item.
 
         Args:
-            webinar_id: UUID of the webinar
+            item_id: UUID of the item
             embedding_type: Type of embedding ('title', 'description', etc.)
             embedding: Embedding vector as list of floats
         """
         query = """
-        INSERT INTO webinar_embeddings 
-        (webinar_id, embedding_type, vector)
+        INSERT INTO item_embeddings 
+        (item_id, embedding_type, vector)
         VALUES ($1, $2, $3::vector)
-        ON CONFLICT (webinar_id, embedding_type) 
+        ON CONFLICT (item_id, embedding_type) 
         DO UPDATE SET vector = $3::vector
         """
 
         # Format embedding as string for PostgreSQL
         embedding_str = f"[{','.join(map(str, embedding))}]"
-        await self._execute(query, webinar_id, embedding_type, embedding_str)
+        await self._execute(query, item_id, embedding_type, embedding_str)
 
-    async def get_embedding_by_webinar(
-        self, webinar_id: str, embedding_type: str = "title"
+    async def get_embedding_by_item(
+        self, item_id: str, embedding_type: str = "title"
     ) -> Dict:
         """
-        Get embedding for a specific webinar.
+        Get embedding for a specific item.
 
         Args:
-            webinar_id: UUID of the webinar
+            item_id: UUID of the item
             embedding_type: Type of embedding to retrieve
 
         Returns:
             Embedding record
         """
         query = """
-        SELECT id, webinar_id, embedding_type, vector, created_at
-        FROM webinar_embeddings
-        WHERE webinar_id = $1 AND embedding_type = $2
+        SELECT id, item_id, embedding_type, vector, created_at
+        FROM item_embeddings
+        WHERE item_id = $1 AND embedding_type = $2
         """
 
-        result = await self._fetch_one(query, webinar_id, embedding_type)
+        result = await self._fetch_one(query, item_id, embedding_type)
         if not result:
-            raise ValueError(f"Embedding not found for webinar {webinar_id}")
+            raise ValueError(f"Embedding not found for item {item_id}")
         return result
 
-    async def delete_embeddings_by_webinar(self, webinar_id: str) -> None:
+    async def delete_embeddings_by_item(self, item_id: str) -> None:
         """
-        Delete all embeddings for a specific webinar.
+        Delete all embeddings for a specific item.
 
         Args:
-            webinar_id: UUID of the webinar
+            item_id: UUID of the item
         """
         query = """
-        DELETE FROM webinar_embeddings
-        WHERE webinar_id = $1
+        DELETE FROM item_embeddings
+        WHERE item_id = $1
         """
 
-        await self._execute(query, webinar_id)
+        await self._execute(query, item_id)
 
     async def count_embeddings(self) -> int:
         """
@@ -121,7 +121,7 @@ class EmbeddingRepository:
         Returns:
             Total count of embeddings
         """
-        query = "SELECT COUNT(*) FROM webinar_embeddings"
+        query = "SELECT COUNT(*) FROM item_embeddings"
         result = await self._fetch_one(query)
         return int(result['count']) if result else 0
 
@@ -135,11 +135,11 @@ class EmbeddingRepository:
         query = """
         SELECT 
             COUNT(*) as total_embeddings,
-            COUNT(DISTINCT webinar_id) as webinars_with_embeddings,
+            COUNT(DISTINCT item_id) as items_with_embeddings,
             COUNT(DISTINCT embedding_type) as embedding_types,
             MIN(created_at) as oldest_embedding,
             MAX(created_at) as newest_embedding
-        FROM webinar_embeddings
+        FROM item_embeddings
         """
 
         result = await self._fetch_one(query)
@@ -151,5 +151,5 @@ class EmbeddingRepository:
 
         Warning: This will remove all vector data and require regeneration.
         """
-        query = "DELETE FROM webinar_embeddings"
+        query = "DELETE FROM item_embeddings"
         await self._execute(query)
