@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiService, ApiError } from '../services/api';
 import type { SearchResult, AutocompleteSuggestion } from '../services/api';
 
@@ -52,6 +52,7 @@ export function useSearch(): SearchState & SearchActions {
   const [selectedDateRange, setSelectedDateRange] = useState<string | null>(null);
   const [categoryNameToSlug, setCategoryNameToSlug] = useState<Map<string, string>>(new Map());
   const [tagNameToSlug, setTagNameToSlug] = useState<Map<string, string>>(new Map());
+  const searchAbortRef = useRef<AbortController | null>(null);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -135,7 +136,10 @@ export function useSearch(): SearchState & SearchActions {
     const hasQuery = searchQuery.trim().length > 0;
     const hasFilters = selectedCategories.length > 0 || selectedSpeakers.length > 0 || selectedTags.length > 0 || selectedDateRange !== null;
 
-    if (!hasQuery && !hasFilters) {
+    // Initial state (nothing searched yet and nothing requested): stay empty.
+    // After hasSearched, clearing filters to "Wszystkie" should list all items,
+    // not silently wipe the results — hence we only bail pre-search.
+    if (!hasQuery && !hasFilters && !hasSearched) {
       setResults([]);
       setSuggestions([]);
       setCorrectedQuery(null);
@@ -143,6 +147,11 @@ export function useSearch(): SearchState & SearchActions {
       clearError();
       return;
     }
+
+    searchAbortRef.current?.abort();
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
+    const { signal } = controller;
 
     try {
       setLoading(true);
@@ -154,7 +163,7 @@ export function useSearch(): SearchState & SearchActions {
       let searchOriginalQuery: string | null = null;
 
       if (hasQuery) {
-        const searchResponse = await apiService.search(searchQuery);
+        const searchResponse = await apiService.search(searchQuery, 20, signal);
         searchResults = searchResponse.results;
         searchCorrectedQuery = searchResponse.corrected_query || null;
         searchOriginalQuery = searchResponse.original_query || null;
@@ -162,12 +171,15 @@ export function useSearch(): SearchState & SearchActions {
         setCorrectedQuery(null);
         setOriginalQuery(null);
 
-        if (selectedDateRange && selectedCategories.length === 0 && selectedSpeakers.length === 0 && selectedTags.length === 0) {
+        const hasEntityFilter = selectedCategories.length > 0 || selectedSpeakers.length > 0 || selectedTags.length > 0;
+
+        if (!hasEntityFilter) {
           try {
-            const response = await apiService.listItems({ date_range: selectedDateRange || undefined, limit: 50 });
+            const response = await apiService.listItems({ date_range: selectedDateRange || undefined, limit: 50, signal });
             searchResults = response.items;
           } catch (err) {
-            console.error(`Failed to fetch items with date_range "${selectedDateRange}":`, err);
+            if (err instanceof DOMException && err.name === 'AbortError') throw err;
+            console.error(`Failed to fetch items (date_range=${selectedDateRange ?? 'any'}):`, err);
             searchResults = [];
           }
         } else {
@@ -176,7 +188,7 @@ export function useSearch(): SearchState & SearchActions {
 
           for (const category of selectedCategories) {
             try {
-              const response = await apiService.listItems({ category, date_range: selectedDateRange || undefined, limit: 50 });
+              const response = await apiService.listItems({ category, date_range: selectedDateRange || undefined, limit: 50, signal });
               response.items.forEach(item => {
                 if (!seenIds.has(item.id)) {
                   seenIds.add(item.id);
@@ -184,13 +196,14 @@ export function useSearch(): SearchState & SearchActions {
                 }
               });
             } catch (err) {
+              if (err instanceof DOMException && err.name === 'AbortError') throw err;
               console.error(`Failed to fetch category "${category}":`, err);
             }
           }
 
           for (const speaker of selectedSpeakers) {
             try {
-              const response = await apiService.listItems({ speaker, date_range: selectedDateRange || undefined, limit: 50 });
+              const response = await apiService.listItems({ speaker, date_range: selectedDateRange || undefined, limit: 50, signal });
               response.items.forEach(item => {
                 if (!seenIds.has(item.id)) {
                   seenIds.add(item.id);
@@ -198,13 +211,14 @@ export function useSearch(): SearchState & SearchActions {
                 }
               });
             } catch (err) {
+              if (err instanceof DOMException && err.name === 'AbortError') throw err;
               console.error(`Failed to fetch speaker ${speaker}:`, err);
             }
           }
 
           for (const tag of selectedTags) {
             try {
-              const response = await apiService.listItems({ tags: tag, date_range: selectedDateRange || undefined, limit: 50 });
+              const response = await apiService.listItems({ tags: tag, date_range: selectedDateRange || undefined, limit: 50, signal });
               response.items.forEach(item => {
                 if (!seenIds.has(item.id)) {
                   seenIds.add(item.id);
@@ -212,6 +226,7 @@ export function useSearch(): SearchState & SearchActions {
                 }
               });
             } catch (err) {
+              if (err instanceof DOMException && err.name === 'AbortError') throw err;
               console.error(`Failed to fetch tag "${tag}":`, err);
             }
           }
@@ -219,6 +234,8 @@ export function useSearch(): SearchState & SearchActions {
           searchResults = allResults;
         }
       }
+
+      if (signal.aborted) return;
 
       // Apply client-side filters
       if (hasFilters) {
@@ -230,6 +247,7 @@ export function useSearch(): SearchState & SearchActions {
       setOriginalQuery(searchOriginalQuery);
       setHasSearched(true);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       if (err instanceof ApiError) {
         setApiError(err);
       } else {
@@ -241,9 +259,11 @@ export function useSearch(): SearchState & SearchActions {
       setCorrectedQuery(null);
       setOriginalQuery(null);
     } finally {
-      setLoading(false);
+      if (!signal.aborted) {
+        setLoading(false);
+      }
     }
-  }, [clearError, setApiError, selectedCategories, selectedSpeakers, selectedTags, selectedDateRange, applyFilters]);
+  }, [clearError, setApiError, selectedCategories, selectedSpeakers, selectedTags, selectedDateRange, applyFilters, hasSearched]);
 
   // Autocomplete only — fires on keystroke (250ms debounce)
   useEffect(() => {
@@ -252,16 +272,20 @@ export function useSearch(): SearchState & SearchActions {
       return;
     }
 
+    const controller = new AbortController();
     const timeoutId = setTimeout(async () => {
       try {
-        const response = await apiService.autocomplete(query);
+        const response = await apiService.autocomplete(query, 10, controller.signal);
         setSuggestions(response.suggestions);
       } catch {
-        setSuggestions([]);
+        // AbortError or network error — either way, don't update suggestions
       }
     }, 250);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [query]);
 
   // Re-run search on filter changes (only if already searched)

@@ -74,7 +74,7 @@ export class ApiError extends Error {
 }
 
 class ApiService {
-  private async request<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
+  private async request<T>(endpoint: string, params?: Record<string, string>, signal?: AbortSignal): Promise<T> {
     const url = new URL(`${API_BASE_URL}${endpoint}`);
 
     if (params) {
@@ -89,6 +89,7 @@ class ApiService {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
+        signal,
       });
 
       if (!response.ok) {
@@ -129,6 +130,10 @@ class ApiService {
         throw error;
       }
 
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw error;
+      }
+
       throw new ApiError(
         'NETWORK_ERROR',
         error instanceof Error ? error.message : 'Network request failed',
@@ -142,7 +147,7 @@ class ApiService {
     return this.request<AppConfig>('/config');
   }
 
-  async search(query: string, limit = 20): Promise<SearchResponse> {
+  async search(query: string, limit = 20, signal?: AbortSignal): Promise<SearchResponse> {
     if (!query || !query.trim()) {
       throw new ApiError('VALIDATION_ERROR', 'Search query cannot be empty', { field: 'query' });
     }
@@ -155,10 +160,10 @@ class ApiService {
       throw new ApiError('VALIDATION_ERROR', 'Limit must be between 1 and 50', { field: 'limit', value: limit });
     }
 
-    return this.request<SearchResponse>('/search', { q: query, limit: limit.toString() });
+    return this.request<SearchResponse>('/search', { q: query, limit: limit.toString() }, signal);
   }
 
-  async autocomplete(query: string, limit = 10): Promise<AutocompleteResponse> {
+  async autocomplete(query: string, limit = 10, signal?: AbortSignal): Promise<AutocompleteResponse> {
     if (!query || !query.trim()) {
       throw new ApiError('VALIDATION_ERROR', 'Autocomplete query cannot be empty', { field: 'query' });
     }
@@ -167,7 +172,7 @@ class ApiService {
       throw new ApiError('VALIDATION_ERROR', 'Limit must be between 1 and 20', { field: 'limit', value: limit });
     }
 
-    return this.request<AutocompleteResponse>('/autocomplete', { q: query, limit: limit.toString() });
+    return this.request<AutocompleteResponse>('/autocomplete', { q: query, limit: limit.toString() }, signal);
   }
 
   async getItem(id: string): Promise<SearchResult> {
@@ -210,6 +215,7 @@ class ApiService {
     source_type?: string;
     offset?: number;
     limit?: number;
+    signal?: AbortSignal;
   } = {}): Promise<{
     items: SearchResult[];
     total: number;
@@ -217,7 +223,7 @@ class ApiService {
     limit: number;
     hasMore: boolean;
   }> {
-    const { category, speaker, tags, date_range, source_type, offset = 0, limit = 20 } = params;
+    const { category, speaker, tags, date_range, source_type, offset = 0, limit = 20, signal } = params;
 
     if (offset < 0) {
       throw new ApiError('VALIDATION_ERROR', 'Offset must be non-negative', { field: 'offset', value: offset });
@@ -238,7 +244,7 @@ class ApiService {
     if (date_range) queryParams.date_range = date_range;
     if (source_type) queryParams.source_type = source_type;
 
-    return this.request('/items', queryParams);
+    return this.request('/items', queryParams, signal);
   }
 }
 
