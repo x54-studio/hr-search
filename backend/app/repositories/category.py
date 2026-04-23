@@ -9,16 +9,16 @@ from ..logging_config import LoggingMixin
 
 class CategoryRepository(LoggingMixin):
     """Repository for category-related database operations."""
-    
+
     def __init__(self, pool: asyncpg.Pool):
         self.pool = pool
-    
+
     async def _fetch(self, query: str, *args) -> List[Dict]:
         """Execute query and return results as list of dictionaries."""
         async with self.pool.acquire() as conn:
             results = await conn.fetch(query, *args)
             return [dict(r) for r in results]
-    
+
     async def get_all_with_counts(self) -> List[Dict]:
         """
         Get all categories with item counts.
@@ -36,6 +36,19 @@ class CategoryRepository(LoggingMixin):
         ORDER BY c.name
         """
         return await self._fetch(query)
+
+    async def search_by_name(self, name: str, limit: int) -> List[Dict]:
+        """Search categories by name using pg_trgm word similarity."""
+        query = """
+        SELECT
+            c.id, c.name as suggestion, c.slug,
+            word_similarity(lower(unaccent($1)), lower(unaccent(c.name))) as similarity
+        FROM categories c
+        WHERE word_similarity(lower(unaccent($1)), lower(unaccent(c.name))) > 0.3
+        ORDER BY similarity DESC
+        LIMIT $2
+        """
+        return await self._fetch(query, name, limit)
 
 
 class SpeakerRepository(LoggingMixin):
@@ -75,21 +88,27 @@ class SpeakerRepository(LoggingMixin):
     
     async def search_by_name(self, name: str, limit: int) -> List[Dict]:
         """
-        Search speakers by name using trigram similarity.
-        
+        Search speakers by name using pg_trgm word similarity.
+
+        Uses word_similarity() rather than similarity() so that partial
+        queries like "agnies" or "Lewandowska" align with the best-matching
+        word inside the full speaker name. similarity() scores a 6-char
+        query against a 20-char full name at ~0.2 (diluted by length);
+        word_similarity scores it at ~0.7 against the actual matching word.
+
         Args:
             name: Speaker name to search for
             limit: Maximum number of results to return
-            
+
         Returns:
             List of speakers with name as 'suggestion' and similarity score
         """
         query = """
-        SELECT 
+        SELECT
             s.id, s.name as suggestion,
-            similarity(lower(unaccent(s.name)), lower(unaccent($1))) as similarity
+            word_similarity(lower(unaccent($1)), lower(unaccent(s.name))) as similarity
         FROM speakers s
-        WHERE similarity(lower(unaccent(s.name)), lower(unaccent($1))) > 0.3
+        WHERE word_similarity(lower(unaccent($1)), lower(unaccent(s.name))) > 0.3
         ORDER BY similarity DESC
         LIMIT $2
         """
@@ -98,16 +117,29 @@ class SpeakerRepository(LoggingMixin):
 
 class TagRepository(LoggingMixin):
     """Repository for tag-related database operations."""
-    
+
     def __init__(self, pool: asyncpg.Pool):
         self.pool = pool
-    
+
     async def _fetch(self, query: str, *args) -> List[Dict]:
         """Execute query and return results as list of dictionaries."""
         async with self.pool.acquire() as conn:
             results = await conn.fetch(query, *args)
             return [dict(r) for r in results]
-    
+
+    async def search_by_name(self, name: str, limit: int) -> List[Dict]:
+        """Search tags by name using pg_trgm word similarity."""
+        query = """
+        SELECT
+            t.id, t.name as suggestion, t.slug,
+            word_similarity(lower(unaccent($1)), lower(unaccent(t.name))) as similarity
+        FROM tags t
+        WHERE word_similarity(lower(unaccent($1)), lower(unaccent(t.name))) > 0.3
+        ORDER BY similarity DESC
+        LIMIT $2
+        """
+        return await self._fetch(query, name, limit)
+
     async def get_all_with_counts(self, limit: int) -> List[Dict]:
         """
         Get all tags with item counts.

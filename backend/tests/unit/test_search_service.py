@@ -18,11 +18,20 @@ class TestSearchService:
     @pytest.fixture
     def mock_repositories(self):
         """Create mock repositories."""
+        speaker_repo = AsyncMock()
+        category_repo = AsyncMock()
+        tag_repo = AsyncMock()
+        # Default: no entity match, so the entity gate in search()
+        # falls through to semantic. Tests that want to exercise the gate
+        # override search_by_name on the relevant fixture.
+        speaker_repo.search_by_name.return_value = []
+        tag_repo.search_by_name.return_value = []
+        category_repo.search_by_name.return_value = []
         return {
             'item_repo': AsyncMock(),
-            'category_repo': AsyncMock(),
-            'speaker_repo': AsyncMock(),
-            'tag_repo': AsyncMock(),
+            'category_repo': category_repo,
+            'speaker_repo': speaker_repo,
+            'tag_repo': tag_repo,
             'autocomplete_repo': AsyncMock(),
             'embedding_repo': AsyncMock()
         }
@@ -367,24 +376,24 @@ class TestSearchService:
     async def test_list_items_category_with_source_type(self, search_service, mock_repositories):
         """Test list_items with category and source_type."""
         # Setup
-        mock_results = [{"id": "1", "title": "PDF Document"}]
+        mock_results = [{"id": "1", "title": "Article"}]
         mock_total = 1
-        
+
         mock_repositories['item_repo'].get_by_category.return_value = (mock_results, mock_total)
-        
+
         # Execute
         results, total = await search_service.list_items(
             category="test-category",
-            source_type="pdf",
+            source_type="article",
             offset=0,
             limit=20
         )
-        
+
         # Verify
         assert results == mock_results
         assert total == mock_total
         mock_repositories['item_repo'].get_by_category.assert_called_once_with(
-            "test-category", 0, 20, None, "pdf"
+            "test-category", 0, 20, None, "article"
         )
     
     @pytest.mark.asyncio

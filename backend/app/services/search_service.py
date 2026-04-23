@@ -12,11 +12,12 @@ if TYPE_CHECKING:
     from .embedding_service import EmbeddingService
 
 from ..exceptions import (
+    SearchException,
     SearchError,
     ValidationError,
 )
 from ..logging_config import LoggingMixin, get_request_id
-from ..config import settings
+from ..config import settings, ALLOWED_SOURCE_TYPES
 from ..repositories import (
     ItemRepository,
     CategoryRepository,
@@ -113,6 +114,14 @@ class SearchService(LoggingMixin):
         )
 
         try:
+            # Entity gate: check if the query matches a known speaker, tag,
+            # or category. Pick the best match across all three. If above
+            # ENTITY_MATCH_THRESHOLD, return entity-filtered results instead
+            # of semantic search (embeddings rank entity-name queries poorly).
+            entity_result = await self._try_entity_gate(query, limit)
+            if entity_result:
+                return entity_result
+
             # Step 1: Fuzzy search with full parameters (for spell correction + potential fallback)
             # Lower threshold for short queries (better typo tolerance)
             # Short words in long titles have lower similarity scores
@@ -186,29 +195,16 @@ class SearchService(LoggingMixin):
                 results = fuzzy_results
                 search_type = "fuzzy"
 
-            # If still no results, try speaker name search
+            # If still no results, try entity name search as last resort
             if not results:
                 self.log_warning(
-                    "No fuzzy results found, trying speaker name search",
+                    "No fuzzy results found, trying entity name fallback",
                     extra={"query": corrected_query},
                 )
 
-                speaker_search_start = time.time()
-                speaker_results = await self._search_by_speaker_name(
-                    corrected_query, limit
-                )
-
-                speaker_search_time = time.time() - speaker_search_start
-                self.log_info(
-                    "Speaker name search completed",
-                    extra={
-                        "duration_sec": round(speaker_search_time, 3),
-                        "results_count": len(speaker_results),
-                    },
-                )
-
-                if speaker_results:
-                    results = speaker_results
+                entity_fallback = await self._try_entity_gate(corrected_query, limit)
+                if entity_fallback:
+                    results = entity_fallback["results"]
 
             total_time = time.time() - start_time
             self.log_info(
@@ -309,6 +305,8 @@ class SearchService(LoggingMixin):
         """
         try:
             return await self.item_repo.get_by_id(item_id)
+        except SearchException:
+            raise
         except Exception as e:
             self.log_error(
                 "Get item details operation failed",
@@ -357,9 +355,9 @@ class SearchService(LoggingMixin):
             ValidationError: If limit is invalid
             SearchError: If operation fails
         """
-        if limit < 1 or limit > 500:
+        if limit < 1 or limit > 100:
             raise ValidationError(
-                f"Limit must be between 1 and 500, got {limit}",
+                f"Limit must be between 1 and 100, got {limit}",
                 field="limit",
                 value=limit,
             )
@@ -391,9 +389,9 @@ class SearchService(LoggingMixin):
             ValidationError: If limit is invalid
             SearchError: If operation fails
         """
-        if limit < 1 or limit > 500:
+        if limit < 1 or limit > 100:
             raise ValidationError(
-                f"Limit must be between 1 and 500, got {limit}",
+                f"Limit must be between 1 and 100, got {limit}",
                 field="limit",
                 value=limit,
             )
@@ -491,6 +489,13 @@ class SearchService(LoggingMixin):
                 f"Invalid date_range: {date_range}. Must be one of: last_30_days, last_90_days, last_365_days",
                 field="date_range",
                 value=date_range,
+            )
+
+        if source_type and source_type not in ALLOWED_SOURCE_TYPES:
+            raise ValidationError(
+                f"Invalid source_type: {source_type}. Must be one of: {', '.join(ALLOWED_SOURCE_TYPES)}",
+                field="source_type",
+                value=source_type,
             )
 
         try:
@@ -604,59 +609,144 @@ class SearchService(LoggingMixin):
 
         return ratio
 
-    async def _search_by_speaker_name(
+    async def _try_entity_gate(
         self, query: str, limit: int
-    ) -> List[Dict]:
-        """
-        Search for items by speaker name.
+    ) -> Optional[Dict]:
+        """Check speakers, tags, and categories for a name match.
 
-        Args:
-            query: Search query (speaker name)
-            limit: Maximum number of results
-
-        Returns:
-            List of item results matching the speaker name
+        Returns a full search response dict if the best match is above
+        ENTITY_MATCH_THRESHOLD, otherwise None (caller falls through to
+        semantic search).
         """
+        threshold = settings.ENTITY_MATCH_THRESHOLD
+
+        top_speaker = await self.speaker_repo.search_by_name(query, limit=1)
+        top_tag = await self.tag_repo.search_by_name(query, limit=1)
+        top_category = await self.category_repo.search_by_name(query, limit=1)
+
+        candidates = []
+        if top_speaker:
+            candidates.append(("speaker", top_speaker[0]))
+        if top_tag:
+            candidates.append(("tag", top_tag[0]))
+        if top_category:
+            candidates.append(("category", top_category[0]))
+
+        if not candidates:
+            return None
+
+        best_type, best_match = max(candidates, key=lambda c: c[1].get("similarity", 0))
+        best_sim = best_match.get("similarity", 0)
+
+        if best_sim < threshold:
+            return None
+
+        self.log_info(
+            "Entity gate matched",
+            extra={
+                "query": query,
+                "entity_type": best_type,
+                "entity_name": best_match.get("suggestion"),
+                "similarity": best_sim,
+                "threshold": threshold,
+            },
+        )
+
+        if best_type == "speaker":
+            results = await self._items_for_speakers(query, limit)
+        elif best_type == "tag":
+            results = await self._items_for_tags(query, limit)
+        else:
+            results = await self._items_for_categories(query, limit)
+
+        if not results:
+            return None
+
+        return {
+            "results": results,
+            "corrected_query": None,
+            "original_query": query,
+            "count": len(results),
+            "matched_entity": {
+                "type": best_type,
+                "name": best_match.get("suggestion"),
+                "similarity": round(best_sim, 3),
+            },
+        }
+
+    def _filter_by_relative_threshold(self, matches: List[Dict]) -> List[Dict]:
+        """Keep only matches within 10% of the best score.
+
+        Prevents "Agnieszka Lewandowska" (1.0) from pulling in
+        "Agnieszka Kamińska" (0.47) while still letting "agnies"
+        (all at 0.857) keep all three Agnieszkas.
+        """
+        if not matches:
+            return []
+        best_sim = matches[0].get("similarity", 0)
+        floor = max(settings.ENTITY_MATCH_THRESHOLD, best_sim * 0.9)
+        return [m for m in matches if m.get("similarity", 0) >= floor]
+
+    async def _items_for_speakers(self, query: str, limit: int) -> List[Dict]:
+        """Return items for all speakers matching the query above threshold."""
         try:
-            matching_speakers = await self.speaker_repo.search_by_name(
-                query, limit=5
-            )
-
-            if not matching_speakers:
+            matches = await self.speaker_repo.search_by_name(query, limit=5)
+            strong = self._filter_by_relative_threshold(matches)
+            if not strong:
                 return []
 
-            all_results = []
-            seen_ids = set()
-
-            for speaker in matching_speakers:
-                speaker_name = speaker["suggestion"]
-
-                speaker_items, _ = await self.item_repo.get_by_speaker(
-                    speaker_name, offset=0, limit=limit
-                )
-
-                for item in speaker_items:
+            all_results: List[Dict] = []
+            seen_ids: set = set()
+            for speaker in strong:
+                items, _ = await self.item_repo.get_by_speaker(speaker["suggestion"], offset=0, limit=limit)
+                for item in items:
                     if item["id"] not in seen_ids:
-                        item["similarity"] = 0.8
+                        item["similarity"] = float(speaker.get("similarity", 0))
                         all_results.append(item)
                         seen_ids.add(item["id"])
-
-                        if len(all_results) >= limit:
-                            break
-
-                if len(all_results) >= limit:
-                    break
-
-            all_results.sort(
-                key=lambda x: x.get("published_date", ""), reverse=True
-            )
-
+            all_results.sort(key=lambda x: x.get("published_date", ""), reverse=True)
             return all_results[:limit]
-
         except Exception as e:
-            self.log_error(
-                "Speaker name search failed",
-                exception=e,
-                extra={"query": query, "limit": limit},
-            )
+            self.log_error("Speaker entity search failed", exception=e)
+            return []
+
+    async def _items_for_tags(self, query: str, limit: int) -> List[Dict]:
+        """Return items for all tags matching the query above threshold."""
+        try:
+            matches = await self.tag_repo.search_by_name(query, limit=5)
+            strong = self._filter_by_relative_threshold(matches)
+            if not strong:
+                return []
+
+            slugs = [t["slug"] for t in strong]
+            items, _ = await self.item_repo.get_by_tags(slugs, offset=0, limit=limit)
+            best_sim = max(t.get("similarity", 0) for t in strong)
+            for item in items:
+                item["similarity"] = float(best_sim)
+            return items
+        except Exception as e:
+            self.log_error("Tag entity search failed", exception=e)
+            return []
+
+    async def _items_for_categories(self, query: str, limit: int) -> List[Dict]:
+        """Return items for all categories matching the query above threshold."""
+        try:
+            matches = await self.category_repo.search_by_name(query, limit=5)
+            strong = self._filter_by_relative_threshold(matches)
+            if not strong:
+                return []
+
+            all_results: List[Dict] = []
+            seen_ids: set = set()
+            for cat in strong:
+                items, _ = await self.item_repo.get_by_category(cat["slug"], offset=0, limit=limit)
+                for item in items:
+                    if item["id"] not in seen_ids:
+                        item["similarity"] = float(cat.get("similarity", 0))
+                        all_results.append(item)
+                        seen_ids.add(item["id"])
+            all_results.sort(key=lambda x: x.get("published_date", ""), reverse=True)
+            return all_results[:limit]
+        except Exception as e:
+            self.log_error("Category entity search failed", exception=e)
             return []

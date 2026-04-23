@@ -9,6 +9,9 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+ALLOWED_SOURCE_TYPES: tuple[str, ...] = ("webinar", "youtube", "article", "paper")
+
+
 class Settings(BaseSettings):
     """Application settings with simplified flat structure."""
 
@@ -30,6 +33,10 @@ class Settings(BaseSettings):
     # Search
     SEMANTIC_THRESHOLD: float = Field(default=0.3, description="Semantic search threshold")
     FUZZY_THRESHOLD: float = Field(default=0.2, description="Fuzzy search threshold")
+    ENTITY_MATCH_THRESHOLD: float = Field(
+        default=0.5,
+        description="word_similarity above which a query auto-routes to matching entity (speaker/tag/category)",
+    )
     MAX_SEARCH_RESULTS: int = Field(default=50, description="Maximum search results")
     MAX_AUTOCOMPLETE_RESULTS: int = Field(default=10, description="Maximum autocomplete results")
     EMBEDDING_BATCH_SIZE: int = Field(default=32, description="Batch size for embedding generation")
