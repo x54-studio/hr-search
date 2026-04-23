@@ -8,6 +8,8 @@ including batch operations for embedding generation.
 import asyncpg
 from typing import List, Dict
 
+from ..exceptions import ResourceNotFoundError
+
 
 class EmbeddingRepository:
     """Repository for embedding-related database operations."""
@@ -97,7 +99,11 @@ class EmbeddingRepository:
 
         result = await self._fetch_one(query, item_id, embedding_type)
         if not result:
-            raise ValueError(f"Embedding not found for item {item_id}")
+            raise ResourceNotFoundError(
+                f"Embedding not found for item {item_id}",
+                resource_type="embedding",
+                resource_id=item_id,
+            )
         return result
 
     async def delete_embeddings_by_item(self, item_id: str) -> None:

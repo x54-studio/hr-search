@@ -22,7 +22,7 @@ done
 
 # --- Backend ---
 source "$ROOT/backend/.venv/bin/activate"
-(cd "$ROOT/backend" && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000) &
+(cd "$ROOT/backend" && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload) &
 BACKEND_PID=$!
 echo "Backend starting (PID $BACKEND_PID)..."
 

@@ -5,12 +5,13 @@ from contextlib import asynccontextmanager
 import time
 import uuid
 from typing import List, Dict
-from .config import settings
+from .config import settings, ALLOWED_SOURCE_TYPES
 from .logging_config import setup_logging, get_logger, set_request_id, get_request_id
 from .exceptions import (
     SearchException,
     SearchError,
     ValidationError,
+    ResourceNotFoundError,
 )
 from .dependencies import (
     dependency_lifespan,
@@ -98,6 +99,8 @@ async def search_exception_handler(
     status_code = 500
     if isinstance(exc, ValidationError):
         status_code = 400
+    elif isinstance(exc, ResourceNotFoundError):
+        status_code = 404
     elif isinstance(exc, SearchError):
         if exc.details.get('search_type') in ['database', 'connection', 'timeout']:
             status_code = 503
@@ -373,14 +376,7 @@ async def search_endpoint(
     debug: bool = False,
     search_service: SearchService = Depends(get_search_service_dependency),
 ):
-    """Search endpoint with proper error handling."""
-    if limit < 1 or limit > 50:
-        raise ValidationError(
-            f"Limit must be between 1 and 50, got {limit}",
-            field="limit",
-            value=limit,
-        )
-
+    """Search endpoint. Bounds enforced in service layer."""
     try:
         search_response = await search_service.search(q, limit, debug)
 
@@ -418,14 +414,7 @@ async def autocomplete_endpoint(
     limit: int = 10,
     search_service: SearchService = Depends(get_search_service_dependency),
 ):
-    """Autocomplete endpoint with proper error handling."""
-    if limit < 1 or limit > 20:
-        raise ValidationError(
-            f"Limit must be between 1 and 20, got {limit}",
-            field="limit",
-            value=limit,
-        )
-
+    """Autocomplete endpoint. Bounds enforced in service layer."""
     try:
         suggestions = await search_service.autocomplete(q, limit)
 
@@ -458,7 +447,7 @@ async def get_config():
     """Public config for frontend (domain title, available source types, etc.)."""
     return {
         "title": settings.DOMAIN_TITLE,
-        "source_types": ["webinar", "youtube", "article", "paper"],
+        "source_types": list(ALLOWED_SOURCE_TYPES),
     }
 
 
@@ -478,7 +467,7 @@ async def get_item(
 
         return item
 
-    except SearchError:
+    except SearchException:
         raise
     except Exception as e:
         logger.error(
@@ -498,15 +487,11 @@ async def list_items(
     tags: str = Query(None),
     date_range: str = Query(None),
     source_type: str = Query(None),
-    offset: int = Query(0, ge=0),
-    limit: int = Query(
-        default=20,
-        ge=1,
-        le=100,
-    ),
+    offset: int = 0,
+    limit: int = 20,
     search_service: SearchService = Depends(get_search_service_dependency),
 ):
-    """List items endpoint with proper error handling."""
+    """List items endpoint. Bounds enforced in service layer."""
     try:
         tag_list = None
         if tags:
@@ -595,9 +580,7 @@ async def list_tags(
     limit: int = 50,
     search_service: SearchService = Depends(get_search_service_dependency),
 ) -> Dict[str, List[Dict]]:
-    """List tags endpoint with proper error handling."""
-    limit = max(1, min(limit, 100))
-
+    """List tags endpoint. Bounds enforced in service layer."""
     try:
         tags = await search_service.get_tags(limit)
 
@@ -624,9 +607,7 @@ async def list_popular_tags(
     limit: int = 20,
     search_service: SearchService = Depends(get_search_service_dependency),
 ) -> Dict[str, List[Dict]]:
-    """List popular tags endpoint with proper error handling."""
-    limit = max(1, min(limit, 50))
-
+    """List popular tags endpoint. Bounds enforced in service layer."""
     try:
         tags = await search_service.get_popular_tags(limit)
 
@@ -655,9 +636,7 @@ async def list_speakers(
     limit: int = 50,
     search_service: SearchService = Depends(get_search_service_dependency),
 ) -> Dict[str, List[Dict]]:
-    """List speakers endpoint with proper error handling."""
-    limit = max(1, min(limit, 100))
-
+    """List speakers endpoint. Bounds enforced in service layer."""
     try:
         speakers = await search_service.get_speakers(limit)
 

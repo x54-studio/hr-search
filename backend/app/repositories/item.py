@@ -9,6 +9,8 @@ import asyncpg
 from typing import List, Dict, Tuple, Optional
 from datetime import date, timedelta
 
+from ..exceptions import ResourceNotFoundError
+
 
 class ItemRepository:
     """Repository for item-related database operations."""
@@ -40,19 +42,36 @@ class ItemRepository:
             raise ValueError(f"Invalid date_range: {date_range}. Must be one of: last_30_days, last_90_days, last_365_days")
         return start_date, today
 
-    def _get_source_type_condition(self, source_type: Optional[str]) -> str:
+    def _build_filters(
+        self,
+        date_range: Optional[str],
+        source_type: Optional[str],
+        start_param: int,
+    ) -> Tuple[str, List]:
         """
-        Get SQL condition for source type filtering.
+        Build parameterized WHERE-clause fragment for optional filters.
 
         Args:
-            source_type: Source type string (e.g. 'webinar', 'youtube') or None
+            date_range: Optional date range key
+            source_type: Optional source_type value
+            start_param: Next available $N placeholder index
 
         Returns:
-            SQL WHERE condition string for source type filtering
+            (sql_fragment, params) — fragment starts with " AND ..." or "".
         """
+        fragment = ""
+        params: List = []
+        next_param = start_param
+        if date_range:
+            start_date, end_date = self._parse_date_range(date_range)
+            fragment += f" AND i.published_date >= ${next_param} AND i.published_date <= ${next_param + 1}"
+            params.extend([start_date, end_date])
+            next_param += 2
         if source_type:
-            return f" AND i.source_type = '{source_type}'"
-        return ""
+            fragment += f" AND i.source_type = ${next_param}"
+            params.append(source_type)
+            next_param += 1
+        return fragment, params
 
     async def _fetch(self, query: str, *args) -> List[Dict]:
         """Execute query and return results as list of dictionaries."""
@@ -194,7 +213,11 @@ class ItemRepository:
 
         result = await self._fetch_one(query, item_id)
         if not result:
-            raise ValueError(f"Item not found: {item_id}")
+            raise ResourceNotFoundError(
+                f"Item not found: {item_id}",
+                resource_type="item",
+                resource_id=item_id,
+            )
         return result
 
     async def get_by_category(
@@ -214,27 +237,19 @@ class ItemRepository:
         Returns:
             Tuple of (item_list, total_count)
         """
-        date_condition = ""
-        date_params = []
-        if date_range:
-            start_date, end_date = self._parse_date_range(date_range)
-            date_condition = " AND i.published_date >= $2 AND i.published_date <= $3"
-            date_params = [start_date, end_date]
-
-        type_condition = self._get_source_type_condition(source_type)
+        filter_sql, filter_params = self._build_filters(date_range, source_type, start_param=2)
 
         count_query = f"""
         SELECT COUNT(*)
         FROM items i
         JOIN categories c ON i.category_id = c.id
         WHERE c.slug = $1
-          AND i.status = 'published'{date_condition}{type_condition}
+          AND i.status = 'published'{filter_sql}
         """
-        count_args = [category_slug] + date_params
-        total_result = await self._fetch_one(count_query, *count_args)
+        total_result = await self._fetch_one(count_query, category_slug, *filter_params)
         total = total_result['count'] if total_result else 0
 
-        param_offset = 1 + len(date_params)
+        next_param = 2 + len(filter_params)
         data_query = f"""
         SELECT
             i.id, i.title, i.description, i.duration_ms, i.published_date,
@@ -249,14 +264,14 @@ class ItemRepository:
         LEFT JOIN item_tags it ON i.id = it.item_id
         LEFT JOIN tags t ON it.tag_id = t.id
         WHERE c.slug = $1
-          AND i.status = 'published'{date_condition}{type_condition}
+          AND i.status = 'published'{filter_sql}
         GROUP BY i.id, i.title, i.description, i.duration_ms, i.published_date,
                  i.source_url, i.source_type, i.metadata, c.name
         ORDER BY i.published_date DESC NULLS LAST
-        LIMIT ${param_offset + 1} OFFSET ${param_offset + 2}
+        LIMIT ${next_param} OFFSET ${next_param + 1}
         """
 
-        results = await self._fetch(data_query, category_slug, *date_params, limit, offset)
+        results = await self._fetch(data_query, category_slug, *filter_params, limit, offset)
         return results, int(total)
 
     async def get_by_speaker(
@@ -276,14 +291,7 @@ class ItemRepository:
         Returns:
             Tuple of (item_list, total_count)
         """
-        date_condition = ""
-        date_params = []
-        if date_range:
-            start_date, end_date = self._parse_date_range(date_range)
-            date_condition = " AND i.published_date >= $2 AND i.published_date <= $3"
-            date_params = [start_date, end_date]
-
-        type_condition = self._get_source_type_condition(source_type)
+        filter_sql, filter_params = self._build_filters(date_range, source_type, start_param=2)
 
         count_query = f"""
         SELECT COUNT(DISTINCT i.id)
@@ -291,13 +299,12 @@ class ItemRepository:
         JOIN item_speakers isp ON i.id = isp.item_id
         JOIN speakers s ON isp.speaker_id = s.id
         WHERE lower(s.name) LIKE '%' || lower($1) || '%'
-          AND i.status = 'published'{date_condition}{type_condition}
+          AND i.status = 'published'{filter_sql}
         """
-        count_args = [speaker_name] + date_params
-        total_result = await self._fetch_one(count_query, *count_args)
+        total_result = await self._fetch_one(count_query, speaker_name, *filter_params)
         total = total_result['count'] if total_result else 0
 
-        param_offset = 1 + len(date_params)
+        next_param = 2 + len(filter_params)
         data_query = f"""
         SELECT
             i.id, i.title, i.description, i.duration_ms, i.published_date,
@@ -312,14 +319,14 @@ class ItemRepository:
         LEFT JOIN item_tags it ON i.id = it.item_id
         LEFT JOIN tags t ON it.tag_id = t.id
         WHERE lower(s.name) LIKE '%' || lower($1) || '%'
-          AND i.status = 'published'{date_condition}{type_condition}
+          AND i.status = 'published'{filter_sql}
         GROUP BY i.id, i.title, i.description, i.duration_ms, i.published_date,
                  i.source_url, i.source_type, i.metadata, c.name
         ORDER BY i.published_date DESC NULLS LAST
-        LIMIT ${param_offset + 1} OFFSET ${param_offset + 2}
+        LIMIT ${next_param} OFFSET ${next_param + 1}
         """
 
-        results = await self._fetch(data_query, speaker_name, *date_params, limit, offset)
+        results = await self._fetch(data_query, speaker_name, *filter_params, limit, offset)
         return results, int(total)
 
     async def get_by_tags(
@@ -339,14 +346,7 @@ class ItemRepository:
         Returns:
             Tuple of (item_list, total_count)
         """
-        date_condition = ""
-        date_params = []
-        if date_range:
-            start_date, end_date = self._parse_date_range(date_range)
-            date_condition = " AND i.published_date >= $2 AND i.published_date <= $3"
-            date_params = [start_date, end_date]
-
-        type_condition = self._get_source_type_condition(source_type)
+        filter_sql, filter_params = self._build_filters(date_range, source_type, start_param=2)
 
         count_query = f"""
         SELECT COUNT(DISTINCT i.id)
@@ -354,13 +354,12 @@ class ItemRepository:
         JOIN item_tags it ON i.id = it.item_id
         JOIN tags t ON it.tag_id = t.id
         WHERE t.slug = ANY($1::text[])
-          AND i.status = 'published'{date_condition}{type_condition}
+          AND i.status = 'published'{filter_sql}
         """
-        count_args = [tag_slugs] + date_params
-        total_result = await self._fetch_one(count_query, *count_args)
+        total_result = await self._fetch_one(count_query, tag_slugs, *filter_params)
         total = total_result['count'] if total_result else 0
 
-        param_offset = 1 + len(date_params)
+        next_param = 2 + len(filter_params)
         data_query = f"""
         SELECT
             i.id, i.title, i.description, i.duration_ms, i.published_date,
@@ -375,14 +374,14 @@ class ItemRepository:
         LEFT JOIN item_speakers isp ON i.id = isp.item_id
         LEFT JOIN speakers s ON isp.speaker_id = s.id
         WHERE t.slug = ANY($1::text[])
-          AND i.status = 'published'{date_condition}{type_condition}
+          AND i.status = 'published'{filter_sql}
         GROUP BY i.id, i.title, i.description, i.duration_ms, i.published_date,
                  i.source_url, i.source_type, i.metadata, c.name
         ORDER BY i.published_date DESC NULLS LAST
-        LIMIT ${param_offset + 1} OFFSET ${param_offset + 2}
+        LIMIT ${next_param} OFFSET ${next_param + 1}
         """
 
-        results = await self._fetch(data_query, tag_slugs, *date_params, limit, offset)
+        results = await self._fetch(data_query, tag_slugs, *filter_params, limit, offset)
         return results, int(total)
 
     async def get_recent(
@@ -401,64 +400,36 @@ class ItemRepository:
         Returns:
             Tuple of (item_list, total_count)
         """
-        date_condition = ""
-        date_params = []
-        if date_range:
-            start_date, end_date = self._parse_date_range(date_range)
-            date_condition = " AND i.published_date >= $1 AND i.published_date <= $2"
-            date_params = [start_date, end_date]
-
-        type_condition = self._get_source_type_condition(source_type)
+        filter_sql, filter_params = self._build_filters(date_range, source_type, start_param=1)
 
         count_query = f"""
         SELECT COUNT(*)
         FROM items i
-        WHERE i.status = 'published'{date_condition}{type_condition}
+        WHERE i.status = 'published'{filter_sql}
         """
-        total_result = await self._fetch_one(count_query, *date_params) if date_params else await self._fetch_one(count_query)
+        total_result = await self._fetch_one(count_query, *filter_params)
         total = total_result['count'] if total_result else 0
 
-        if date_params:
-            data_query = f"""
-            SELECT
-                i.id, i.title, i.description, i.duration_ms, i.published_date,
-                i.source_url, i.source_type, i.metadata,
-                c.name as category_name,
-                array_agg(DISTINCT s.name) FILTER (WHERE s.name IS NOT NULL) as speakers,
-                array_agg(DISTINCT t.name) FILTER (WHERE t.name IS NOT NULL) as tags
-            FROM items i
-            LEFT JOIN categories c ON i.category_id = c.id
-            LEFT JOIN item_speakers isp ON i.id = isp.item_id
-            LEFT JOIN speakers s ON isp.speaker_id = s.id
-            LEFT JOIN item_tags it ON i.id = it.item_id
-            LEFT JOIN tags t ON it.tag_id = t.id
-            WHERE i.status = 'published'{date_condition}{type_condition}
-            GROUP BY i.id, i.title, i.description, i.duration_ms, i.published_date,
-                     i.source_url, i.source_type, i.metadata, c.name
-            ORDER BY i.published_date DESC NULLS LAST, i.created_at DESC
-            LIMIT $3 OFFSET $4
-            """
-            results = await self._fetch(data_query, *date_params, limit, offset)
-        else:
-            data_query = f"""
-            SELECT
-                i.id, i.title, i.description, i.duration_ms, i.published_date,
-                i.source_url, i.source_type, i.metadata,
-                c.name as category_name,
-                array_agg(DISTINCT s.name) FILTER (WHERE s.name IS NOT NULL) as speakers,
-                array_agg(DISTINCT t.name) FILTER (WHERE t.name IS NOT NULL) as tags
-            FROM items i
-            LEFT JOIN categories c ON i.category_id = c.id
-            LEFT JOIN item_speakers isp ON i.id = isp.item_id
-            LEFT JOIN speakers s ON isp.speaker_id = s.id
-            LEFT JOIN item_tags it ON i.id = it.item_id
-            LEFT JOIN tags t ON it.tag_id = t.id
-            WHERE i.status = 'published'{type_condition}
-            GROUP BY i.id, i.title, i.description, i.duration_ms, i.published_date,
-                     i.source_url, i.source_type, i.metadata, c.name
-            ORDER BY i.published_date DESC NULLS LAST, i.created_at DESC
-            LIMIT $1 OFFSET $2
-            """
-            results = await self._fetch(data_query, limit, offset)
+        next_param = 1 + len(filter_params)
+        data_query = f"""
+        SELECT
+            i.id, i.title, i.description, i.duration_ms, i.published_date,
+            i.source_url, i.source_type, i.metadata,
+            c.name as category_name,
+            array_agg(DISTINCT s.name) FILTER (WHERE s.name IS NOT NULL) as speakers,
+            array_agg(DISTINCT t.name) FILTER (WHERE t.name IS NOT NULL) as tags
+        FROM items i
+        LEFT JOIN categories c ON i.category_id = c.id
+        LEFT JOIN item_speakers isp ON i.id = isp.item_id
+        LEFT JOIN speakers s ON isp.speaker_id = s.id
+        LEFT JOIN item_tags it ON i.id = it.item_id
+        LEFT JOIN tags t ON it.tag_id = t.id
+        WHERE i.status = 'published'{filter_sql}
+        GROUP BY i.id, i.title, i.description, i.duration_ms, i.published_date,
+                 i.source_url, i.source_type, i.metadata, c.name
+        ORDER BY i.published_date DESC NULLS LAST, i.created_at DESC
+        LIMIT ${next_param} OFFSET ${next_param + 1}
+        """
+        results = await self._fetch(data_query, *filter_params, limit, offset)
 
         return results, int(total)

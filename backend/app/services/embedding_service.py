@@ -126,7 +126,7 @@ class EmbeddingService(LoggingMixin):
             for i in range(0, len(items), batch_size):
                 batch = items[i : i + batch_size]
 
-                texts = [f"{w['title']}. {w['description'] or ''}"[:100] for w in batch]
+                texts = [f"{item['title']}. {item['description'] or ''}" for item in batch]
 
                 loop = asyncio.get_event_loop()
                 embeddings = await loop.run_in_executor(

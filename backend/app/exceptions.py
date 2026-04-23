@@ -109,33 +109,6 @@ class SearchError(SearchException):
         )
 
 
-class DatabaseError(SearchException):
-    """
-    Exception raised for database-related errors.
-    
-    Maps to HTTP 503 Service Unavailable status code.
-    """
-    
-    def __init__(
-        self,
-        message: str,
-        operation: Optional[str] = None,
-        request_id: Optional[str] = None,
-        cause: Optional[Exception] = None,
-    ):
-        details = {}
-        if operation is not None:
-            details["operation"] = operation
-            
-        super().__init__(
-            message=message,
-            error_code="DATABASE_ERROR",
-            details=details,
-            request_id=request_id,
-            cause=cause,
-        )
-
-
 class ResourceNotFoundError(SearchException):
     """
     Exception raised when a requested resource is not found.
@@ -161,33 +134,6 @@ class ResourceNotFoundError(SearchException):
             error_code="RESOURCE_NOT_FOUND",
             details=details,
             request_id=request_id,
-        )
-
-
-class EmbeddingError(SearchException):
-    """
-    Exception raised for embedding/model-related errors.
-    
-    Maps to HTTP 503 Service Unavailable status code.
-    """
-    
-    def __init__(
-        self,
-        message: str,
-        model_name: Optional[str] = None,
-        request_id: Optional[str] = None,
-        cause: Optional[Exception] = None,
-    ):
-        details = {}
-        if model_name is not None:
-            details["model_name"] = model_name
-            
-        super().__init__(
-            message=message,
-            error_code="EMBEDDING_ERROR",
-            details=details,
-            request_id=request_id,
-            cause=cause,
         )
 
 

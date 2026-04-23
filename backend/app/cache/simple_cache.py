@@ -137,30 +137,46 @@ cache = SimpleCache(default_ttl=300, max_size=1000)
 
 def hash_args(args: tuple, kwargs: dict) -> str:
     """Generate hash for function arguments."""
-    # Convert args and kwargs to a consistent format
-    args_str = str(args)
+    args_str = json.dumps(args, sort_keys=True, default=str)
     kwargs_str = json.dumps(kwargs, sort_keys=True, default=str)
     combined = f"{args_str}:{kwargs_str}"
-    
-    # Generate hash
+
     return hashlib.md5(combined.encode()).hexdigest()[:16]
+
+
+def _is_method(func: Callable) -> bool:
+    """Return True if func's first parameter is 'self' or 'cls'."""
+    try:
+        params = list(inspect.signature(func).parameters)
+    except (TypeError, ValueError):
+        return False
+    return bool(params) and params[0] in ("self", "cls")
 
 
 def cached(ttl: int = 300, key_prefix: str = ""):
     """
     Decorator for caching function results.
-    
+
+    Skips the first positional arg when it is `self`/`cls`, so cache keys
+    don't depend on instance identity. FastAPI builds a fresh service per
+    request, and keying off `str(self)` (memory address) would miss every time.
+
     Args:
         ttl: Time-to-live in seconds
         key_prefix: Prefix for cache keys
     """
     def decorator(func: Callable):
+        skip_first = _is_method(func)
+        cache_name = f"{func.__module__}.{func.__qualname__}"
+
+        def _build_key(args: tuple, kwargs: dict) -> str:
+            key_args = args[1:] if skip_first else args
+            return f"{key_prefix}:{cache_name}:{hash_args(key_args, kwargs)}"
+
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
-            # Generate cache key from function name and arguments
-            args_hash = hash_args(args, kwargs)
-            cache_key = f"{key_prefix}:{func.__name__}:{args_hash}"
-            
+            cache_key = _build_key(args, kwargs)
+
             # Try to get from cache
             cached_value = cache.get(cache_key)
             if cached_value is not None:
@@ -169,7 +185,7 @@ def cached(ttl: int = 300, key_prefix: str = ""):
                     extra={"cache_key": cache_key[:50]}
                 )
                 return cached_value
-            
+
             # Call function and cache result
             logger.debug(
                 f"Cache miss for {func.__name__}",
@@ -178,12 +194,10 @@ def cached(ttl: int = 300, key_prefix: str = ""):
             result = await func(*args, **kwargs)
             cache.set(cache_key, result, ttl)
             return result
-        
+
         @wraps(func)
         def sync_wrapper(*args, **kwargs):
-            # Generate cache key from function name and arguments
-            args_hash = hash_args(args, kwargs)
-            cache_key = f"{key_prefix}:{func.__name__}:{args_hash}"
+            cache_key = _build_key(args, kwargs)
             
             # Try to get from cache
             cached_value = cache.get(cache_key)

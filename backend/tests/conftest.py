@@ -12,6 +12,15 @@ backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
 from app.config import settings
+from app.cache import cache
+
+
+@pytest.fixture(autouse=True)
+def _reset_cache():
+    """Clear the in-memory cache between tests so fixtures don't leak."""
+    cache.clear()
+    yield
+    cache.clear()
 
 
 @pytest.fixture(scope="session")
