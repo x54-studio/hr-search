@@ -4,6 +4,8 @@
 ## Overview
 Search system based on semantic similarity using vector embeddings with fuzzy matching fallback for typos.
 
+> **Note (current implementation):** the actual pipeline also has a **speaker-name gate** in front of semantic search — if the query's trigram similarity against the speaker list is ≥ `SPEAKER_NAME_THRESHOLD` (default 0.5), items for the matching speaker are returned directly. This avoids flat/random rankings when the user searches for a person (e.g. "Agnieszka Lewandowska"), which topical embeddings cannot distinguish. See `docs/04_implementation/SEARCH_IMPLEMENTATION.md` for the up-to-date pipeline. The code snippets below describe the original design (pre-gate, pre-`items` rename) and are kept for historical context.
+
 ## 1. Semantic Search (Primary)
 
 ### Embedding Model

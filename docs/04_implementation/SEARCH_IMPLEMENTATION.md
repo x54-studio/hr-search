@@ -6,17 +6,22 @@ The search functionality has been fully implemented according to the documented 
 
 ## Key Features Implemented
 
-### 1. Semantic Search (`search()`)
-- **Primary method**: Uses cosine similarity on vector embeddings
-- **Threshold**: 0.7 similarity score minimum
-- **Fallback**: If no semantic results, falls back to fuzzy search
-- **Model**: `paraphrase-multilingual-MiniLM-L12-v2` (Polish + English support)
+### 1. Search pipeline (`SearchService.search`)
 
-### 2. Fuzzy Search Fallback
-- **Method**: Uses PostgreSQL `pg_trgm` extension
-- **Threshold**: 0.3 similarity score minimum
-- **Features**: Handles typos and misspellings
-- **Normalization**: Uses `unaccent()` for Polish characters
+The query runs through this ordered pipeline. The first step that yields results short-circuits the rest.
+
+1. **Speaker-name gate** — Before anything else, match the query against speaker names with pg_trgm `word_similarity` (finds the best-matching *word window* inside the full name, so "agnies" hits "Agnieszka X" at ~0.7 instead of the ~0.2 a naive `similarity()` would give against a 20-char full name). If the top speaker ≥ `SPEAKER_NAME_THRESHOLD`, skip semantic/fuzzy and return items for every speaker above the threshold. Rationale: a name query like "Agnieszka Lewandowska" produces flat, near-random similarity against topical title embeddings, so routing it to speaker lookup avoids polluting results with unrelated authors.
+2. **Spell correction** — Title-level fuzzy search (pg_trgm) looks for a close title; if similarity > 0.85, the query words are replaced with the matching title words (`_extract_correction`).
+3. **Semantic search** — pgvector cosine similarity on `item_embeddings.vector` (threshold `SEMANTIC_THRESHOLD`, default 0.3). Model: `paraphrase-multilingual-MiniLM-L12-v2` (384-dim, Polish + English).
+4. **Fuzzy fallback** — If semantic returns zero rows, return the fuzzy results gathered in step 2.
+5. **Speaker-name fallback** — If still empty, as a last resort do the same speaker-name lookup as step 1 (this catches mid-confidence name matches below the gate).
+
+Thresholds live in `app/config.py` / `.env`: `SEMANTIC_THRESHOLD`, `FUZZY_THRESHOLD`, `SPEAKER_NAME_THRESHOLD`.
+
+### 2. Fuzzy matching
+- **Method**: PostgreSQL `pg_trgm` extension via the `similarity()` function
+- **Threshold**: `FUZZY_THRESHOLD` (default 0.2); lowered to 0.1 for queries shorter than 8 characters
+- **Features**: Handles typos, inflections, and Polish diacritics via `unaccent()`
 
 ### 3. Autocomplete (`autocomplete()`)
 - **Sources**: Webinars, speakers, and tags
